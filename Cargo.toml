@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "ks_render_map",
+    "cli",
+    "gui",
+]
+resolver = "2"

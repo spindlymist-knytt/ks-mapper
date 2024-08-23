@@ -1,0 +1,10 @@
+[package]
+name = "ks_render_map_cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+clap = { version = "4.5.16", features = ["derive"] }
+ks_render_map = { path = "../ks_render_map" }
+libks = { path = "../../libks/libks" }

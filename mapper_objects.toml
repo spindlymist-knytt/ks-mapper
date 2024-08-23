@@ -1,0 +1,1849 @@
+################################################################################
+# Bank 0 System
+################################################################################
+
+[0-1]
+is_anim_synced = true
+blend_mode = "Add"
+frame_range = { start = 0, end = 9 }
+
+[0-2]
+is_editor_only = true
+
+[0-3]
+is_anim_synced = true
+frame_range = { start = 0, end = 12 }
+
+[0-4]
+is_anim_synced = true
+frame_range = { start = 0, end = 8 }
+
+[0-5]
+is_anim_synced = true
+frame_range = { start = 0, end = 7 }
+
+[0-6]
+is_anim_synced = true
+frame_range = { start = 0, end = 6 }
+
+[0-7]
+is_anim_synced = true
+frame_range = { start = 0, end = 8 }
+
+[0-8]
+is_anim_synced = true
+frame_range = { start = 0, end = 8 }
+
+[0-10]
+is_anim_synced = true
+frame_range = { start = 0, end = 8 }
+
+[0-11]
+is_editor_only = true
+
+[0-12]
+is_editor_only = true
+
+[0-13]
+is_editor_only = true
+
+["0-14 Spot"]
+is_anim_synced = true
+blend_mode = "Add"
+frame_range = { start = 0, end = 9 }
+
+["0-14 Circle"]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+["0-15 Spot"]
+path = "Bank0/Object14_Spot.png"
+is_anim_synced = true
+blend_mode = "Add"
+frame_range = { start = 0, end = 9 }
+
+["0-15 Floor"]
+path = "Bank0/Object14_Floor.png"
+
+["0-15 Circle"]
+path = "Bank0/Object14_Circle.png"
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+["0-15 Square"]
+path = "Bank0/Object14_Square.png"
+
+["0-16 Spot"]
+path = "Bank0/Object14_Spot.png"
+is_anim_synced = true
+blend_mode = "Add"
+frame_range = { start = 0, end = 9 }
+
+["0-16 Floor"]
+path = "Bank0/Object14_Floor.png"
+
+["0-16 Circle"]
+path = "Bank0/Object14_Circle.png"
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+["0-16 Square"]
+path = "Bank0/Object14_Square.png"
+
+[0-17]
+is_editor_only = true
+
+[0-18]
+is_editor_only = true
+
+[0-19]
+is_editor_only = true
+
+[0-20]
+is_editor_only = true
+
+[0-25]
+is_editor_only = true
+
+[0-26]
+is_editor_only = true
+
+[0-27]
+is_editor_only = true
+
+[0-28]
+is_editor_only = true
+
+[0-29]
+is_editor_only = true
+
+[0-30]
+is_editor_only = true
+
+[0-31]
+is_editor_only = true
+
+["0-32 Spot"]
+is_anim_synced = true
+blend_mode = "Add"
+frame_range = { start = 0, end = 9 }
+
+["0-32 Circle"]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+["0-33 Spot"]
+path = "Bank0/Object32_Spot.png"
+is_anim_synced = true
+blend_mode = "Add"
+frame_range = { start = 0, end = 9 }
+
+["0-33 Floor"]
+path = "Bank0/Object32_Floor.png"
+
+["0-33 Circle"]
+path = "Bank0/Object32_Circle.png"
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+["0-33 Square"]
+path = "Bank0/Object32_Square.png"
+
+["0-34 Spot"]
+path = "Bank0/Object32_Spot.png"
+is_anim_synced = true
+blend_mode = "Add"
+frame_range = { start = 0, end = 9 }
+
+["0-34 Floor"]
+path = "Bank0/Object32_Floor.png"
+
+["0-34 Circle"]
+path = "Bank0/Object32_Circle.png"
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+["0-34 Square"]
+path = "Bank0/Object32_Square.png"
+
+[0-35]
+is_anim_synced = true
+frame_range = { start = 0, end = 8 }
+
+[0-36]
+is_editor_only = true
+
+[0-37]
+is_editor_only = true
+
+[0-38]
+is_editor_only = true
+
+[0-39]
+is_editor_only = true
+
+[0-40]
+is_editor_only = true
+
+[0-41]
+is_editor_only = true
+
+[0-42]
+is_editor_only = true
+
+[0-43]
+is_editor_only = true
+
+[0-44]
+is_editor_only = true
+
+[0-45]
+is_editor_only = true
+
+[0-46]
+is_editor_only = true
+
+[0-47]
+is_editor_only = true
+
+[0-48]
+is_editor_only = true
+
+[0-49]
+is_editor_only = true
+
+[0-247]
+is_editor_only = true
+
+[0-248]
+is_editor_only = true
+
+[0-249]
+is_editor_only = true
+
+[0-250]
+is_editor_only = true
+
+[0-251]
+is_editor_only = true
+
+[0-252]
+is_editor_only = true
+
+[0-253]
+is_editor_only = true
+
+[0-254]
+is_editor_only = true
+
+[0-255]
+is_editor_only = true
+
+################################################################################
+# Bank 1 Liquids
+################################################################################
+
+[1-5]
+frame_range = { start = 0, end = 39 }
+
+["1-5 Glow"]
+blend_mode = "Add"
+frame_size = [24, 96]
+offset = [0, -36]
+
+["1-10 Glow"]
+is_anim_synced = true
+blend_mode = "Add"
+frame_size = [24, 96]
+offset = [0, -36]
+
+["1-12 Glow"]
+is_anim_synced = true
+blend_mode = "Add"
+frame_size = [24, 96]
+offset = [0, -36]
+
+[1-18]
+blend_mode = "Add"
+
+["1-22 Glow"]
+is_anim_synced = true
+blend_mode = "Add"
+frame_size = [24, 72]
+offset = [0, -24]
+
+[1-23]
+blend_mode = "Add"
+
+[1-25]
+is_editor_only = true
+
+[1-26]
+is_editor_only = true
+
+[1-27]
+is_editor_only = true
+
+################################################################################
+# Bank 2 Flyers
+################################################################################
+
+[2-1]
+is_anim_synced = true
+
+[2-2]
+is_anim_synced = true
+
+[2-3]
+blend_mode = "Sub"
+frame_range = { start = 0, end = 1 }
+
+[2-4]
+blend_mode = "Sub"
+frame_range = { start = 0, end = 1 }
+
+[2-5]
+is_anim_synced = true
+
+[2-6]
+is_anim_synced = true
+
+[2-7]
+is_anim_synced = true
+
+[2-8]
+alpha_range = { start = 0, end = 255 }
+frame_range = { start = 0, end = 17 }
+
+[2-9]
+is_anim_synced = true
+
+[2-10]
+is_anim_synced = true
+
+[2-11]
+is_anim_synced = true
+
+[2-12]
+is_anim_synced = true
+frame_range = { start = 0, end = 10 }
+
+[2-13]
+alpha_range = { start = 0, end = 255 }
+
+[2-14]
+is_anim_synced = true
+
+[2-15]
+is_anim_synced = true
+
+[2-16]
+is_anim_synced = true
+
+[2-17]
+is_anim_synced = true
+
+["2-18 A"]
+is_anim_synced = true
+frame_range = { start = 0, end = 19 }
+
+["2-18 B"]
+is_anim_synced = true
+frame_range = { start = 0, end = 13 }
+
+["2-18 C"]
+is_anim_synced = true
+frame_range = { start = 0, end = 8 }
+
+["2-18 D"]
+is_anim_synced = true
+frame_range = { start = 0, end = 8 }
+
+["2-19 A"]
+is_anim_synced = true
+frame_range = { start = 0, end = 17 }
+
+["2-19 B"]
+is_anim_synced = true
+frame_range = { start = 0, end = 12 }
+
+["2-19 C"]
+is_anim_synced = true
+frame_range = { start = 0, end = 14 }
+
+["2-19 D"]
+is_anim_synced = true
+frame_range = { start = 0, end = 6 }
+
+[2-20]
+is_anim_synced = true
+
+[2-21]
+is_anim_synced = true
+
+[2-22]
+is_anim_synced = true
+
+[2-23]
+frame_range = { start = 0, end = 19 }
+
+[2-24]
+is_anim_synced = true
+frame_range = { start = 0, end = 4 }
+
+[2-25]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+[2-26]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+[2-27]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+[2-29]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+[2-30]
+frame_range = { start = 0, end = 19 }
+
+[2-32]
+is_anim_synced = true
+
+################################################################################
+# Bank 3 Knytt & Fluff
+################################################################################
+
+[3-4]
+frame_range = { start = 0, end = 7 }
+
+[3-5]
+frame_range = { start = 0, end = 1 }
+
+[3-6]
+frame_range = { start = 0, end = 7 }
+
+[3-13]
+frame_range = { start = 0, end = 17 }
+
+[3-22]
+frame_range = { start = 0, end = 7 }
+
+[3-25]
+frame_range = { start = 0, end = 1 }
+
+[3-27]
+frame_range = { start = 0, end = 23 }
+
+[3-30]
+is_anim_synced = true
+
+[3-33]
+frame_range = { start = 0, end = 7 }
+
+[3-39]
+frame_range = { start = 0, end = 23 }
+
+################################################################################
+# Bank 4 Meanies
+################################################################################
+
+[4-1]
+frame_range = { start = 0, end = 1 }
+
+[4-2]
+frame_range = { start = 0, end = 1 }
+
+[4-3]
+frame_range = { start = 0, end = 13 }
+
+[4-6]
+frame_range = { start = 0, end = 1 }
+
+[4-7]
+frame_range = { start = 0, end = 1 }
+
+[4-8]
+frame_range = { start = 0, end = 1 }
+
+[4-9]
+frame_size = [48, 24]
+frame_range = { start = 0, end = 1 }
+offset = [12, 0]
+
+[4-10]
+frame_range = { start = 0, end = 8 }
+
+[4-11]
+frame_range = { start = 0, end = 8 }
+
+[4-12]
+is_anim_synced = true
+
+[4-13]
+frame_range = { start = 0, end = 1 }
+
+[4-15]
+is_anim_synced = true
+
+[4-16]
+is_anim_synced = true
+frame_range = { start = 5, end = 13 }
+
+[4-18]
+frame_range = { start = 0, end = 4 }
+
+[4-19]
+frame_range = { start = 0, end = 6 }
+
+[4-20]
+frame_range = { start = 0, end = 6 }
+
+[4-21]
+frame_range = { start = 0, end = 12 }
+
+[4-22]
+frame_range = { start = 0, end = 12 }
+
+################################################################################
+# Bank 5 Shadow People
+################################################################################
+
+[5-1]
+frame_size = [24, 48]
+offset = [0, 12]
+
+[5-2]
+frame_size = [24, 48]
+offset = [0, 12]
+
+[5-3]
+frame_size = [24, 48]
+offset = [0, 12]
+
+################################################################################
+# Bank 6 Traps
+################################################################################
+
+[6-1]
+frame_size = [96, 24]
+offset = [36, 0]
+
+[6-5]
+frame_size = [48, 48]
+frame_range = { start = 0, end = 1 }
+offset = [12, -12]
+
+[6-6]
+blend_mode = "Add"
+frame_range = { start = 0, end = 8 }
+
+[6-7]
+frame_range = { start = 0, end = 1 }
+
+[6-8]
+frame_range = { start = 0, end = 1 }
+
+[6-9]
+frame_range = { start = 0, end = 1 }
+
+[6-10]
+frame_range = { start = 0, end = 1 }
+
+[6-11]
+frame_range = { start = 0, end = 1 }
+
+[6-12]
+frame_range = { start = 0, end = 1 }
+
+[6-13]
+frame_range = { start = 0, end = 1 }
+
+################################################################################
+# Bank 7 Nature FX
+################################################################################
+
+[7-1]
+is_editor_only = true
+
+[7-2]
+frame_range = { start = 0, end = 13 }
+
+[7-3]
+is_editor_only = true
+
+[7-5]
+alpha_range = { start = 0, end = 40 }
+frame_size = [20, 98]
+offset = [-2, 37]
+
+[7-6]
+is_editor_only = true
+
+[7-7]
+frame_range = { start = 0, end = 23 }
+
+[7-8]
+is_editor_only = true
+
+[7-9]
+frame_range = { start = 0, end = 5 }
+
+[7-10]
+is_editor_only = true
+
+[7-11]
+frame_range = { start = 0, end = 23 }
+
+[7-12]
+is_editor_only = true
+
+[7-13]
+frame_range = { start = 0, end = 23 }
+
+[7-14]
+is_editor_only = true
+
+[7-16]
+is_editor_only = true
+
+[7-17]
+is_editor_only = true
+
+################################################################################
+# Bank 8 Decoration
+################################################################################
+
+[8-1]
+is_anim_synced = true
+
+[8-2]
+is_anim_synced = true
+
+[8-3]
+is_anim_synced = true
+
+[8-4]
+is_anim_synced = true
+
+[8-5]
+is_anim_synced = true
+
+[8-6]
+blend_mode = "Add"
+
+[8-7]
+blend_mode = "Add"
+frame_size = [48, 24]
+offset = [12, 0]
+
+[8-8]
+blend_mode = "Add"
+
+[8-10]
+blend_mode = "Add"
+
+[8-12]
+is_anim_synced = true
+
+[8-13]
+frame_range = { start = 0, end = 13 }
+
+[8-15]
+frame_range = { start = 0, end = 5 }
+
+[8-16]
+is_editor_only = true
+
+[8-17]
+is_editor_only = true
+
+################################################################################
+# Bank 9 Flowers
+################################################################################
+
+[9-1]
+frame_range = { start = 0, end = 1 }
+
+[9-2]
+frame_range = { start = 0, end = 1 }
+
+[9-3]
+frame_range = { start = 0, end = 1 }
+
+[9-4]
+frame_range = { start = 0, end = 1 }
+
+[9-5]
+frame_range = { start = 0, end = 1 }
+
+################################################################################
+# Bank 10 Bouncers
+################################################################################
+
+[10-1]
+frame_range = { start = 3, end = 4 }
+
+[10-2]
+frame_range = { start = 3, end = 4 }
+
+[10-3]
+frame_range = { start = 3, end = 4 }
+
+[10-4]
+frame_range = { start = 0, end = 1 }
+
+[10-5]
+frame_range = { start = 0, end = 1 }
+
+[10-6]
+frame_range = { start = 0, end = 6 }
+
+[10-7]
+frame_range = { start = 0, end = 6 }
+
+[10-8]
+frame_range = { start = 3, end = 4 }
+
+[10-9]
+frame_range = { start = 0, end = 19 }
+
+[10-12]
+frame_range = { start = 0, end = 19 }
+
+[10-13]
+frame_range = { start = 0, end = 29 }
+
+################################################################################
+# Bank 11 Disks
+################################################################################
+
+[11-2]
+frame_range = { start = 4, end = 8 }
+
+[11-6]
+frame_range = { start = 4, end = 8 }
+
+[11-9]
+frame_range = { start = 4, end = 8 }
+
+################################################################################
+# Bank 12 Ghosts
+################################################################################
+
+[12-1]
+alpha_range = { start = 0, end = 96 }
+is_anim_synced = true
+
+[12-2]
+alpha_range = { start = 0, end = 96 }
+is_anim_synced = true
+
+[12-4]
+alpha_range = { start = 0, end = 96 }
+is_anim_synced = true
+
+[12-5]
+alpha_range = { start = 0, end = 56 }
+
+[12-6]
+alpha_range = { start = 0, end = 96 }
+frame_size = [48, 24]
+offset = [12, 0]
+
+[12-7]
+alpha_range = { start = 0, end = 96 }
+is_anim_synced = true
+
+[12-8]
+alpha_range = { start = 0, end = 96 }
+is_anim_synced = true
+
+[12-9]
+alpha_range = { start = 0, end = 96 }
+frame_size = [48, 24]
+offset = [12, 0]
+
+[12-10]
+frame_size = [48, 48]
+frame_range = { start = 0, end = 1 }
+offset = [12, -12]
+
+[12-11]
+alpha_range = { start = 0, end = 96 }
+is_anim_synced = true
+
+[12-12]
+alpha_range = { start = 0, end = 96 }
+frame_range = { start = 0, end = 1 }
+
+[12-13]
+alpha_range = { start = 0, end = 96 }
+
+[12-14]
+frame_size = [25, 72]
+offset= [0, 24]
+
+[12-15]
+alpha_range = { start = 0, end = 96 }
+
+[12-16]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+[12-17]
+is_editor_only = true
+
+[12-18]
+blend_mode = "Add"
+is_anim_synced = true
+
+[12-19]
+blend_mode = "Add"
+is_anim_synced = true
+
+[12-20]
+blend_mode = "Add"
+is_anim_synced = true
+
+[12-21]
+blend_mode = "Add"
+is_anim_synced = true
+
+################################################################################
+# Bank 13 Robots
+################################################################################
+
+[13-1]
+is_anim_synced = true
+frame_range = { start = 0, end = 6 }
+
+[13-2]
+is_anim_synced = true
+frame_range = { start = 0, end = 6 }
+
+[13-3]
+frame_size = [24, 96]
+frame_range = { start = 0, end = 1 }
+offset = [-7, 36]
+
+[13-4]
+frame_size = [48, 48]
+frame_range = { start = 0, end = 1 }
+offset = [12, 12]
+
+[13-6]
+is_anim_synced = true
+
+[13-7]
+is_anim_synced = true
+
+[13-8]
+is_anim_synced = true
+
+[13-9]
+is_anim_synced = true
+
+[13-10]
+is_anim_synced = true
+
+[13-11]
+is_anim_synced = true
+
+[13-12]
+is_anim_synced = true
+
+[13-13]
+is_anim_synced = true
+
+[13-14]
+is_anim_synced = true
+
+################################################################################
+# Bank 14 Earth Beings
+################################################################################
+
+[14-2]
+is_anim_synced = true
+
+[14-8]
+is_anim_synced = true
+
+[14-10]
+frame_range = { start = 0, end = 17 }
+
+[14-11]
+is_anim_synced = true
+
+[14-16]
+frame_size = [120, 72]
+frame_range = { start = 0, end = 4 }
+offset = [0, -24]
+
+[14-17]
+is_anim_synced = true
+
+[14-18]
+frame_size = [120, 72]
+frame_range = { start = 0, end = 4 }
+offset = [0, 24]
+
+[14-19]
+frame_range = { start = 5, end = 6 }
+
+[14-20]
+frame_range = { start = 5, end = 6 }
+
+[14-21]
+is_anim_synced = true
+frame_range = { start = 1, end = 5 }
+
+[14-22]
+is_anim_synced = true
+frame_range = { start = 1, end = 5 }
+
+[14-23]
+is_anim_synced = true
+frame_range = { start = 1, end = 5 }
+
+[14-24]
+is_anim_synced = true
+frame_range = { start = 1, end = 5 }
+
+################################################################################
+# Bank 15 Objects & Areas
+################################################################################
+
+[15-5]
+blend_mode = "Add"
+
+[15-6]
+is_editor_only = true
+
+[15-7]
+is_anim_synced = true
+
+[15-8]
+path = "Bank15/Object1.png"
+
+[15-9]
+path = "Bank15/Object2.png"
+
+[15-10]
+path = "Bank15/Object3.png"
+
+[15-11]
+path = "Bank15/Object4.png"
+
+[15-13]
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-14]
+path = "Bank15/Object13.png"
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-15]
+path = "Bank15/Object13.png"
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-16]
+path = "Bank15/Object13.png"
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-17]
+path = "Bank15/Object13.png"
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-18]
+path = "Bank15/Object13.png"
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-19]
+path = "Bank15/Object13.png"
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-20]
+path = "Bank15/Object13.png"
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-21]
+path = "Bank15/Object13.png"
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-22]
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-25]
+alpha_range = { start = 0, end = 80 }
+
+[15-26]
+frame_size = [24, 48]
+offset = [0, 12]
+
+[15-31]
+frame_range = { start = 0, end = 10 }
+
+[15-32]
+frame_range = { start = 0, end = 10 }
+
+[15-33]
+frame_range = { start = 0, end = 10 }
+
+[15-34]
+frame_range = { start = 0, end = 10 }
+
+[15-35]
+frame_range = { start = 0, end = 10 }
+
+[15-36]
+frame_range = { start = 0, end = 10 }
+
+[15-38]
+path = "Bank15/Object4.png"
+
+################################################################################
+# Bank 16 Invisible
+################################################################################
+
+[16-1]
+is_editor_only = true
+
+[16-2]
+is_editor_only = true
+
+[16-3]
+is_editor_only = true
+
+[16-4]
+is_editor_only = true
+
+[16-5]
+is_editor_only = true
+
+[16-6]
+is_editor_only = true
+
+[16-7]
+is_editor_only = true
+
+[16-8]
+is_editor_only = true
+
+[16-9]
+is_editor_only = true
+
+[16-10]
+is_editor_only = true
+
+[16-11]
+is_editor_only = true
+
+[16-12]
+is_editor_only = true
+
+[16-13]
+is_editor_only = true
+
+[16-14]
+is_editor_only = true
+
+[16-15]
+is_editor_only = true
+
+[16-16]
+is_editor_only = true
+
+[16-17]
+is_editor_only = true
+
+[16-18]
+is_editor_only = true
+
+[16-19]
+is_editor_only = true
+
+[16-20]
+is_editor_only = true
+
+[16-21]
+is_editor_only = true
+
+[16-22]
+is_editor_only = true
+
+[16-23]
+is_editor_only = true
+
+[16-24]
+is_editor_only = true
+
+[16-25]
+is_editor_only = true
+
+[16-26]
+is_editor_only = true
+
+[16-27]
+is_editor_only = true
+
+[16-28]
+is_editor_only = true
+
+[16-29]
+is_editor_only = true
+
+[16-30]
+is_editor_only = true
+
+################################################################################
+# Bank 17 Creepy
+################################################################################
+
+[17-1]
+is_anim_synced = true
+frame_range = { start = 6, end = 13 }
+
+[17-2]
+frame_range = { start = 0, end = 7 }
+
+[17-3]
+is_anim_synced = true # synced with 18-6
+frame_size = [24, 48]
+frame_range = { start = 0, end = 16 }
+offset = [0, 12]
+
+[17-4]
+frame_range = { start = 0, end = 1 }
+
+[17-5]
+frame_range = { start = 0, end = 1 }
+
+[17-6]
+is_anim_synced = true
+
+[17-7]
+is_anim_synced = true
+frame_range = { start = 0, end = 17 }
+
+[17-8]
+frame_range = { start = 0, end = 6 }
+
+[17-9]
+frame_range = { start = 0, end = 6 }
+
+[17-10]
+frame_size = [120, 72]
+frame_range = { start = 0, end = 4 }
+offset = [0, -24]
+
+[17-11]
+frame_size = [72, 120]
+frame_range = { start = 0, end = 4 }
+offset = [24, 0]
+
+[17-12]
+frame_size = [72, 120]
+frame_range = { start = 0, end = 4 }
+offset = [-24, 0]
+
+################################################################################
+# Bank 18 Water Creatures
+################################################################################
+
+[18-1]
+is_anim_synced = true
+
+[18-2]
+is_anim_synced = true
+
+[18-3]
+is_anim_synced = true
+
+[18-4]
+is_anim_synced = true
+
+[18-5]
+is_anim_synced = true
+
+[18-6]
+is_anim_synced = true # synced with 17-3
+frame_size = [24, 48]
+frame_range = { start = 0, end = 16 }
+offset = [0, 12]
+
+################################################################################
+# Bank 19 Collectables
+################################################################################
+
+### Golden Creatures
+
+[19-1]
+is_anim_synced = true
+
+[19-2]
+is_anim_synced = true
+
+[19-3]
+is_anim_synced = true
+
+[19-4]
+alpha_range = { start = 0, end = 255 }
+
+[19-5]
+is_anim_synced = true
+
+[19-6]
+is_anim_synced = true
+
+[19-7]
+is_anim_synced = true
+
+[19-8]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+[19-10]
+is_anim_synced = true
+frame_range = { start = 0, end = 1 }
+
+[19-11]
+frame_range = { start = 0, end = 19 }
+
+[19-13]
+frame_range = { start = 0, end = 1 }
+
+[19-14]
+frame_range = { start = 0, end = 7 }
+
+[19-20]
+frame_range = { start = 0, end = 1 }
+
+[19-24]
+frame_range = { start = 0, end = 1 }
+
+[19-25]
+frame_range = { start = 0, end = 8 }
+
+[19-26]
+is_anim_synced = true
+
+[19-27]
+is_anim_synced = true
+frame_range = { start = 5, end = 13 }
+
+[19-28]
+frame_range = { start = 0, end = 4 }
+
+[19-29]
+frame_range = { start = 0, end = 6 }
+
+[19-30]
+frame_range = { start = 0, end = 12 }
+
+[19-31]
+frame_size = [48, 48]
+frame_range = { start = 0, end = 1 }
+offset = [12, -12]
+
+[19-32]
+frame_range = { start = 0, end = 1 }
+
+[19-33]
+frame_range = { start = 0, end = 1 }
+
+[19-34]
+frame_range = { start = 0, end = 1 }
+
+[19-35]
+frame_range = { start = 0, end = 1 }
+
+[19-36]
+frame_range = { start = 0, end = 1 }
+
+[19-37]
+frame_range = { start = 0, end = 29 }
+
+[19-38]
+frame_range = { start = 4, end = 8 }
+
+[19-40]
+frame_range = { start = 4, end = 8 }
+
+[19-41]
+is_anim_synced = true
+
+[19-42]
+is_anim_synced = true
+
+[19-43]
+frame_range = { start = 0, end = 17 }
+
+[19-46]
+frame_range = { start = 5, end = 6 }
+
+[19-47]
+is_anim_synced = true
+frame_range = { start = 1, end = 5 }
+
+[19-48]
+is_anim_synced = true
+frame_range = { start = 6, end = 13 }
+
+[19-50]
+frame_size = [24, 48]
+frame_range = { start = 0, end = 16 }
+offset = [0, 12]
+
+### Coins
+
+[19-51]
+is_anim_synced = true
+
+[19-52]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-53]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-54]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-55]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-56]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-57]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-58]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-59]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-60]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-61]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-62]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-63]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-64]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-65]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-66]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-67]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-68]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-69]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-70]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-71]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-72]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-73]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-74]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-75]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-76]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-77]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-78]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-79]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-80]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-81]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-82]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-83]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-84]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-85]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-86]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-87]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-88]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-89]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-90]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-91]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-92]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-93]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-94]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-95]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-96]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-97]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-98]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-99]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-100]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-101]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-102]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-103]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-104]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-105]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-106]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-107]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-108]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-109]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-110]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-111]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-112]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-113]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-114]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-115]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-116]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-117]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-118]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-119]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-120]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-121]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-122]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-123]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-124]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-125]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-126]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-127]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-128]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-129]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-130]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-131]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-132]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-133]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-134]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-135]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-136]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-137]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-138]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-139]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-140]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-141]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-142]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-143]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-144]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-145]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-146]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-147]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-148]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-149]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+[19-150]
+path = "Bank19/Object51.png"
+is_anim_synced = true
+
+##### Red Artifacts
+
+[19-152]
+path = "Bank19/Object151.png"
+
+[19-153]
+path = "Bank19/Object151.png"
+
+[19-154]
+path = "Bank19/Object151.png"
+
+[19-155]
+path = "Bank19/Object151.png"
+
+[19-156]
+path = "Bank19/Object151.png"
+
+[19-157]
+path = "Bank19/Object151.png"
+
+##### Yellow Artifacts
+
+[19-159]
+path = "Bank19/Object158.png"
+
+[19-160]
+path = "Bank19/Object158.png"
+
+[19-161]
+path = "Bank19/Object158.png"
+
+[19-162]
+path = "Bank19/Object158.png"
+
+[19-163]
+path = "Bank19/Object158.png"
+
+[19-164]
+path = "Bank19/Object158.png"
+
+##### Blue Artifacts
+
+[19-166]
+path = "Bank19/Object165.png"
+
+[19-167]
+path = "Bank19/Object165.png"
+
+[19-168]
+path = "Bank19/Object165.png"
+
+[19-169]
+path = "Bank19/Object165.png"
+
+[19-170]
+path = "Bank19/Object165.png"
+
+[19-171]
+path = "Bank19/Object165.png"
+
+##### Purple Artifacts
+
+[19-173]
+path = "Bank19/Object172.png"
+
+[19-174]
+path = "Bank19/Object172.png"
+
+[19-175]
+path = "Bank19/Object172.png"
+
+[19-176]
+path = "Bank19/Object172.png"
+
+[19-177]
+path = "Bank19/Object172.png"
+
+[19-178]
+path = "Bank19/Object172.png"
+
+##### Green Artifacts
+
+[19-180]
+path = "Bank19/Object179.png"
+
+[19-181]
+path = "Bank19/Object179.png"
+
+[19-182]
+path = "Bank19/Object179.png"
+
+[19-183]
+path = "Bank19/Object179.png"
+
+[19-184]
+path = "Bank19/Object179.png"
+
+[19-185]
+path = "Bank19/Object179.png"
+
+##### Pink Artifacts
+
+[19-187]
+path = "Bank19/Object186.png"
+
+[19-188]
+path = "Bank19/Object186.png"
+
+[19-189]
+path = "Bank19/Object186.png"
+
+[19-190]
+path = "Bank19/Object186.png"
+
+[19-191]
+path = "Bank19/Object186.png"
+
+[19-192]
+path = "Bank19/Object186.png"
+
+##### Cyan Artifacts
+
+[19-194]
+path = "Bank19/Object193.png"
+
+[19-195]
+path = "Bank19/Object193.png"
+
+[19-196]
+path = "Bank19/Object193.png"
+
+[19-197]
+path = "Bank19/Object193.png"
+
+[19-198]
+path = "Bank19/Object193.png"
+
+[19-199]
+path = "Bank19/Object193.png"
