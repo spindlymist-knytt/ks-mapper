@@ -994,21 +994,27 @@ frame_size = [24, 48]
 offset = [0, 12]
 
 [15-31]
+is_anim_synced = true
 frame_range = { start = 0, end = 10 }
 
 [15-32]
+is_anim_synced = true
 frame_range = { start = 0, end = 10 }
 
 [15-33]
+is_anim_synced = true
 frame_range = { start = 0, end = 10 }
 
 [15-34]
+is_anim_synced = true
 frame_range = { start = 0, end = 10 }
 
 [15-35]
+is_anim_synced = true
 frame_range = { start = 0, end = 10 }
 
 [15-36]
+is_anim_synced = true
 frame_range = { start = 0, end = 10 }
 
 [15-38]

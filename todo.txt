@@ -22,3 +22,5 @@ Custom powers (the all-in-one version) are not implemented.
 Custom coins and artifacts aren't either.
 Tints aren't implemented.
 When an OCO requires an offset (14:16 and 18, and 17:10-12), you have to subtract the toml offset from the one in World.ini.
+OCOs of lava and water don't have liquid lights (1:5, 10, 12, and 15).
+Duplicates of custom golden creatures are visible.
