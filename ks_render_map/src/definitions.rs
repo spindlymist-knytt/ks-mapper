@@ -96,22 +96,15 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         let anim_repeat: u32 = section.get("Init AnimRepeat")
             .and_then(|v| str::parse(v).ok())
             .unwrap_or(0);
-
-        let frame_range = match (anim_repeat, anim_to) {
-            (0, Some(anim_to)) => anim_loop_back..anim_to + 1,
-            (_, Some(_)) => anim_from..anim_from + 1,
-            _ => 0..1,
-        };
-        let mut frame_range = Some(frame_range);
-
-        let mut is_anim_synced = true;
-
-        // OCOs
-
         let bank = section.get("Bank")
             .and_then(|v| str::parse(v).ok());
         let object = section.get("Object")
             .and_then(|v| str::parse(v).ok());
+
+        // OCOs
+        
+        let frame_range;
+        let is_anim_synced;
 
         if let (Some(bank), Some(obj)) = (bank, object) {
             let oco_id = ObjectId(Tile(bank, obj), None);
@@ -129,6 +122,14 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
                 offset_x = 0;
                 offset_y = 0;
             }
+        }
+        else {
+            frame_range = match (anim_repeat, anim_to) {
+                (0, Some(anim_to)) => Some(anim_loop_back..anim_to + 1),
+                (_, Some(_)) => Some(anim_from..anim_from + 1),
+                _ => Some(0..1),
+            };
+            is_anim_synced = true;
         }
 
         let draw = DrawParams {

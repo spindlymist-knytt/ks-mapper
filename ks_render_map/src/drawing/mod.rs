@@ -336,7 +336,7 @@ fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: u32) -
         }
         else if params.is_anim_synced {
             let n_frames = frame_range.end - frame_range.start;
-            anim_t % n_frames
+            (anim_t % n_frames) + frame_range.start
         }
         else {
             thread_rng().gen_range(frame_range)
