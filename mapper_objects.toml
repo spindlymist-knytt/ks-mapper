@@ -1246,6 +1246,10 @@ frame_range = { start = 0, end = 7 }
 [19-20]
 frame_range = { start = 0, end = 1 }
 
+[19-23]
+is_anim_synced = true
+frame_range = { start = 0, end = 6 }
+
 [19-24]
 frame_range = { start = 0, end = 1 }
 
