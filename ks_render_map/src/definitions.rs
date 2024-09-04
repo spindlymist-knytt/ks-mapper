@@ -7,6 +7,13 @@ use serde::Deserialize;
 
 use crate::drawing::BlendMode;
 
+#[derive(Debug, Clone, Copy, Default, Deserialize)]
+pub enum OffsetCombine {
+    #[default]
+    Add,
+    Replace,
+}
+
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct ObjectDef {
     #[serde(default)]
@@ -18,6 +25,8 @@ pub struct ObjectDef {
     pub override_of: Option<Tile>,
     #[serde(flatten)]
     pub draw_params: DrawParams,
+    #[serde(default)]
+    pub offset_combine: OffsetCombine,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -128,8 +137,13 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
                 is_anim_synced = oco_def.draw_params.is_anim_synced;
                 frame_range = oco_def.draw_params.frame_range.clone();
                 if let Some(offset) = oco_def.draw_params.offset {
-                    offset_x += offset.0;
-                    offset_y += offset.1;
+                    match oco_def.offset_combine {
+                        OffsetCombine::Add => {
+                            offset_x += offset.0;
+                            offset_y += offset.1;
+                        },
+                        OffsetCombine::Replace => {},
+                    }
                 }
             }
             else {
@@ -164,6 +178,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
             path: Some(path.to_owned()),
             override_of,
             draw_params: draw,
+            offset_combine: OffsetCombine::Replace,
         };
 
         defs.insert(ObjectId(tile, None), def);

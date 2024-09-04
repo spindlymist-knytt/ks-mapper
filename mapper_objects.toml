@@ -891,6 +891,7 @@ is_anim_synced = true
 frame_size = [120, 72]
 frame_range = { start = 0, end = 4 }
 offset = [0, -24]
+offset_combine = "Replace"
 
 [14-17]
 is_anim_synced = true
@@ -899,6 +900,7 @@ is_anim_synced = true
 frame_size = [120, 72]
 frame_range = { start = 0, end = 4 }
 offset = [0, 24]
+offset_combine = "Replace"
 
 [14-19]
 frame_range = { start = 5, end = 6 }
@@ -1163,16 +1165,19 @@ frame_range = { start = 0, end = 6 }
 frame_size = [120, 72]
 frame_range = { start = 0, end = 4 }
 offset = [0, -24]
+offset_combine = "Replace"
 
 [17-11]
 frame_size = [72, 120]
 frame_range = { start = 0, end = 4 }
 offset = [24, 0]
+offset_combine = "Replace"
 
 [17-12]
 frame_size = [72, 120]
 frame_range = { start = 0, end = 4 }
 offset = [-24, 0]
+offset_combine = "Replace"
 
 ################################################################################
 # Bank 18 Water Creatures
