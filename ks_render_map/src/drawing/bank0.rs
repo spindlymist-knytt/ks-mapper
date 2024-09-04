@@ -6,14 +6,14 @@ use super::{
 
 #[inline]
 pub fn draw_bank_0_object(ctx: &mut DrawContext, curs: Cursor) -> Result<()> {
-    match curs.tile.1 {
+    match curs.proxy_id.0.1 {
         14 => draw_shift(ctx, curs, "ShiftVisible(A)", "ShiftType(A)"),
         15 => draw_shift(ctx, curs, "ShiftVisible(B)", "ShiftType(B)"),
         16 => draw_shift(ctx, curs, "ShiftVisible(C)", "ShiftType(C)"),
         32 => draw_shift(ctx, curs, "TrigVisible(A)", "TrigType(A)"),
         33 => draw_shift(ctx, curs, "TrigVisible(B)", "TrigType(B)"),
         34 => draw_shift(ctx, curs, "TrigVisible(C)", "TrigType(C)"),
-        _ => draw_object(ctx, curs),
+        _ => draw_object(ctx, curs.i, curs.actual_id),
     }
 }
 
@@ -40,5 +40,5 @@ fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &s
         _ => "Spot",
     };
 
-    draw_object(ctx, curs.into_variant(shift_type))
+    draw_object(ctx, curs.i, curs.proxy_id.into_variant(shift_type))
 }

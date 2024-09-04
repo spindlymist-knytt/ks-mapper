@@ -104,34 +104,22 @@ impl GraphicsLoader {
         Ok(image)
     }
 
-    pub fn stock_object(&mut self, id: &ObjectId) -> Result<Option<Rc<RgbaImage>>> {
+    pub fn object(&mut self, id: &ObjectId) -> Result<Option<Rc<RgbaImage>>> {
         let image = match self.objects.get(id) {
             Some(cached) => cached.as_ref().map(Rc::clone),
             None => {
                 let def = self.object_defs.get(&id);
-                let cached = load_stock_object(&self.paths, id, def)?
-                    .map(Rc::new);
-                let image = cached.as_ref().map(Rc::clone);
-                self.objects.insert(id.clone(), cached);
 
-                image
-            }
-        };
+                let cached =
+                    if id.0.0 >= 254 {
+                        load_custom_object(&self.paths, def)?
+                            .map(Rc::new)
+                    }
+                    else {
+                        load_stock_object(&self.paths, id, def)?
+                            .map(Rc::new)
+                    };
 
-        Ok(image)
-    }
-
-    pub fn custom_object(&mut self, tile: Tile) -> Result<Option<Rc<RgbaImage>>> {
-        let id = ObjectId(tile, None);
-        let image = match self.objects.get(&id) {
-            Some(cached) => cached.as_ref().map(Rc::clone),
-            None => {
-                let cached = self.object_defs.get(&id)
-                    .map_or(
-                        Ok(None),
-                        |def| load_custom_object(&self.paths, def)
-                    )?
-                    .map(Rc::new);
                 let image = cached.as_ref().map(Rc::clone);
                 self.objects.insert(id.clone(), cached);
 
@@ -226,10 +214,15 @@ fn load_stock_object(
     ], MAGENTA, true)
 }
 
-fn load_custom_object(paths: &Paths, obj_def: &ObjectDef) -> Result<Option<RgbaImage>> {
-    let Some(object_path) = obj_def.path.as_ref() else {
-        return Ok(None)
+fn load_custom_object(paths: &Paths, def: Option<&ObjectDef>) -> Result<Option<RgbaImage>> {
+    let Some(def) = def else {
+        return Ok(None);
     };
+
+    let Some(object_path) = def.path.as_ref() else {
+        return Ok(None);
+    }; 
+
     let image_path = paths.custom_objects.join(object_path);
 
     try_load_image(&image_path, BLACK, false)

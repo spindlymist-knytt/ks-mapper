@@ -53,27 +53,10 @@ pub struct DrawOptions {
 #[derive(Debug, Clone)]
 struct Cursor {
     i: usize,
-    tile: Tile,
-    variant: Option<String>,
-}
-
-impl Cursor {
-    fn into_variant(mut self, variant: &str) -> Self {
-        self.variant = Some(variant.to_owned());
-        self
-    }
-
-    fn with_variant(&self, variant: &str) -> Self {
-        Self {
-            i: self.i,
-            tile: self.tile,
-            variant: Some(variant.to_owned())
-        }
-    }
-
-    fn to_object_id(&self) -> ObjectId {
-        ObjectId(self.tile, self.variant.clone())
-    }
+    actual_id: ObjectId,
+    proxy_id: ObjectId,
+    // tile: Tile,
+    // variant: Option<String>,
 }
 
 pub fn draw_partitions(
@@ -241,25 +224,33 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
             continue;
         }
 
-        let curs = Cursor {
-            i,
-            tile: *tile,
-            variant: None,
-        };
+        let actual_id = ObjectId(*tile, None);
+        let object_def = ctx.gfx.object_def(&actual_id);
 
         if !ctx.opts.editor_only
-            && ctx.gfx.object_def(&curs.to_object_id()).is_some_and(|object| object.is_editor_only)
+            && object_def.is_some_and(|object| object.is_editor_only)
         {
             continue;
         }
 
-        match tile {
+        let proxy_id = {
+            let tile = object_def.and_then(|def| def.override_of)
+                .unwrap_or(*tile);
+            ObjectId(tile, None)
+        };
+
+        let curs = Cursor {
+            i,
+            actual_id,
+            proxy_id,
+        };
+
+        match curs.proxy_id.0 {
             Tile(0, _) => bank0::draw_bank_0_object(ctx, curs)?,
             Tile(1, _) => bank1::draw_bank_1_object(ctx, curs)?,
             Tile(2, _) => bank2::draw_bank_2_object(ctx, curs)?,
             Tile(8, _) => bank8::draw_bank_8_object(ctx, curs)?,
-            Tile(254..=255, _) => draw_custom_object(ctx, curs)?,
-            _ => draw_object(ctx, curs)?,
+            _ => draw_object(ctx, curs.i, curs.actual_id)?,
         }
     }
 
@@ -267,36 +258,25 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
 }
 
 #[inline]
-fn draw_object(ctx: &mut DrawContext, curs: Cursor) -> Result<()> {
-    let draw_params = ctx.gfx.object_def(&curs.to_object_id())
+fn draw_object(ctx: &mut DrawContext, at_index: usize, object: ObjectId) -> Result<()> {
+    let draw_params = ctx.gfx.object_def(&object)
         .map_or_else(Default::default, |def| def.draw_params.clone());
-    draw_object_with_params(ctx, curs, &draw_params)
+
+    draw_object_with_params(ctx, at_index, object, &draw_params)
 }
 
 #[inline]
-fn draw_object_with_params(ctx: &mut DrawContext, curs: Cursor, params: &DrawParams) -> Result<()> {
-    if let Some(obj_image) = ctx.gfx.stock_object(&curs.to_object_id())? {
-        draw_spritesheet(ctx, curs.i as u8, params, ctx.sync.anim_t, obj_image);
+fn draw_object_with_params(ctx: &mut DrawContext, at_index: usize, object: ObjectId, params: &DrawParams) -> Result<()> {
+    if let Some(obj_image) = ctx.gfx.object(&object)? {
+        draw_spritesheet(ctx, at_index as u8, params, ctx.sync.anim_t, obj_image);
     }
 
     Ok(())
 }
 
-#[inline]
-fn draw_custom_object(ctx: &mut DrawContext, curs: Cursor) -> Result<()> {
-    let draw_params = ctx.gfx.object_def(&curs.to_object_id())
-        .map_or_else(Default::default, |def| def.draw_params.clone());
-
-    if let Some(obj_image) = ctx.gfx.custom_object(curs.tile)? {
-        draw_spritesheet(ctx, curs.i as u8, &draw_params, ctx.sync.anim_t, obj_image);
-    }
-
-    Ok(())
-}
-
-fn draw_spritesheet(ctx: &mut DrawContext, screen_index: u8, params: &DrawParams, anim_t: u32, obj_img: Rc<RgbaImage>) {
+fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, anim_t: u32, obj_img: Rc<RgbaImage>) {
     let frame = pick_frame(&obj_img, params, anim_t);
-    let (screen_x, screen_y) = screen_index_to_pixels(screen_index);
+    let (screen_x, screen_y) = screen_index_to_pixels(at_index);
     let (offset_x, offset_y) = params.offset.unwrap_or_default();
 
     let (final_x, final_y) = match params.frame_size {

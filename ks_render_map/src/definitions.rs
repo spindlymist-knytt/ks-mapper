@@ -14,6 +14,8 @@ pub struct ObjectDef {
     // #[serde(default)]
     // pub is_custom_object: bool,
     pub path: Option<String>,
+    #[serde(skip)]
+    pub override_of: Option<Tile>,
     #[serde(flatten)]
     pub draw_params: DrawParams,
 }
@@ -32,6 +34,17 @@ pub struct DrawParams {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ObjectId(pub Tile, pub Option<String>);
+
+impl ObjectId {
+    pub fn into_variant(mut self, variant: &str) -> Self {
+        self.1 = Some(variant.to_owned());
+        self
+    }
+
+    pub fn with_variant(&self, variant: &str) -> Self {
+        Self(self.0, Some(variant.to_owned()))
+    }
+}
 
 pub fn load_object_defs(path: impl AsRef<Path>) -> Result<HashMap<ObjectId, ObjectDef>> {
     let mut objects = HashMap::<ObjectId, ObjectDef>::new();
@@ -105,9 +118,12 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         
         let frame_range;
         let is_anim_synced;
+        let override_of;
 
         if let (Some(bank), Some(obj)) = (bank, object) {
+            override_of = Some(Tile(bank, obj));
             let oco_id = ObjectId(Tile(bank, obj), None);
+
             if let Some(oco_def) = defs.get(&oco_id) {
                 is_anim_synced = oco_def.draw_params.is_anim_synced;
                 frame_range = oco_def.draw_params.frame_range.clone();
@@ -124,6 +140,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
             }
         }
         else {
+            override_of = None;
             frame_range = match (anim_repeat, anim_to) {
                 (0, Some(anim_to)) => Some(anim_loop_back..anim_to + 1),
                 (_, Some(_)) => Some(anim_from..anim_from + 1),
@@ -145,6 +162,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
             is_editor_only: false,
             // is_custom_object: true,
             path: Some(path.to_owned()),
+            override_of,
             draw_params: draw,
         };
 
