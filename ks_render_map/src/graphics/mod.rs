@@ -8,7 +8,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use image::{DynamicImage, Rgba, RgbaImage};
-use libks::map_bin::{AssetId, Tile};
+use libks::map_bin::AssetId;
 
 use crate::definitions::{ObjectDef, ObjectId};
 
@@ -70,6 +70,10 @@ impl GraphicsLoader {
 
     pub fn object_def(&self, id: &ObjectId) -> Option<&ObjectDef> {
         self.object_defs.get(id)
+    }
+
+    pub fn object_defs(&self) -> &HashMap<ObjectId, ObjectDef> {
+        &self.object_defs
     }
 
     pub fn tileset(&mut self, id: AssetId) -> Result<Option<Rc<RgbaImage>>> {

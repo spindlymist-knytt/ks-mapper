@@ -154,13 +154,14 @@ pub fn draw_screen(screen: &ScreenData, gfx: &mut GraphicsLoader, ini: &Ini, opt
         });
 
     // Create context
+    let sync = ScreenSync::new(screen, gfx.object_defs());
     let mut ctx = DrawContext {
         image: RgbaImage::new(600, 240),
         tileset_a: gfx.tileset(screen.assets.tileset_a)?,
         tileset_b: gfx.tileset(screen.assets.tileset_b)?,
         gfx,
         ini_section,
-        sync: ScreenSync::new(screen),
+        sync,
         opts: options,
     };
     
@@ -218,13 +219,14 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
             continue;
         }
 
-        if ctx.sync.limiters.get_mut(tile)
+        let actual_id = ObjectId(*tile, None);
+
+        if ctx.sync.limiters.get_mut(&actual_id)
             .is_some_and(|limiter| !limiter.increment())
         {
             continue;
         }
 
-        let actual_id = ObjectId(*tile, None);
         let object_def = ctx.gfx.object_def(&actual_id);
 
         if !ctx.opts.editor_only

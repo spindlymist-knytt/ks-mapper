@@ -7,13 +7,6 @@ use serde::Deserialize;
 
 use crate::drawing::BlendMode;
 
-#[derive(Debug, Clone, Copy, Default, Deserialize)]
-pub enum OffsetCombine {
-    #[default]
-    Add,
-    Replace,
-}
-
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct ObjectDef {
     #[serde(default)]
@@ -27,6 +20,8 @@ pub struct ObjectDef {
     pub draw_params: DrawParams,
     #[serde(default)]
     pub offset_combine: OffsetCombine,
+    #[serde(default)]
+    pub limit: Limit,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -53,6 +48,23 @@ impl ObjectId {
     pub fn with_variant(&self, variant: &str) -> Self {
         Self(self.0, Some(variant.to_owned()))
     }
+}
+
+#[derive(Debug, Clone, Copy, Default, Deserialize)]
+pub enum OffsetCombine {
+    #[default]
+    Add,
+    Replace,
+}
+
+#[derive(Debug, Clone, Copy, Default, Deserialize)]
+#[serde(tag = "pick")]
+pub enum Limit {
+    #[default]
+    None,
+    First { n: usize },
+    Random { n: usize },
+    LogNPlusOne,
 }
 
 pub fn load_object_defs(path: impl AsRef<Path>) -> Result<HashMap<ObjectId, ObjectDef>> {
@@ -128,6 +140,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         let frame_range;
         let is_anim_synced;
         let override_of;
+        let limit;
 
         if let (Some(bank), Some(obj)) = (bank, object) {
             override_of = Some(Tile(bank, obj));
@@ -145,12 +158,14 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
                         OffsetCombine::Replace => {},
                     }
                 }
+                limit = oco_def.limit;
             }
             else {
                 is_anim_synced = false;
                 frame_range = None;
                 offset_x = 0;
                 offset_y = 0;
+                limit = Limit::None;
             }
         }
         else {
@@ -161,6 +176,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
                 _ => Some(0..1),
             };
             is_anim_synced = true;
+            limit = Limit::None;
         }
 
         let draw = DrawParams {
@@ -179,6 +195,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
             override_of,
             draw_params: draw,
             offset_combine: OffsetCombine::Replace,
+            limit,
         };
 
         defs.insert(ObjectId(tile, None), def);

@@ -654,6 +654,7 @@ blend_mode = "Add"
 
 [8-10]
 blend_mode = "Add"
+limit = { pick = "Random", n = 2 }
 
 [8-12]
 is_anim_synced = true
@@ -663,6 +664,7 @@ frame_range = { start = 0, end = 13 }
 
 [8-15]
 frame_range = { start = 0, end = 5 }
+limit = { pick = "LogNPlusOne" }
 
 [8-16]
 is_editor_only = true
@@ -1141,6 +1143,7 @@ is_anim_synced = true # synced with 18-6
 frame_size = [24, 48]
 frame_range = { start = 0, end = 16 }
 offset = [0, 12]
+limit = { pick = "Random", n = 1 }
 
 [17-4]
 frame_range = { start = 0, end = 1 }
@@ -1203,6 +1206,7 @@ is_anim_synced = true # synced with 17-3
 frame_size = [24, 48]
 frame_range = { start = 0, end = 16 }
 offset = [0, 12]
+limit = { pick = "Random", n = 1 }
 
 ################################################################################
 # Bank 19 Collectables
@@ -1212,662 +1216,901 @@ offset = [0, 12]
 
 [19-1]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-2]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-3]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-4]
 alpha_range = { start = 0, end = 255 }
+limit = { pick = "First", n = 1 }
 
 [19-5]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-6]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-7]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-8]
 is_anim_synced = true
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
+
+[19-9]
+limit = { pick = "First", n = 1 }
 
 [19-10]
 is_anim_synced = true
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
 
 [19-11]
 frame_range = { start = 0, end = 19 }
+limit = { pick = "First", n = 1 }
+
+[19-12]
+limit = { pick = "First", n = 1 }
 
 [19-13]
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
 
 [19-14]
 frame_range = { start = 0, end = 7 }
+limit = { pick = "First", n = 1 }
+
+[19-15]
+limit = { pick = "First", n = 1 }
+
+[19-16]
+limit = { pick = "First", n = 1 }
+
+[19-17]
+limit = { pick = "First", n = 1 }
+
+[19-18]
+limit = { pick = "First", n = 1 }
+
+[19-19]
+limit = { pick = "First", n = 1 }
 
 [19-20]
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
+
+[19-21]
+limit = { pick = "First", n = 1 }
+
+[19-22]
+limit = { pick = "First", n = 1 }
 
 [19-23]
 is_anim_synced = true
 frame_range = { start = 0, end = 6 }
+limit = { pick = "First", n = 1 }
 
 [19-24]
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
 
 [19-25]
 frame_range = { start = 0, end = 8 }
+limit = { pick = "First", n = 1 }
 
 [19-26]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-27]
 is_anim_synced = true
 frame_range = { start = 5, end = 13 }
+limit = { pick = "First", n = 1 }
 
 [19-28]
 frame_range = { start = 0, end = 4 }
+limit = { pick = "First", n = 1 }
 
 [19-29]
 frame_range = { start = 0, end = 6 }
+limit = { pick = "First", n = 1 }
 
 [19-30]
 frame_range = { start = 0, end = 12 }
+limit = { pick = "First", n = 1 }
 
 [19-31]
 frame_size = [48, 48]
 frame_range = { start = 0, end = 1 }
 offset = [12, -12]
+limit = { pick = "First", n = 1 }
 
 [19-32]
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
 
 [19-33]
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
 
 [19-34]
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
 
 [19-35]
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
 
 [19-36]
 frame_range = { start = 0, end = 1 }
+limit = { pick = "First", n = 1 }
 
 [19-37]
 frame_range = { start = 0, end = 29 }
+limit = { pick = "First", n = 1 }
 
 [19-38]
 frame_range = { start = 4, end = 8 }
+limit = { pick = "First", n = 1 }
+
+[19-39]
+limit = { pick = "First", n = 1 }
 
 [19-40]
 frame_range = { start = 4, end = 8 }
+limit = { pick = "First", n = 1 }
 
 [19-41]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-42]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-43]
 frame_range = { start = 0, end = 17 }
+limit = { pick = "First", n = 1 }
+
+[19-44]
+limit = { pick = "First", n = 1 }
+
+[19-45]
+limit = { pick = "First", n = 1 }
 
 [19-46]
 frame_range = { start = 5, end = 6 }
+limit = { pick = "First", n = 1 }
 
 [19-47]
 is_anim_synced = true
 frame_range = { start = 1, end = 5 }
+limit = { pick = "First", n = 1 }
 
 [19-48]
 is_anim_synced = true
 frame_range = { start = 6, end = 13 }
+limit = { pick = "First", n = 1 }
+
+[19-49]
+limit = { pick = "First", n = 1 }
 
 [19-50]
 frame_size = [24, 48]
 frame_range = { start = 0, end = 16 }
 offset = [0, 12]
+limit = { pick = "Random", n = 1 }
 
 ### Coins
 
 [19-51]
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-52]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-53]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-54]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-55]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-56]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-57]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-58]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-59]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-60]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-61]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-62]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-63]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-64]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-65]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-66]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-67]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-68]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-69]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-70]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-71]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-72]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-73]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-74]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-75]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-76]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-77]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-78]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-79]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-80]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-81]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-82]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-83]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-84]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-85]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-86]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-87]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-88]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-89]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-90]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-91]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-92]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-93]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-94]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-95]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-96]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-97]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-98]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-99]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-100]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-101]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-102]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-103]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-104]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-105]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-106]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-107]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-108]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-109]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-110]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-111]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-112]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-113]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-114]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-115]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-116]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-117]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-118]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-119]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-120]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-121]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-122]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-123]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-124]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-125]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-126]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-127]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-128]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-129]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-130]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-131]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-132]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-133]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-134]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-135]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-136]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-137]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-138]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-139]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-140]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-141]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-142]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-143]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-144]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-145]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-146]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-147]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-148]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-149]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 [19-150]
 path = "Bank19/Object51.png"
 is_anim_synced = true
+limit = { pick = "First", n = 1 }
 
 ##### Red Artifacts
 
+[19-151]
+limit = { pick = "First", n = 1 }
+
 [19-152]
 path = "Bank19/Object151.png"
+limit = { pick = "First", n = 1 }
 
 [19-153]
 path = "Bank19/Object151.png"
+limit = { pick = "First", n = 1 }
 
 [19-154]
 path = "Bank19/Object151.png"
+limit = { pick = "First", n = 1 }
 
 [19-155]
 path = "Bank19/Object151.png"
+limit = { pick = "First", n = 1 }
 
 [19-156]
 path = "Bank19/Object151.png"
+limit = { pick = "First", n = 1 }
 
 [19-157]
 path = "Bank19/Object151.png"
+limit = { pick = "First", n = 1 }
 
 ##### Yellow Artifacts
 
+[19-158]
+limit = { pick = "First", n = 1 }
+
 [19-159]
 path = "Bank19/Object158.png"
+limit = { pick = "First", n = 1 }
 
 [19-160]
 path = "Bank19/Object158.png"
+limit = { pick = "First", n = 1 }
 
 [19-161]
 path = "Bank19/Object158.png"
+limit = { pick = "First", n = 1 }
 
 [19-162]
 path = "Bank19/Object158.png"
+limit = { pick = "First", n = 1 }
 
 [19-163]
 path = "Bank19/Object158.png"
+limit = { pick = "First", n = 1 }
 
 [19-164]
 path = "Bank19/Object158.png"
+limit = { pick = "First", n = 1 }
 
 ##### Blue Artifacts
 
+[19-165]
+limit = { pick = "First", n = 1 }
+
 [19-166]
 path = "Bank19/Object165.png"
+limit = { pick = "First", n = 1 }
 
 [19-167]
 path = "Bank19/Object165.png"
+limit = { pick = "First", n = 1 }
 
 [19-168]
 path = "Bank19/Object165.png"
+limit = { pick = "First", n = 1 }
 
 [19-169]
 path = "Bank19/Object165.png"
+limit = { pick = "First", n = 1 }
 
 [19-170]
 path = "Bank19/Object165.png"
+limit = { pick = "First", n = 1 }
 
 [19-171]
 path = "Bank19/Object165.png"
+limit = { pick = "First", n = 1 }
 
 ##### Purple Artifacts
 
+[19-172]
+limit = { pick = "First", n = 1 }
+
 [19-173]
 path = "Bank19/Object172.png"
+limit = { pick = "First", n = 1 }
 
 [19-174]
 path = "Bank19/Object172.png"
+limit = { pick = "First", n = 1 }
 
 [19-175]
 path = "Bank19/Object172.png"
+limit = { pick = "First", n = 1 }
 
 [19-176]
 path = "Bank19/Object172.png"
+limit = { pick = "First", n = 1 }
 
 [19-177]
 path = "Bank19/Object172.png"
+limit = { pick = "First", n = 1 }
 
 [19-178]
 path = "Bank19/Object172.png"
+limit = { pick = "First", n = 1 }
 
 ##### Green Artifacts
 
+[19-179]
+limit = { pick = "First", n = 1 }
+
 [19-180]
 path = "Bank19/Object179.png"
+limit = { pick = "First", n = 1 }
 
 [19-181]
 path = "Bank19/Object179.png"
+limit = { pick = "First", n = 1 }
 
 [19-182]
 path = "Bank19/Object179.png"
+limit = { pick = "First", n = 1 }
 
 [19-183]
 path = "Bank19/Object179.png"
+limit = { pick = "First", n = 1 }
 
 [19-184]
 path = "Bank19/Object179.png"
+limit = { pick = "First", n = 1 }
 
 [19-185]
 path = "Bank19/Object179.png"
+limit = { pick = "First", n = 1 }
 
 ##### Pink Artifacts
 
+[19-186]
+limit = { pick = "First", n = 1 }
+
 [19-187]
 path = "Bank19/Object186.png"
+limit = { pick = "First", n = 1 }
 
 [19-188]
 path = "Bank19/Object186.png"
+limit = { pick = "First", n = 1 }
 
 [19-189]
 path = "Bank19/Object186.png"
+limit = { pick = "First", n = 1 }
 
 [19-190]
 path = "Bank19/Object186.png"
+limit = { pick = "First", n = 1 }
 
 [19-191]
 path = "Bank19/Object186.png"
+limit = { pick = "First", n = 1 }
 
 [19-192]
 path = "Bank19/Object186.png"
+limit = { pick = "First", n = 1 }
 
 ##### Cyan Artifacts
 
+[19-193]
+limit = { pick = "First", n = 1 }
+
 [19-194]
 path = "Bank19/Object193.png"
+limit = { pick = "First", n = 1 }
 
 [19-195]
 path = "Bank19/Object193.png"
+limit = { pick = "First", n = 1 }
 
 [19-196]
 path = "Bank19/Object193.png"
+limit = { pick = "First", n = 1 }
 
 [19-197]
 path = "Bank19/Object193.png"
+limit = { pick = "First", n = 1 }
 
 [19-198]
 path = "Bank19/Object193.png"
+limit = { pick = "First", n = 1 }
 
 [19-199]
 path = "Bank19/Object193.png"
+limit = { pick = "First", n = 1 }

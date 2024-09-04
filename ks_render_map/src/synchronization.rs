@@ -1,11 +1,13 @@
-use std::{cmp::min, collections::HashMap};
+use std::collections::HashMap;
 
 use rand::{seq::SliceRandom, thread_rng, Rng};
-use libks::map_bin::{ScreenData, Tile};
+use libks::map_bin::ScreenData;
+
+use crate::definitions::{Limit, ObjectDef, ObjectId};
 
 pub struct ScreenSync {
     pub anim_t: u32,
-    pub limiters: HashMap<Tile, Limiter>,
+    pub limiters: HashMap<ObjectId, Limiter>,
 }
 
 pub struct Limiter {
@@ -13,61 +15,52 @@ pub struct Limiter {
     chosen: Vec<usize>,
 }
 
+// let mut n_8_10 = 0;
+// let mut n_8_15 = 0;
+// let mut n_17_3 = 0;
+// let mut n_18_6 = 0;
+// let mut n_19_50 = 0;
+
 impl ScreenSync {
-    pub fn new(screen: &ScreenData) -> Self {
+    pub fn new(screen: &ScreenData, object_defs: &HashMap<ObjectId, ObjectDef>) -> Self {
         let anim_t = thread_rng().gen();
         let mut limiters = HashMap::new();
-        
-        // Count limited objects
-        let mut n_8_10 = 0;
-        let mut n_8_15 = 0;
-        let mut n_17_3 = 0;
-        let mut n_18_6 = 0;
-        let mut n_19_50 = 0;
+        let mut counts = HashMap::new();
 
         for layer in &screen.layers[4..] {
             for tile in &layer.0 {
-                match tile {
-                    Tile(8, 10) => n_8_10 += 1,
-                    Tile(8, 15) => n_8_15 += 1,
-                    Tile(17, 3) => n_17_3 += 1,
-                    Tile(18, 6) => n_18_6 += 1,
-                    Tile(19, 50) => n_19_50 += 1,
-                    Tile(19, 1..=49 | 51..) => {
-                        // All collectibles except 19-50 are limited to the first one
-                        limiters.entry(*tile)
-                            .or_insert(Limiter::first());
-                    },
-                    _ => (),
-                }
+                counts.entry(*tile)
+                    .and_modify(|count| *count += 1)
+                    .or_insert(1);
             }
         }
 
-        if n_8_10 > 0 {
-            let n_active_8_10 = min(2, n_8_10);
-            let limiter = Limiter::choose_n(n_8_10, n_active_8_10);
-            limiters.insert(Tile(8, 10), limiter);
-        }
+        for (tile, count) in counts {
+            let id = ObjectId(tile, None);
 
-        if n_8_15 > 0 {
-            let n_active_8_15 = (1.0 + (n_8_15 as f32).log2())
-                .round()
-                .clamp(0.0, n_8_15 as f32)
-                as usize;
-            let limiter = Limiter::choose_n(n_8_15, n_active_8_15);
-            limiters.insert(Tile(8, 15), limiter);
-        }
-        
-        if n_17_3 > 0 {
-            limiters.insert(Tile(17, 3), Limiter::choose_one(n_17_3));
-        }
+            let Some(def) = object_defs.get(&id) else {
+                continue
+            };
 
-        if n_18_6 > 0 {
-            limiters.insert(Tile(18, 6), Limiter::choose_one(n_18_6));
-        }
-
-        if n_19_50 > 0 {
-            limiters.insert(Tile(19, 50), Limiter::choose_one(n_19_50));
+            match def.limit {
+                Limit::None => {},
+                Limit::First { n } => {
+                    let limiter = Limiter::take(n);
+                    limiters.insert(id, limiter);
+                },
+                Limit::Random { n } => {
+                    let limiter = Limiter::choose_n(count, n);
+                    limiters.insert(id, limiter);
+                },
+                Limit::LogNPlusOne => {
+                    let n = (1.0 + (count as f32).log2())
+                        .round()
+                        .clamp(0.0, count as f32)
+                        as usize;
+                    let limiter = Limiter::choose_n(count, n);
+                    limiters.insert(id, limiter);
+                },
+            }
         }
     
         Self {
@@ -86,22 +79,11 @@ impl Limiter {
         }
     }
 
-    pub fn first() -> Self {
+    pub fn take(n: usize) -> Self {
         Self {
             count: 0,
-            chosen: vec![0],
+            chosen: Vec::from_iter(0..n),
         }
-    }
-
-    pub fn choose_one(total: usize) -> Self {
-        let mut chosen = Vec::new();
-
-        if total > 0 {
-            let sample = thread_rng().gen_range(0..total);
-            chosen.push(sample);
-        }
-
-        Self { count: 0, chosen }
     }
 
     pub fn choose_n(total: usize, n: usize) -> Self {
@@ -109,7 +91,7 @@ impl Limiter {
             return Self { count: 0, chosen: Vec::new() };
         }
 
-        let mut all: Vec<usize> = (0..total).collect();
+        let mut all = Vec::from_iter(0..total);
         let (shuffled, _) = all.partial_shuffle(&mut thread_rng(), n);
 
         Self::new(shuffled.to_owned())
