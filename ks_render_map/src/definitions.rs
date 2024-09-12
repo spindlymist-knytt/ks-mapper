@@ -22,6 +22,11 @@ pub struct ObjectDef {
     pub offset_combine: OffsetCombine,
     #[serde(default)]
     pub limit: Limit,
+    pub color_base: Option<i64>,
+    #[serde(default)]
+    pub color_offsets: Vec<i64>,
+    #[serde(skip)]
+    pub replace_colors: Vec<([u8; 3], [u8; 3])>,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -103,7 +108,15 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
             },
         };
 
-        let Some(path) = section.get("Image") else { continue };
+        let bank = section.get("Bank")
+            .and_then(|v| str::parse(v).ok());
+        let object = section.get("Object")
+            .and_then(|v| str::parse(v).ok());
+
+        let mut path = section.get("Image").map(|v| v.to_owned());
+        if path.is_none() && bank != Some(7) {
+            continue;
+        }
 
         let frame_width: u32 = section.get("Tile Width")
             .and_then(|v| str::parse(v).ok())
@@ -130,10 +143,6 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         let anim_repeat: u32 = section.get("Init AnimRepeat")
             .and_then(|v| str::parse(v).ok())
             .unwrap_or(0);
-        let bank = section.get("Bank")
-            .and_then(|v| str::parse(v).ok());
-        let object = section.get("Object")
-            .and_then(|v| str::parse(v).ok());
 
         // OCOs
         
@@ -141,6 +150,9 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         let is_anim_synced;
         let override_of;
         let limit;
+        let color_base = None;
+        let color_offsets = Vec::new();
+        let mut replace_colors = Vec::new();
 
         if let (Some(bank), Some(obj)) = (bank, object) {
             override_of = Some(Tile(bank, obj));
@@ -149,6 +161,8 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
             if let Some(oco_def) = defs.get(&oco_id) {
                 is_anim_synced = oco_def.draw_params.is_anim_synced;
                 frame_range = oco_def.draw_params.frame_range.clone();
+                limit = oco_def.limit;
+
                 if let Some(offset) = oco_def.draw_params.offset {
                     match oco_def.offset_combine {
                         OffsetCombine::Add => {
@@ -158,7 +172,17 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
                         OffsetCombine::Replace => {},
                     }
                 }
-                limit = oco_def.limit;
+
+                if let Some(color_base) = oco_def.color_base {
+                    let color: i64 = section.get("Color")
+                        .and_then(|v| str::parse(v).ok())
+                        .unwrap_or(0);
+                    for offset in [0].iter().chain(oco_def.color_offsets.iter()) {
+                        let old_color = unpack_color(color_base + offset);
+                        let new_color = unpack_color(color + offset);
+                        replace_colors.push((old_color, new_color));
+                    }
+                }
             }
             else {
                 is_anim_synced = false;
@@ -191,15 +215,28 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         let def = ObjectDef {
             is_editor_only: false,
             // is_custom_object: true,
-            path: Some(path.to_owned()),
+            path: path,
             override_of,
             draw_params: draw,
             offset_combine: OffsetCombine::Replace,
             limit,
+            color_base,
+            color_offsets,
+            replace_colors,
         };
 
         defs.insert(ObjectId(tile, None), def);
     }
+}
+
+fn unpack_color(mut color: i64) -> [u8; 3] {
+    color %= 256 * 256 * 256;
+
+    let r = color & 0x0000FF;
+    let g = (color & 0x00FF00) >> 8;
+    let b = (color & 0xFF0000) >> 16;
+
+    [r as u8, g as u8, b as u8]
 }
 
 impl std::fmt::Display for ObjectId {

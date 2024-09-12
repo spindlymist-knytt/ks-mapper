@@ -228,6 +228,24 @@ fn load_custom_object(paths: &Paths, def: Option<&ObjectDef>) -> Result<Option<R
     }; 
 
     let image_path = paths.custom_objects.join(object_path);
+    let mut image = try_load_image(&image_path, BLACK, false)?;
 
-    try_load_image(&image_path, BLACK, false)
+    if def.replace_colors.is_empty() {
+        return Ok(image);
+    }
+
+    if let Some(image) = image.as_mut() {
+        for pixel in image.pixels_mut() {
+            for (old, new) in &def.replace_colors {
+                if pixel.0[0] == old[0] && pixel.0[1] == old[1] && pixel.0[2] == old[2] {
+                    pixel.0[0] = new[0];
+                    pixel.0[1] = new[1];
+                    pixel.0[2] = new[2];
+                    // Alpha channel is preserved
+                }
+            }
+        }
+    }
+
+    Ok(image)
 }
