@@ -1,0 +1,20 @@
+[package]
+name = "ksmap"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = { version = "1.0.75", features = ["backtrace"] }
+byteorder-lite = "0.1.0"
+clap = { version = "4.4.10", features = ["derive"] }
+image = "0.25.2"
+libks = { path = "../../libks/libks" }
+libks_ini = { path = "../../libks/libks_ini" }
+petgraph = "0.6.5"
+png = { git = "https://github.com/image-rs/image-png" }
+rand = "0.8.5"
+serde = { version = "1.0.208", features = ["derive"] }
+thiserror = "1.0.63"
+toml = "0.8.19"

@@ -2,10 +2,10 @@ use anyhow::{anyhow, Result};
 use clap::Parser;
 use libks::{map_bin, world_ini};
 
-use ks_render_map::definitions;
-use ks_render_map::drawing::{self, DrawOptions};
-use ks_render_map::graphics::GraphicsLoader;
-use ks_render_map::screen_map::ScreenMap;
+use ksmap::definitions;
+use ksmap::drawing::{self, DrawOptions};
+use ksmap::graphics::GraphicsLoader;
+use ksmap::screen_map::ScreenMap;
 
 mod cli;
 

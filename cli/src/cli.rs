@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand, Args};
 
-use ks_render_map::partition::{
+use ksmap::partition::{
     PartitionStrategy,
     GridStrategy,
     IslandsStrategy,
