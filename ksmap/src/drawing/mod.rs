@@ -7,7 +7,7 @@ use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
 use crate::{
-    definitions::{DrawParams, ObjectId},
+    definitions::{DrawParams, ObjectId, ObjectKind},
     graphics::GraphicsLoader,
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
@@ -213,8 +213,7 @@ fn draw_tile_layer(ctx: &mut DrawContext, layer: &LayerData) {
 }
 
 fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
-    for (i, tile) in layer.0.iter().enumerate()
-    {
+    for (i, tile) in layer.0.iter().enumerate() {
         if tile.1 == 0 {
             continue;
         }
@@ -236,8 +235,10 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
         }
 
         let proxy_id = {
-            let tile = object_def.and_then(|def| def.override_of)
-                .unwrap_or(*tile);
+            let tile = match object_def.map(|def| &def.kind) {
+                Some(ObjectKind::OverrideObject(tile)) => *tile,
+                _ => *tile,
+            };
             ObjectId(tile, None)
         };
 

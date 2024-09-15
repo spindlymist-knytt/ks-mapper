@@ -580,9 +580,15 @@ is_editor_only = true
 
 [7-2]
 frame_range = { start = 0, end = 13 }
+color_base = 0
+ignore_oco_path = true
 
 [7-3]
 is_editor_only = true
+
+[7-4]
+color_base = 14408667
+ignore_oco_path = true
 
 [7-5]
 alpha_range = { start = 0, end = 40 }
@@ -594,27 +600,41 @@ is_editor_only = true
 
 [7-7]
 frame_range = { start = 0, end = 23 }
+color_base = 10639221
+color_offsets = [989204, -1970198]
+ignore_oco_path = true
 
 [7-8]
 is_editor_only = true
 
 [7-9]
 frame_range = { start = 0, end = 5 }
+color_base = 8944745
+color_offsets = [-1249551]
+ignore_oco_path = true
 
 [7-10]
 is_editor_only = true
 
 [7-11]
 frame_range = { start = 0, end = 23 }
+color_base = 2709554
+ignore_oco_path = true
 
 [7-12]
 is_editor_only = true
 
 [7-13]
 frame_range = { start = 0, end = 23 }
+color_base = 16711679
+ignore_oco_path = true
 
 [7-14]
 is_editor_only = true
+
+[7-15]
+color_base = 986895
+ignore_oco_path = true
 
 [7-16]
 is_editor_only = true

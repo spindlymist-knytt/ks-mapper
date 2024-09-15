@@ -10,7 +10,7 @@ use anyhow::{Context, Result};
 use image::{DynamicImage, Rgba, RgbaImage};
 use libks::map_bin::AssetId;
 
-use crate::definitions::{ObjectDef, ObjectId};
+use crate::definitions::{ObjectDef, ObjectId, ObjectKind};
 
 mod png_decoder;
 
@@ -113,17 +113,13 @@ impl GraphicsLoader {
             Some(cached) => cached.as_ref().map(Rc::clone),
             None => {
                 let def = self.object_defs.get(&id);
-
-                let cached =
-                    if id.0.0 >= 254 {
-                        load_custom_object(&self.paths, def)?
-                            .map(Rc::new)
+                let cached = match def.map(|def| &def.kind) {
+                        Some(ObjectKind::Object) | None => load_stock_object(&self.paths, id, def)?,
+                        Some(ObjectKind::CustomObject) => load_custom_object(&self.paths, def.unwrap())?,
+                        Some(ObjectKind::OverrideObject(_)) =>
+                            load_override_object(&self.paths, def.unwrap(), &self.object_defs)?
                     }
-                    else {
-                        load_stock_object(&self.paths, id, def)?
-                            .map(Rc::new)
-                    };
-
+                    .map(Rc::new);
                 let image = cached.as_ref().map(Rc::clone);
                 self.objects.insert(id.clone(), cached);
 
@@ -218,17 +214,34 @@ fn load_stock_object(
     ], MAGENTA, true)
 }
 
-fn load_custom_object(paths: &Paths, def: Option<&ObjectDef>) -> Result<Option<RgbaImage>> {
-    let Some(def) = def else {
+fn load_custom_object(paths: &Paths, def: &ObjectDef) -> Result<Option<RgbaImage>> {
+    let Some(object_path) = def.path.as_ref() else {
         return Ok(None);
     };
 
-    let Some(object_path) = def.path.as_ref() else {
-        return Ok(None);
-    }; 
-
     let image_path = paths.custom_objects.join(object_path);
-    let mut image = try_load_image(&image_path, BLACK, false)?;
+    try_load_image(&image_path, BLACK, false)
+}
+
+fn load_override_object(
+    paths: &Paths,
+    def: &ObjectDef,
+    object_defs: &HashMap<ObjectId, ObjectDef>
+) -> Result<Option<RgbaImage>> {
+    let mut image = 
+        if def.ignore_oco_path {
+            let ObjectKind::OverrideObject(original_tile) = def.kind else {
+                return Ok(None);
+            };
+            let original_id = ObjectId(original_tile, None);
+            let Some(original_def) = object_defs.get(&original_id) else {
+                return Ok(None);
+            };
+            load_stock_object(paths, &original_id, Some(original_def))?
+        }
+        else {
+            load_custom_object(paths, def)?
+        };
 
     if def.replace_colors.is_empty() {
         return Ok(image);
@@ -237,7 +250,10 @@ fn load_custom_object(paths: &Paths, def: Option<&ObjectDef>) -> Result<Option<R
     if let Some(image) = image.as_mut() {
         for pixel in image.pixels_mut() {
             for (old, new) in &def.replace_colors {
-                if pixel.0[0] == old[0] && pixel.0[1] == old[1] && pixel.0[2] == old[2] {
+                if pixel.0[0] == old[0]
+                    && pixel.0[1] == old[1]
+                    && pixel.0[2] == old[2]
+                {
                     pixel.0[0] = new[0];
                     pixel.0[1] = new[1];
                     pixel.0[2] = new[2];

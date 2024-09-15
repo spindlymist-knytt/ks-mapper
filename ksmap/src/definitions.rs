@@ -9,17 +9,17 @@ use crate::drawing::BlendMode;
 
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct ObjectDef {
+    #[serde(skip)]
+    pub kind: ObjectKind,
+    pub path: Option<String>,
     #[serde(default)]
     pub is_editor_only: bool,
-    // #[serde(default)]
-    // pub is_custom_object: bool,
-    pub path: Option<String>,
-    #[serde(skip)]
-    pub override_of: Option<Tile>,
     #[serde(flatten)]
     pub draw_params: DrawParams,
     #[serde(default)]
     pub offset_combine: OffsetCombine,
+    #[serde(default)]
+    pub ignore_oco_path: bool,
     #[serde(default)]
     pub limit: Limit,
     pub color_base: Option<i64>,
@@ -27,6 +27,14 @@ pub struct ObjectDef {
     pub color_offsets: Vec<i64>,
     #[serde(skip)]
     pub replace_colors: Vec<([u8; 3], [u8; 3])>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub enum ObjectKind {
+    #[default]
+    Object,
+    CustomObject,
+    OverrideObject(Tile),
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -146,22 +154,24 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
 
         // OCOs
         
+        let kind;
         let frame_range;
         let is_anim_synced;
-        let override_of;
         let limit;
+        let ignore_oco_path;
         let color_base = None;
         let color_offsets = Vec::new();
         let mut replace_colors = Vec::new();
 
         if let (Some(bank), Some(obj)) = (bank, object) {
-            override_of = Some(Tile(bank, obj));
+            kind = ObjectKind::OverrideObject(Tile(bank, obj));
             let oco_id = ObjectId(Tile(bank, obj), None);
 
             if let Some(oco_def) = defs.get(&oco_id) {
                 is_anim_synced = oco_def.draw_params.is_anim_synced;
                 frame_range = oco_def.draw_params.frame_range.clone();
                 limit = oco_def.limit;
+                ignore_oco_path = oco_def.ignore_oco_path;
 
                 if let Some(offset) = oco_def.draw_params.offset {
                     match oco_def.offset_combine {
@@ -190,10 +200,11 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
                 offset_x = 0;
                 offset_y = 0;
                 limit = Limit::None;
+                ignore_oco_path = false;
             }
         }
         else {
-            override_of = None;
+            kind = ObjectKind::CustomObject;
             frame_range = match (anim_repeat, anim_to) {
                 (0, Some(anim_to)) => Some(anim_loop_back..anim_to + 1),
                 (_, Some(_)) => Some(anim_from..anim_from + 1),
@@ -201,6 +212,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
             };
             is_anim_synced = true;
             limit = Limit::None;
+            ignore_oco_path = false;
         }
 
         let draw = DrawParams {
@@ -213,12 +225,12 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         };
 
         let def = ObjectDef {
+            kind, 
+            path,
             is_editor_only: false,
-            // is_custom_object: true,
-            path: path,
-            override_of,
             draw_params: draw,
             offset_combine: OffsetCombine::Replace,
+            ignore_oco_path,
             limit,
             color_base,
             color_offsets,
