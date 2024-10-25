@@ -768,14 +768,18 @@ frame_range = { start = 4, end = 8 }
 [12-1]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
+frame_size = [24, 28]
 
 [12-2]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
+frame_size = [24, 28]
 
 [12-4]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
+frame_size = [24, 29]
+offset = [0, -2]
 
 [12-5]
 alpha_range = { start = 0, end = 56 }
@@ -788,6 +792,8 @@ offset = [12, 0]
 [12-7]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
+frame_size = [24, 28]
+offset = [0, -2]
 
 [12-8]
 alpha_range = { start = 0, end = 96 }
@@ -806,6 +812,7 @@ offset = [12, -12]
 [12-11]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
+frame_size = [24, 28]
 
 [12-12]
 alpha_range = { start = 0, end = 96 }
@@ -816,10 +823,12 @@ alpha_range = { start = 0, end = 96 }
 
 [12-14]
 frame_size = [25, 72]
-offset= [0, 24]
+offset = [0, 24]
 
 [12-15]
 alpha_range = { start = 0, end = 96 }
+frame_size = [24, 26]
+offset = [0, -1]
 
 [12-16]
 is_anim_synced = true
