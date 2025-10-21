@@ -42,6 +42,8 @@ pub struct DrawParams {
     #[serde(default)]
     pub is_anim_synced: bool,
     #[serde(default)]
+    pub sync_offset: u32,
+    #[serde(default)]
     pub blend_mode: BlendMode,
     pub alpha_range: Option<RangeInclusive<u8>>,
     pub frame_size: Option<(u32, u32)>,
@@ -157,6 +159,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         let kind;
         let frame_range;
         let is_anim_synced;
+        let mut sync_offset = 0;
         let limit;
         let ignore_oco_path;
         let color_base = None;
@@ -169,6 +172,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
 
             if let Some(oco_def) = defs.get(&oco_id) {
                 is_anim_synced = oco_def.draw_params.is_anim_synced;
+                sync_offset = 0;
                 frame_range = oco_def.draw_params.frame_range.clone();
                 limit = oco_def.limit;
                 ignore_oco_path = oco_def.ignore_oco_path;
@@ -196,6 +200,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
             }
             else {
                 is_anim_synced = false;
+                sync_offset = 0;
                 frame_range = None;
                 offset_x = 0;
                 offset_y = 0;
@@ -217,6 +222,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
 
         let draw = DrawParams {
             is_anim_synced,
+            sync_offset,
             blend_mode: BlendMode::Over,
             alpha_range: None,
             frame_size: Some((frame_width, frame_height)),

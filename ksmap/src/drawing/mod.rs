@@ -1,8 +1,8 @@
-use std::{fs, path::Path, rc::Rc};
+use std::{fs, ops::RangeInclusive, path::Path, rc::Rc};
 
 use anyhow::{anyhow, Result};
 use image::{codecs::png::PngEncoder, imageops, GenericImage, ImageEncoder, RgbaImage, SubImage};
-use rand::{thread_rng, Rng};
+use rand::{thread_rng, Rng, seq::SliceRandom};
 use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
@@ -16,11 +16,6 @@ use crate::{
 
 mod blend_modes;
 pub use blend_modes::BlendMode;
-
-mod bank0;
-mod bank1;
-mod bank2;
-mod bank8;
 
 pub fn tileset_index_to_pixels(i: u8) -> (u32, u32) {
     (
@@ -249,12 +244,18 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
         };
 
         match curs.proxy_id.0 {
-            Tile(0, _) => bank0::draw_bank_0_object(ctx, curs)?,
-            Tile(1, _) => bank1::draw_bank_1_object(ctx, curs)?,
-            Tile(2, _) => bank2::draw_bank_2_object(ctx, curs)?,
-            Tile(8, _) => bank8::draw_bank_8_object(ctx, curs)?,
-            _ => draw_object(ctx, curs.i, curs.actual_id)?,
-        }
+            Tile(0, 14) => draw_shift(ctx, curs, "ShiftVisible(A)", "ShiftType(A)"),
+            Tile(0, 15) => draw_shift(ctx, curs, "ShiftVisible(B)", "ShiftType(B)"),
+            Tile(0, 16) => draw_shift(ctx, curs, "ShiftVisible(C)", "ShiftType(C)"),
+            Tile(0, 32) => draw_shift(ctx, curs, "TrigVisible(A)", "TrigType(A)"),
+            Tile(0, 33) => draw_shift(ctx, curs, "TrigVisible(B)", "TrigType(B)"),
+            Tile(0, 34) => draw_shift(ctx, curs, "TrigVisible(C)", "TrigType(C)"),
+            Tile(1, 5 | 10 | 12 | 22) => draw_with_glow(ctx, curs),
+            Tile(2, 18 | 19) => draw_elemental(ctx, curs),
+            Tile(8, 10) => draw_with_random_offset(ctx, curs, -6..=6),
+            Tile(8, 15) => draw_with_random_offset(ctx, curs, -12..=12),
+            _ => draw_object(ctx, curs.i, curs.actual_id),
+        }?;
     }
 
     Ok(())
@@ -329,4 +330,58 @@ fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: u32) -
     let frame_y = (frame / frames_per_row) * frame_height;
 
     imageops::crop_imm(object_img, frame_x, frame_y, frame_width, frame_height)
+}
+
+fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &str) -> Result<()> {
+    let shift_visible = !ctx.ini_section
+        .as_ref()
+        .and_then(|section| section.get(vis_prop))
+        .unwrap_or("True")
+        .eq_ignore_ascii_case("False");
+
+    if !shift_visible {
+        return Ok(());
+    }
+
+    let shift_type = match ctx.ini_section
+        .as_ref()
+        .and_then(|section| section.get(type_prop))
+        .unwrap_or("0")
+    {
+        "0" => "Spot",
+        "1" => "Floor",
+        "2" => "Circle",
+        "3" => "Square",
+        _ => "Spot",
+    };
+
+    draw_object(ctx, curs.i, curs.proxy_id.into_variant(shift_type))
+}
+
+fn draw_with_glow(ctx: &mut DrawContext, curs: Cursor) -> Result<()> {
+    draw_object(ctx, curs.i, curs.proxy_id.with_variant("Glow"))?;
+    draw_object(ctx, curs.i, curs.actual_id)?;
+
+    Ok(())
+}
+
+fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) -> Result<()> {
+    let mut rng = thread_rng();
+    let variant = &["A", "B", "C", "D"]
+        .choose(&mut rng)
+        .unwrap();
+
+    draw_object(ctx, curs.i, curs.proxy_id.into_variant(variant))
+}
+
+fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeInclusive<i64>) -> Result<()> {
+    let mut rng = thread_rng();
+    let offset_x = rng.gen_range(range.clone());
+    let offset_y = rng.gen_range(range);
+
+    let mut draw_params = ctx.gfx.object_def(&curs.actual_id)
+        .map_or_else(Default::default, |def| def.draw_params.clone());
+    draw_params.offset = Some((offset_x, offset_y));
+
+    draw_object_with_params(ctx, curs.i, curs.actual_id, &draw_params)
 }
