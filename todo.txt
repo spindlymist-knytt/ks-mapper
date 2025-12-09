@@ -1,20 +1,29 @@
 Variations
-- Randomize direction
+- Randomize direction (flip)
 - Use normal(?) distribution for random alpha
 
 Options
 - Global sync
-- Clean frame ranges
 - Exaggerated decorations
 - Show hidden (mole, spiky ghost block)
-
-Specific Objects
-- Falling stuff (8-16) and white explosion (8-17)
-- Crumbling gray block (15:38)?
-- Gold creature particles
 
 Bugs and Missing Features
 - Handle tRNS chunks correctly
 - Custom powers (the all-in-one version) are not implemented.
 - Custom coins and artifacts aren't either.
 - Tints aren't implemented.
+- Bank 7 OCOs
+- Gold creature particles
+- Blinking
+- Multiple ini sections not handled correctly
+
+Defs
+- Explicit frame ranges (for OCOs with differing spritesheet geometry)
+
+Other
+- Falling stuff (8-16)
+- White explosion (8-17)
+- Crumbling gray block (15:38)
+
+Improvements
+- Multicore PNG encoding
