@@ -76,8 +76,8 @@ pub fn draw_partitions(
             let Some(screen) = screens.get(pos) else { continue };
             match draw_screen(screen, gfx, ini, options) {
                 Ok(screen_image) => {
-                    let canvas_x: u32 = ((screen.position.0 - bounds.left()) * 600).try_into().unwrap();
-                    let canvas_y: u32 = ((screen.position.1 - bounds.top()) * 240).try_into().unwrap();
+                    let canvas_x: u32 = ((screen.position.0 as i64 - bounds.x.start) * 600).try_into().unwrap();
+                    let canvas_y: u32 = ((screen.position.1 as i64 - bounds.y.start) * 240).try_into().unwrap();
                     canvas.copy_from(&screen_image, canvas_x, canvas_y)?;
                 },
                 Err(err) => {

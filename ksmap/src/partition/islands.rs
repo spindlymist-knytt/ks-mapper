@@ -5,39 +5,48 @@ use petgraph::{
     unionfind::UnionFind,
     visit::{IntoNodeReferences, NodeIndexable}
 };
+use libks::ScreenCoord;
 
-use crate::{screen_map::ScreenMap, Position};
+use crate::{partition::grid, screen_map::ScreenMap};
 use super::{Partition, PartitionStrategy};
 
 pub struct IslandsStrategy {
     pub max_size: (u64, u64),
-    pub max_dist: u64,
+    pub min_gap: u64,
+    pub max_gap: u64,
 }
 
 impl PartitionStrategy for IslandsStrategy {
     fn partitions(&self, screens: &ScreenMap) -> Result<Vec<Partition>, anyhow::Error> {
+        if self.max_gap < self.min_gap {
+            anyhow::bail!("Max gap must not be less than min gap");
+        }
+        
         let positions = screens.iter_positions()
             .copied()
             .collect();
         let partition = Partition::new(positions);
-
-        if is_partition_too_large(&partition, self.max_size) {
-            Ok(partition_recursively(partition, self.max_size, self.max_dist))
-        }
-        else {
-            Ok(vec![partition])
-        }
+        Ok(partition_recursively(partition, self.max_size, self.min_gap, self.max_gap))
     }
 }
 
-fn partition_recursively(partition: Partition, max_size: (u64, u64), max_dist: u64) -> Vec<Partition> {
+fn partition_recursively(partition: Partition, max_size: (u64, u64), min_gap: u64, max_gap: u64) -> Vec<Partition> {
     let mut partitions = Vec::new();
 
-
-    let graph = partition_into_graph(partition, max_dist);
+    let graph = partition_into_graph(partition, max_gap);
     for partition in graph_into_partitions(graph) {
-        if is_partition_too_large(&partition, max_size) {
-            let subpartitions = partition_recursively(partition, max_size, attenuate(max_dist));
+        let is_too_large = is_partition_too_large(&partition, max_size);
+        if is_too_large && max_gap > min_gap {
+            // Reduce the gap and try again
+            let new_max_gap = attenuate_max_gap(min_gap, max_gap);
+            let subpartitions = partition_recursively(partition, max_size, min_gap, new_max_gap);
+            partitions.extend(subpartitions);
+        }
+        else if is_too_large && max_gap == min_gap {
+            // We can't reduce the gap anymore, so switch to the grid strategy
+            let (rows, cols) = grid::calc_grid_dimensions(&partition.bounds, max_size);
+            let positions = partition.positions.iter();
+            let subpartitions = grid::partitions_from_grid(positions, &partition.bounds, rows, cols);
             partitions.extend(subpartitions);
         }
         else {
@@ -49,22 +58,21 @@ fn partition_recursively(partition: Partition, max_size: (u64, u64), max_dist: u
 }
 
 fn is_partition_too_large(partition: &Partition, max_size: (u64, u64)) -> bool {
-    let size = partition.bounds().size();
-
-    size.0 > max_size.0
-        || size.1 > max_size.1
+    partition.bounds.width() > max_size.0
+        || partition.bounds.height() > max_size.1
 }
 
-fn attenuate(max_dist: u64) -> u64 {
-    if max_dist > 5 {
-        max_dist / 2
+fn attenuate_max_gap(min_gap: u64, max_gap: u64) -> u64 {
+    let diff = max_gap - min_gap;
+    if diff > 5 {
+        min_gap + diff / 2
     }
     else {
-        max_dist - 1
+        u64::max(min_gap, max_gap.saturating_sub(1))
     }
 }
 
-fn partition_into_graph(partition: Partition, max_dist: u64) -> UnGraph<Position, u64> {
+fn partition_into_graph(partition: Partition, max_gap: u64) -> UnGraph<ScreenCoord, u64> {
     let n_screens = partition.len();
     let mut graph = UnGraph::with_capacity(n_screens, n_screens);
 
@@ -73,13 +81,13 @@ fn partition_into_graph(partition: Partition, max_dist: u64) -> UnGraph<Position
 
         for other_node in graph.node_indices() {
             let dist = {
-                let other_pos = graph[other_node];
-                let dist_x = pos.0.abs_diff(other_pos.0);
-                let dist_y = pos.1.abs_diff(other_pos.1);
+                let other_pos = &graph[other_node];
+                let dist_x = pos.0.abs_diff(other_pos.0) as u64;
+                let dist_y = pos.1.abs_diff(other_pos.1) as u64;
                 dist_x.saturating_add(dist_y)
             };
 
-            if dist <= max_dist {
+            if dist <= max_gap {
                 graph.add_edge(node, other_node, dist);
             }
         }
@@ -88,13 +96,13 @@ fn partition_into_graph(partition: Partition, max_dist: u64) -> UnGraph<Position
     graph
 }
 
-fn graph_into_partitions(graph: UnGraph<Position, u64>) -> Vec<Partition> {
+fn graph_into_partitions(graph: UnGraph<ScreenCoord, u64>) -> Vec<Partition> {
     let mut vertex_sets = UnionFind::new(graph.node_bound());
     for edge in graph.edge_references() {
         vertex_sets.union(edge.source(), edge.target());
     }
     
-    let mut partitions = HashMap::<NodeIndex, Vec<Position>>::new();
+    let mut partitions = HashMap::<NodeIndex, Vec<ScreenCoord>>::new();
     for (node, pos) in graph.node_references() {
         let parent = vertex_sets.find(node);
         let partition = partitions.entry(parent)

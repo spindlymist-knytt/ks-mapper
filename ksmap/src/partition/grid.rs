@@ -1,4 +1,4 @@
-use std::cmp::min;
+use libks::ScreenCoord;
 
 use crate::screen_map::ScreenMap;
 use super::{Bounds, Partition, PartitionStrategy};
@@ -12,39 +12,64 @@ pub struct GridStrategy {
 impl PartitionStrategy for GridStrategy {
     fn partitions(&self, screens: &ScreenMap) -> Result<Vec<Partition>, anyhow::Error> {
         let bounds = Bounds::from_iter(screens.iter_positions());
-        let (level_width, level_height) = bounds.size();
+        let rows = self.rows.unwrap_or_else(|| calc_grid_rows(&bounds, self.max_size.1));
+        let cols = self.cols.unwrap_or_else(|| calc_grid_cols(&bounds, self.max_size.0));
+        let positions = screens.iter().map(|screen| &screen.position);
+        let partitions = partitions_from_grid(positions, &bounds, rows, cols);
         
-        let cols = self.cols.unwrap_or_else(|| {
-            (level_width as f64 / self.max_size.0 as f64).ceil() as u64
-        });
-
-        let rows = self.rows.unwrap_or_else(|| {
-            (level_height as f64 / self.max_size.1 as f64).ceil() as u64
-        });
-
-        let cell_width = level_width / cols;
-        let cell_height = level_height / rows;
-        let n_cells = rows * cols;
-
-        let mut partitions: Vec<_> = (0..n_cells)
-            .map(|_| Vec::new())
-            .collect();
-
-        for screen in screens {
-            let dx = screen.position.0.abs_diff(bounds.left());
-            let dy = screen.position.1.abs_diff(bounds.top());
-
-            let cell_x = min(dx / cell_width, cols - 1);
-            let cell_y = min(dy / cell_height, rows - 1);
-            let cell_i = (cell_x + cell_y * cols) as usize;
-
-            partitions[cell_i].push(screen.position);
-        }
-
-        let partitions = partitions.into_iter()
-            .filter(|p| !p.is_empty())
-            .map(Partition::new)
-            .collect();
         Ok(partitions)
     }
+}
+
+#[inline]
+pub fn calc_grid_rows(bounds: &Bounds, max_height: u64) -> u64 {
+    (bounds.height() as f64 / max_height as f64).ceil() as u64
+}
+
+#[inline]
+pub fn calc_grid_cols(bounds: &Bounds, max_width: u64) -> u64 {
+    (bounds.width() as f64 / max_width as f64).ceil() as u64
+}
+
+#[inline]
+pub fn calc_grid_dimensions(bounds: &Bounds, max_size: (u64, u64)) -> (u64, u64) {
+    let rows = calc_grid_rows(bounds, max_size.1);
+    let cols = calc_grid_cols(bounds, max_size.0);
+    (rows, cols)
+}
+
+pub fn partitions_from_grid<'a, 'b, I>(
+    positions: I,
+    bounds: &'b Bounds,
+    rows: u64,
+    cols: u64,
+) -> Vec<Partition>
+where
+    I: std::iter::Iterator<Item = &'a ScreenCoord>
+{
+    let cell_width = (bounds.width() as f64 / cols as f64).ceil() as u64;
+    let cell_height = (bounds.height() as f64 / rows as f64).ceil() as u64;
+    let n_cells = (rows * cols) as usize;
+
+    let mut partitions: Vec<Vec<ScreenCoord>> = (0..n_cells)
+        .map(|_| Vec::new())
+        .collect();
+
+    for position in positions {
+        let x = position.0 as i64;
+        let y = position.1 as i64;
+        let dx = x.abs_diff(bounds.x.start);
+        let dy = y.abs_diff(bounds.y.start);
+
+        let cell_x = u64::min(dx / cell_width, cols - 1);
+        let cell_y = u64::min(dy / cell_height, rows - 1);
+        let cell_i = (cell_x + cell_y * cols) as usize;
+
+        partitions[cell_i].push(*position);
+    }
+
+    partitions.into_iter()
+        .filter(|p| !p.is_empty())
+        .map(Partition::new)
+        .collect()
 }

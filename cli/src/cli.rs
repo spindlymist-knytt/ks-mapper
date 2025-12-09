@@ -15,10 +15,10 @@ pub struct Cli {
     #[command(subcommand)]
     pub strategy: Strategy,
     /// The maximum width (in pixels) of an output image
-    #[arg(short = 'x', long, default_value = "96000")]
+    #[arg(short = 'x', long, default_value = "48000")]
     pub max_width: u64,
     /// The maximum height (in pixels) of an output image
-    #[arg(short = 'y', long, default_value = "96000")]
+    #[arg(short = 'y', long, default_value = "48000")]
     pub max_height: u64,
     /// Draw objects that are only visible in the editor
     #[arg(short, long)]
@@ -79,13 +79,16 @@ pub struct IslandsArgs {
     /// How many screens apart two islands can be before they are split into separate images
     #[arg(short = 'g', long, default_value = "20")]
     max_gap: u64,
+    #[arg(short = 'g', long, default_value = "1")]
+    min_gap: u64,
 }
 
 impl IslandsArgs {
     fn into_strategy(self, max_size: (u64, u64)) -> DynamicStrategy {
         let strategy = IslandsStrategy {
             max_size,
-            max_dist: self.max_gap
+            min_gap: self.min_gap,
+            max_gap: self.max_gap,
         };
         Box::new(strategy)
     }

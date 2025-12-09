@@ -1,6 +1,6 @@
-use std::{cmp::{max, min}, ops::Range};
+use std::ops::Range;
 
-use crate::Position;
+use libks::ScreenCoord;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Bounds {
@@ -20,54 +20,48 @@ impl Bounds {
     pub fn width(&self) -> u64 {
         self.x.end.abs_diff(self.x.start)
     }
-
+    
     pub fn height(&self) -> u64 {
         self.y.end.abs_diff(self.y.start)
     }
-
-    pub fn top(&self) -> i64 {
-        self.y.start
-    }
-
-    pub fn right(&self) -> i64 {
-        self.x.end - 1
-    }
-
-    pub fn bottom(&self) -> i64 {
-        self.y.end - 1
-    }
-
-    pub fn left(&self) -> i64 {
-        self.x.start
-    }
 }
 
-impl From<&[Position]> for Bounds {
-    fn from(positions: &[Position]) -> Self {
+impl From<&[ScreenCoord]> for Bounds {
+    fn from(positions: &[ScreenCoord]) -> Self {
         Self::from_iter(positions)
     }
 }
 
-impl<'a> FromIterator<&'a Position> for Bounds {
+impl<'a> FromIterator<&'a ScreenCoord> for Bounds {
     fn from_iter<I>(positions: I) -> Self
     where
-        I: IntoIterator<Item = &'a Position>,
+        I: IntoIterator<Item = &'a ScreenCoord>,
     {
-        let mut min_x = i64::MAX;
-        let mut min_y = i64::MAX;
-        let mut max_x = i64::MIN;
-        let mut max_y = i64::MIN;
-
-        for pos in positions {
-            min_x = min(min_x, pos.0);
-            min_y = min(min_y, pos.1);
-            max_x = max(max_x, pos.0);
-            max_y = max(max_y, pos.1);
+        let mut positions = positions.into_iter();
+        
+        if let Some(first) = positions.next() {
+            let mut min_x = first.0;
+            let mut min_y = first.1;
+            let mut max_x = first.0;
+            let mut max_y = first.1;
+            
+            for pos in positions {
+                min_x = i32::min(min_x, pos.0);
+                min_y = i32::min(min_y, pos.1);
+                max_x = i32::max(max_x, pos.0);
+                max_y = i32::max(max_y, pos.1);
+            }
+            
+            Self {
+                x: (min_x as i64)..(max_x as i64 + 1),
+                y: (min_y as i64)..(max_y as i64 + 1),
+            }
         }
-
-        Self {
-            x: min_x..max_x + 1,
-            y: min_y..max_y + 1,
+        else {
+            Self {
+                x: 0..0,
+                y: 0..0,
+            }
         }
     }
 }

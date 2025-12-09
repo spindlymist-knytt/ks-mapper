@@ -1,12 +1,10 @@
 use std::{collections::HashMap, ops::Index};
 
-use libks::map_bin::ScreenData;
-
-use crate::Position;
+use libks::{ScreenCoord, map_bin::ScreenData};
 
 pub struct ScreenMap {
     screens: Vec<ScreenData>,
-    map: HashMap<Position, usize>,
+    map: HashMap<ScreenCoord, usize>,
 }
 
 impl ScreenMap {
@@ -23,7 +21,7 @@ impl ScreenMap {
         }
     }
 
-    pub fn get(&self, position: &Position) -> Option<&ScreenData> {
+    pub fn get(&self, position: &ScreenCoord) -> Option<&ScreenData> {
         self.map.get(position)
             .map(|i| &self.screens[*i])
     }
@@ -36,7 +34,7 @@ impl ScreenMap {
         self.into_iter()
     }
 
-    pub fn iter_positions(&self) -> impl Iterator<Item = &Position> {
+    pub fn iter_positions(&self) -> impl Iterator<Item = &ScreenCoord> {
         self.into_iter()
             .map(|screen| &screen.position)
     }

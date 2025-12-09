@@ -123,7 +123,7 @@ pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini
         let object = section.get("Object")
             .and_then(|v| str::parse(v).ok());
 
-        let mut path = section.get("Image").map(|v| v.to_owned());
+        let path = section.get("Image").map(|v| v.to_owned());
         if path.is_none() && bank != Some(7) {
             continue;
         }
