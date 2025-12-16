@@ -51,8 +51,6 @@ struct Cursor {
     i: usize,
     actual_id: ObjectId,
     proxy_id: ObjectId,
-    // tile: Tile,
-    // variant: Option<String>,
 }
 
 pub fn draw_partitions(
@@ -238,39 +236,30 @@ fn draw_tile_layer(ctx: &mut DrawContext, layer: &LayerData) {
 
 fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
     for (i, tile) in layer.0.iter().enumerate() {
-        if tile.1 == 0 {
-            continue;
-        }
+        if tile.1 == 0 { continue }
 
         let actual_id = ObjectId(*tile, None);
-
-        if ctx.sync.limiters.get_mut(&actual_id)
-            .is_some_and(|limiter| !limiter.increment())
-        {
-            continue;
-        }
-
         let object_def = ctx.gfx.object_def(&actual_id);
-
-        if !ctx.opts.editor_only
-            && object_def.is_some_and(|object| object.is_editor_only)
-        {
-            continue;
-        }
-
-        let proxy_id = {
-            let tile = match object_def.map(|def| &def.kind) {
-                Some(ObjectKind::OverrideObject(tile)) => *tile,
-                _ => *tile,
-            };
-            ObjectId(tile, None)
+        let proxy_id = match object_def.map(|def| &def.kind) {
+            Some(ObjectKind::OverrideObject(tile)) => ObjectId(*tile, None),
+            _ => ObjectId(*tile, None),
         };
-
         let curs = Cursor {
             i,
             actual_id,
             proxy_id,
         };
+
+        if ctx.sync.limiters.get_mut(&curs.actual_id)
+            .is_some_and(|limiter| !limiter.increment())
+        {
+            continue;
+        }
+        if !ctx.opts.editor_only
+            && object_def.is_some_and(|object| object.is_editor_only)
+        {
+            continue;
+        }
 
         match curs.proxy_id.0 {
             Tile(0, 14) => draw_shift(ctx, curs, "ShiftVisible(A)", "ShiftType(A)"),
