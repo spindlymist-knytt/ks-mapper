@@ -1,4 +1,4 @@
-use std::{fs, ops::RangeInclusive, path::Path, rc::Rc};
+use std::{fs, io::Write, ops::RangeInclusive, path::Path, rc::Rc};
 
 use anyhow::{anyhow, Result};
 use image::{codecs::png::PngEncoder, imageops, GenericImage, ImageEncoder, RgbaImage, SubImage};
@@ -12,6 +12,7 @@ use crate::{
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
     synchronization::ScreenSync,
+    timespan::Timespan,
 };
 
 mod blend_modes;
@@ -62,16 +63,14 @@ pub fn draw_partitions(
     output_dir: impl AsRef<Path>,
     options: &DrawOptions,
 ) -> Result<()> {
-    for partition in partitions {
+    for partition in partitions {        
         let bounds = partition.bounds();
-
         println!("{bounds}");
-        println!("    Allocating canvas");
-        
         let Ok(mut canvas) = make_canvas(&bounds) else { continue };
 
-        println!("    Drawing screens");
-
+        let mut span_draw = Timespan::begin();
+        print!("    Drawing screens");
+        let _ = std::io::stdout().flush();
         for pos in partition {
             let Some(screen) = screens.get(pos) else { continue };
             match draw_screen(screen, gfx, ini, options) {
@@ -85,14 +84,17 @@ pub fn draw_partitions(
                 },
             }
         }
+        span_draw.end();
+        println!(" [{span_draw}]");
 
-        println!("    Saving canvas to disk");
-
+        let mut span_export = Timespan::begin();
+        print!("    Saving canvas to disk");
+        let _ = std::io::stdout().flush();
         let file_name = format!("{bounds}.png");
         let path = output_dir.as_ref().join(file_name);
-        export_canvas(canvas, &path)?;
-
-        println!();
+        export_canvas_multithreaded(canvas, &path)?;
+        span_export.end();
+        println!(" [{span_export}]\n");
     }
 
     Ok(())
@@ -134,6 +136,33 @@ fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
     let buf = canvas.into_vec();
 
     encoder.write_image(&buf, width, height, image::ExtendedColorType::Rgba8)?;
+
+    Ok(())
+}
+
+fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
+    let file = fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(path)?;
+    let writer = std::io::BufWriter::new(file);
+    
+    let width = canvas.width();
+    let height = canvas.height();
+    let data = canvas.into_vec();
+    
+    let mut header = mtpng::Header::new();
+    header.set_size(width, height)?;
+    header.set_color(mtpng::ColorType::TruecolorAlpha, 8)?;
+    
+    let mut options = mtpng::encoder::Options::new();
+    options.set_compression_level(mtpng::CompressionLevel::High)?;
+
+    let mut encoder = mtpng::encoder::Encoder::new(writer, &options);
+    encoder.write_header(&header)?;
+    encoder.write_image_rows(&data)?;
+    encoder.finish()?;
 
     Ok(())
 }

@@ -545,6 +545,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "build_const"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4ae4235e6dac0694637c763029ecea1a2ec9e4e06ec2729bd21ba4d9c863eb7"
+
+[[package]]
 name = "built"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -936,6 +942,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51e852e6dc9a5bed1fae92dd2375037bf2b768725bf3be87811edee3249d09ad"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "crc"
+version = "1.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d663548de7f5cca343f1e0a48d14dcfb0e9eb4e079ec58883b7251539fa10aeb"
+dependencies = [
+ "build_const",
 ]
 
 [[package]]
@@ -1703,7 +1718,7 @@ dependencies = [
  "cfg-if",
  "chrono",
  "iced",
- "itertools",
+ "itertools 0.12.1",
  "num-traits",
  "once_cell",
  "time",
@@ -1964,6 +1979,15 @@ checksum = "7943c866cc5cd64cbc25b2e01621d07fa8eb2a1a23160ee81ce38704e97b8ecf"
 
 [[package]]
 name = "itertools"
+version = "0.10.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
@@ -2044,6 +2068,7 @@ dependencies = [
  "image",
  "libks",
  "libks_ini",
+ "mtpng",
  "petgraph",
  "png 0.17.13 (git+https://github.com/image-rs/image-png)",
  "rand",
@@ -2164,6 +2189,18 @@ dependencies = [
  "bitflags 2.6.0",
  "libc",
  "redox_syscall 0.4.1",
+]
+
+[[package]]
+name = "libz-sys"
+version = "1.1.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15d118bbf3771060e7311cc7bb0545b01d08a8b4a7de949198dec1fa0ca1c0f7"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
+ "vcpkg",
 ]
 
 [[package]]
@@ -2353,6 +2390,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2d80299ef12ff69b16a84bb182e3b9df68b5a91574d3d4fa6e41b65deec4df1"
 dependencies = [
  "adler2",
+]
+
+[[package]]
+name = "mtpng"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d05e488693c22438d55b5acc9f74dea027636df0666c2768d6ef769f9f2d947"
+dependencies = [
+ "crc",
+ "itertools 0.10.5",
+ "libz-sys",
+ "rayon",
 ]
 
 [[package]]
@@ -3099,7 +3148,7 @@ dependencies = [
  "built",
  "cfg-if",
  "interpolate_name",
- "itertools",
+ "itertools 0.12.1",
  "libc",
  "libfuzzer-sys",
  "log",
@@ -4030,6 +4079,12 @@ dependencies = [
  "num-traits",
  "wasm-bindgen",
 ]
+
+[[package]]
+name = "vcpkg"
+version = "0.2.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
 
 [[package]]
 name = "version-compare"

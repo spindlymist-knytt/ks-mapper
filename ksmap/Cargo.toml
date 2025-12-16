@@ -12,6 +12,7 @@ clap = { version = "4.4.10", features = ["derive"] }
 image = "0.25.2"
 libks = { path = "../../libks/libks" }
 libks_ini = { path = "../../libks/libks_ini" }
+mtpng = "0.4.1"
 petgraph = "0.6.5"
 png = { git = "https://github.com/image-rs/image-png" }
 rand = "0.8.5"
