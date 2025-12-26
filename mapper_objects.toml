@@ -9,6 +9,7 @@ frame_range = { start = 0, end = 9 }
 
 [0-2]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-3]
 is_anim_synced = true
@@ -34,18 +35,24 @@ frame_range = { start = 0, end = 8 }
 is_anim_synced = true
 frame_range = { start = 0, end = 8 }
 
+[0-9]
+frame_range = { start = 0, end = 1 }
+
 [0-10]
 is_anim_synced = true
 frame_range = { start = 0, end = 8 }
 
 [0-11]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-12]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-13]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 ["0-14 Spot"]
 is_anim_synced = true
@@ -64,6 +71,7 @@ frame_range = { start = 0, end = 9 }
 
 ["0-15 Floor"]
 path = "Bank0/Object14_Floor.png"
+frame_range = { start = 0, end = 1 }
 
 ["0-15 Circle"]
 path = "Bank0/Object14_Circle.png"
@@ -72,6 +80,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-15 Square"]
 path = "Bank0/Object14_Square.png"
+frame_range = { start = 0, end = 1 }
 
 ["0-16 Spot"]
 path = "Bank0/Object14_Spot.png"
@@ -81,6 +90,7 @@ frame_range = { start = 0, end = 9 }
 
 ["0-16 Floor"]
 path = "Bank0/Object14_Floor.png"
+frame_range = { start = 0, end = 1 }
 
 ["0-16 Circle"]
 path = "Bank0/Object14_Circle.png"
@@ -89,39 +99,63 @@ frame_range = { start = 0, end = 1 }
 
 ["0-16 Square"]
 path = "Bank0/Object14_Square.png"
+frame_range = { start = 0, end = 1 }
 
 [0-17]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-18]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-19]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-20]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
+
+[0-21]
+frame_range = { start = 0, end = 1 }
+
+[0-22]
+frame_range = { start = 0, end = 1 }
+
+[0-23]
+frame_range = { start = 0, end = 1 }
+
+[0-24]
+frame_range = { start = 0, end = 1 }
 
 [0-25]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-26]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-27]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-28]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-29]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-30]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-31]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 ["0-32 Spot"]
 is_anim_synced = true
@@ -140,6 +174,7 @@ frame_range = { start = 0, end = 9 }
 
 ["0-33 Floor"]
 path = "Bank0/Object32_Floor.png"
+frame_range = { start = 0, end = 1 }
 
 ["0-33 Circle"]
 path = "Bank0/Object32_Circle.png"
@@ -148,6 +183,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-33 Square"]
 path = "Bank0/Object32_Square.png"
+frame_range = { start = 0, end = 1 }
 
 ["0-34 Spot"]
 path = "Bank0/Object32_Spot.png"
@@ -157,6 +193,7 @@ frame_range = { start = 0, end = 9 }
 
 ["0-34 Floor"]
 path = "Bank0/Object32_Floor.png"
+frame_range = { start = 0, end = 1 }
 
 ["0-34 Circle"]
 path = "Bank0/Object32_Circle.png"
@@ -165,6 +202,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-34 Square"]
 path = "Bank0/Object32_Square.png"
+frame_range = { start = 0, end = 1 }
 
 [0-35]
 is_anim_synced = true
@@ -172,76 +210,111 @@ frame_range = { start = 0, end = 8 }
 
 [0-36]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-37]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-38]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-39]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-40]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-41]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-42]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-43]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-44]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-45]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-46]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-47]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-48]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-49]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-247]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-248]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-249]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-250]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-251]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-252]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-253]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-254]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [0-255]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 ################################################################################
 # Bank 1 Liquids
 ################################################################################
+
+[1-1]
+frame_range = { start = 0, end = 16 }
+
+[1-2]
+frame_range = { start = 0, end = 16 }
+
+[1-3]
+frame_range = { start = 0, end = 18 }
+
+[1-4]
+frame_range = { start = 0, end = 18 }
 
 [1-5]
 frame_range = { start = 0, end = 39 }
@@ -250,39 +323,99 @@ frame_range = { start = 0, end = 39 }
 blend_mode = "Add"
 frame_size = [24, 96]
 offset = [0, -36]
+frame_range = { start = 0, end = 1 }
+
+[1-6]
+frame_range = { start = 0, end = 10 }
+
+[1-7]
+frame_range = { start = 0, end = 1 }
+
+[1-8]
+frame_range = { start = 0, end = 1 }
+
+[1-9]
+frame_range = { start = 0, end = 1 }
+
+[1-10]
+frame_range = { start = 0, end = 32 }
 
 ["1-10 Glow"]
 is_anim_synced = true
 blend_mode = "Add"
 frame_size = [24, 96]
 offset = [0, -36]
+frame_range = { start = 0, end = 2 }
+
+[1-11]
+frame_range = { start = 0, end = 1 }
+
+[1-12]
+frame_range = { start = 0, end = 32 }
 
 ["1-12 Glow"]
 is_anim_synced = true
 blend_mode = "Add"
 frame_size = [24, 96]
 offset = [0, -36]
+frame_range = { start = 0, end = 2 }
+
+[1-13]
+frame_range = { start = 0, end = 10 }
+
+[1-14]
+frame_range = { start = 0, end = 16 }
+
+[1-15]
+frame_range = { start = 0, end = 18 }
+
+[1-16]
+frame_range = { start = 0, end = 10 }
+
+[1-17]
+frame_range = { start = 0, end = 1 }
 
 [1-18]
 blend_mode = "Add"
+frame_range = { start = 0, end = 30 }
+
+[1-19]
+frame_range = { start = 0, end = 24 }
+
+[1-20]
+frame_range = { start = 0, end = 21 }
+
+[1-21]
+frame_range = { start = 0, end = 1 }
+
+[1-22]
+frame_range = { start = 0, end = 24 }
 
 ["1-22 Glow"]
 is_anim_synced = true
 blend_mode = "Add"
 frame_size = [24, 72]
 offset = [0, -24]
+frame_range = { start = 0, end = 10 }
 
 [1-23]
 blend_mode = "Add"
+frame_range = { start = 0, end = 21 }
+
+[1-24]
+frame_range = { start = 0, end = 1 }
 
 [1-25]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [1-26]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [1-27]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 ################################################################################
 # Bank 2 Flyers
@@ -290,9 +423,11 @@ is_editor_only = true
 
 [2-1]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [2-2]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [2-3]
 blend_mode = "Sub"
@@ -304,12 +439,15 @@ frame_range = { start = 0, end = 1 }
 
 [2-5]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [2-6]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [2-7]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [2-8]
 alpha_range = { start = 0, end = 255 }
@@ -317,12 +455,15 @@ frame_range = { start = 0, end = 17 }
 
 [2-9]
 is_anim_synced = true
+frame_range = { start = 0, end = 12 }
 
 [2-10]
 is_anim_synced = true
+frame_range = { start = 0, end = 12 }
 
 [2-11]
 is_anim_synced = true
+frame_range = { start = 0, end = 10 }
 
 [2-12]
 is_anim_synced = true
@@ -330,18 +471,23 @@ frame_range = { start = 0, end = 10 }
 
 [2-13]
 alpha_range = { start = 0, end = 255 }
+frame_range = { start = 0, end = 33 }
 
 [2-14]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [2-15]
 is_anim_synced = true
+frame_range = { start = 0, end = 4 }
 
 [2-16]
 is_anim_synced = true
+frame_range = { start = 0, end = 4 }
 
 [2-17]
 is_anim_synced = true
+frame_range = { start = 0, end = 4 }
 
 ["2-18 A"]
 is_anim_synced = true
@@ -377,12 +523,15 @@ frame_range = { start = 0, end = 6 }
 
 [2-20]
 is_anim_synced = true
+frame_range = { start = 0, end = 7 }
 
 [2-21]
 is_anim_synced = true
+frame_range = { start = 0, end = 7 }
 
 [2-22]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [2-23]
 frame_range = { start = 0, end = 19 }
@@ -403,6 +552,9 @@ frame_range = { start = 0, end = 1 }
 is_anim_synced = true
 frame_range = { start = 0, end = 1 }
 
+[2-28]
+frame_range = { start = 0, end = 12 }
+
 [2-29]
 is_anim_synced = true
 frame_range = { start = 0, end = 1 }
@@ -410,12 +562,25 @@ frame_range = { start = 0, end = 1 }
 [2-30]
 frame_range = { start = 0, end = 19 }
 
+[2-31]
+frame_range = { start = 0, end = 16 }
+
 [2-32]
 is_anim_synced = true
+frame_range = { start = 0, end = 4 }
 
 ################################################################################
 # Bank 3 Knytt & Fluff
 ################################################################################
+
+[3-1]
+frame_range = { start = 0, end = 6 }
+
+[3-2]
+frame_range = { start = 0, end = 14 }
+
+[3-3]
+frame_range = { start = 0, end = 7 }
 
 [3-4]
 frame_range = { start = 0, end = 7 }
@@ -426,26 +591,120 @@ frame_range = { start = 0, end = 1 }
 [3-6]
 frame_range = { start = 0, end = 7 }
 
+[3-7]
+frame_range = { start = 0, end = 6 }
+
+[3-8]
+frame_range = { start = 0, end = 14 }
+
+[3-9]
+frame_range = { start = 0, end = 9 }
+
+[3-10]
+frame_range = { start = 0, end = 9 }
+
+[3-11]
+frame_range = { start = 0, end = 10 }
+
+[3-12]
+frame_range = { start = 0, end = 21 }
+
 [3-13]
 frame_range = { start = 0, end = 17 }
+
+[3-14]
+frame_range = { start = 0, end = 1 }
+
+[3-15]
+frame_range = { start = 0, end = 11 }
+
+[3-16]
+frame_range = { start = 0, end = 6 }
+
+[3-17]
+frame_range = { start = 0, end = 6 }
+
+[3-18]
+frame_range = { start = 0, end = 6 }
+
+[3-19]
+frame_range = { start = 0, end = 9 }
+
+[3-20]
+frame_range = { start = 0, end = 32 }
+
+[3-21]
+frame_range = { start = 0, end = 25 }
 
 [3-22]
 frame_range = { start = 0, end = 7 }
 
+[3-23]
+frame_range = { start = 0, end = 7 }
+
+[3-24]
+frame_range = { start = 0, end = 14 }
+
 [3-25]
+frame_range = { start = 0, end = 1 }
+
+[3-26]
 frame_range = { start = 0, end = 1 }
 
 [3-27]
 frame_range = { start = 0, end = 23 }
 
+[3-28]
+frame_range = { start = 0, end = 11 }
+
+[3-29]
+frame_range = { start = 0, end = 9 }
+
 [3-30]
 is_anim_synced = true
+frame_range = { start = 0, end = 6 }
+
+[3-31]
+frame_range = { start = 0, end = 11 }
+
+[3-32]
+frame_range = { start = 0, end = 7 }
 
 [3-33]
 frame_range = { start = 0, end = 7 }
 
+[3-34]
+frame_range = { start = 0, end = 12 }
+
+[3-35]
+frame_range = { start = 0, end = 12 }
+
+[3-36]
+frame_range = { start = 0, end = 9 }
+
+[3-37]
+frame_range = { start = 0, end = 8 }
+
+[3-38]
+frame_range = { start = 0, end = 1 }
+
 [3-39]
 frame_range = { start = 0, end = 23 }
+
+[3-40]
+frame_range = { start = 0, end = 11 }
+
+[3-41]
+frame_range = { start = 0, end = 1 }
+
+[3-42]
+frame_range = { start = 0, end = 14 }
+
+[3-43]
+frame_range = { start = 0, end = 14 }
+
+[3-44]
+frame_range = { start = 0, end = 9 }
 
 ################################################################################
 # Bank 4 Meanies
@@ -491,16 +750,24 @@ frame_range = { start = 0, end = 8 }
 
 [4-12]
 is_anim_synced = true
+frame_range = { start = 0, end = 8 }
 
 [4-13]
 frame_range = { start = 0, end = 1 }
 
+[4-14]
+frame_range = { start = 0, end = 11 }
+
 [4-15]
 is_anim_synced = true
+frame_range = { start = 0, end = 8 }
 
 [4-16]
 is_anim_synced = true
 frame_range = { start = 5, end = 13 }
+
+[4-17]
+frame_range = { start = 0, end = 7 }
 
 [4-18]
 frame_range = { start = 0, end = 4 }
@@ -524,14 +791,17 @@ frame_range = { start = 0, end = 12 }
 [5-1]
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 8 }
 
 [5-2]
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 12 }
 
 [5-3]
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 12 }
 
 ################################################################################
 # Bank 6 Traps
@@ -540,6 +810,16 @@ offset = [0, 12]
 [6-1]
 frame_size = [96, 24]
 offset = [36, 0]
+frame_range = { start = 0, end = 1 }
+
+[6-2]
+frame_range = { start = 0, end = 1 }
+
+[6-3]
+frame_range = { start = 0, end = 1 }
+
+[6-4]
+frame_range = { start = 0, end = 1 }
 
 [6-5]
 frame_size = [48, 48]
@@ -571,12 +851,25 @@ frame_range = { start = 0, end = 1 }
 [6-13]
 frame_range = { start = 0, end = 1 }
 
+[6-14]
+frame_range = { start = 0, end = 1 }
+
+[6-15]
+frame_range = { start = 0, end = 1 }
+
+[6-16]
+frame_range = { start = 0, end = 1 }
+
+[6-17]
+frame_range = { start = 0, end = 1 }
+
 ################################################################################
 # Bank 7 Nature FX
 ################################################################################
 
 [7-1]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [7-2]
 frame_range = { start = 0, end = 13 }
@@ -585,18 +878,22 @@ ignore_oco_path = true
 
 [7-3]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [7-4]
 color_base = 14408667
 ignore_oco_path = true
+frame_range = { start = 0, end = 1 }
 
 [7-5]
 alpha_range = { start = 0, end = 40 }
 frame_size = [20, 98]
 offset = [-2, 37]
+frame_range = { start = 0, end = 1 }
 
 [7-6]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [7-7]
 frame_range = { start = 0, end = 23 }
@@ -606,6 +903,7 @@ ignore_oco_path = true
 
 [7-8]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [7-9]
 frame_range = { start = 0, end = 5 }
@@ -615,6 +913,7 @@ ignore_oco_path = true
 
 [7-10]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [7-11]
 frame_range = { start = 0, end = 23 }
@@ -623,6 +922,7 @@ ignore_oco_path = true
 
 [7-12]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [7-13]
 frame_range = { start = 0, end = 23 }
@@ -631,16 +931,20 @@ ignore_oco_path = true
 
 [7-14]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [7-15]
 color_base = 986895
 ignore_oco_path = true
+frame_range = { start = 0, end = 1 }
 
 [7-16]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [7-17]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 ################################################################################
 # Bank 8 Decoration
@@ -648,39 +952,58 @@ is_editor_only = true
 
 [8-1]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [8-2]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [8-3]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [8-4]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [8-5]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [8-6]
 blend_mode = "Add"
+frame_range = { start = 0, end = 8 }
 
 [8-7]
 blend_mode = "Add"
 frame_size = [48, 24]
 offset = [12, 0]
+frame_range = { start = 0, end = 9 }
 
 [8-8]
 blend_mode = "Add"
+frame_range = { start = 0, end = 9 }
+
+[8-9]
+frame_range = { start = 0, end = 4 }
 
 [8-10]
 blend_mode = "Add"
 limit = { pick = "Random", n = 2 }
+frame_range = { start = 0, end = 24 }
+
+[8-11]
+frame_range = { start = 0, end = 8 }
 
 [8-12]
 is_anim_synced = true
+frame_range = { start = 0, end = 6 }
 
 [8-13]
 frame_range = { start = 0, end = 13 }
+
+[8-14]
+frame_range = { start = 0, end = 8 }
 
 [8-15]
 frame_range = { start = 0, end = 5 }
@@ -688,9 +1011,11 @@ limit = { pick = "LogNPlusOne" }
 
 [8-16]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [8-17]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 ################################################################################
 # Bank 9 Flowers
@@ -742,6 +1067,12 @@ frame_range = { start = 3, end = 4 }
 [10-9]
 frame_range = { start = 0, end = 19 }
 
+[10-10]
+frame_range = { start = 0, end = 18 }
+
+[10-11]
+frame_range = { start = 0, end = 11 }
+
 [10-12]
 frame_range = { start = 0, end = 19 }
 
@@ -752,14 +1083,38 @@ frame_range = { start = 0, end = 29 }
 # Bank 11 Disks
 ################################################################################
 
+[11-1]
+frame_range = { start = 0, end = 5 }
+
 [11-2]
 frame_range = { start = 4, end = 8 }
+
+[11-3]
+frame_range = { start = 0, end = 5 }
+
+[11-4]
+frame_range = { start = 0, end = 5 }
+
+[11-5]
+frame_range = { start = 0, end = 5 }
 
 [11-6]
 frame_range = { start = 4, end = 8 }
 
+[11-7]
+frame_range = { start = 0, end = 6 }
+
+[11-8]
+frame_range = { start = 0, end = 5 }
+
 [11-9]
 frame_range = { start = 4, end = 8 }
+
+[11-10]
+frame_range = { start = 0, end = 5 }
+
+[11-11]
+frame_range = { start = 0, end = 5 }
 
 ################################################################################
 # Bank 12 Ghosts
@@ -769,40 +1124,51 @@ frame_range = { start = 4, end = 8 }
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
 frame_size = [24, 28]
+frame_range = { start = 0, end = 10 }
 
 [12-2]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
 frame_size = [24, 28]
+frame_range = { start = 0, end = 10 }
+
+[12-3]
+frame_range = { start = 0, end = 6 }
 
 [12-4]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
 frame_size = [24, 29]
 offset = [0, -2]
+frame_range = { start = 0, end = 10 }
 
 [12-5]
 alpha_range = { start = 0, end = 56 }
+frame_range = { start = 0, end = 1 }
 
 [12-6]
 alpha_range = { start = 0, end = 96 }
 frame_size = [48, 24]
 offset = [12, 0]
+frame_range = { start = 0, end = 14 }
 
 [12-7]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
 frame_size = [24, 28]
 offset = [0, -2]
+frame_range = { start = 0, end = 8 }
 
 [12-8]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
+frame_range = { start = 0, end = 18 }
 
 [12-9]
 alpha_range = { start = 0, end = 96 }
 frame_size = [48, 24]
 offset = [12, 0]
+frame_range = { start = 0, end = 14 }
 
 [12-10]
 frame_size = [48, 48]
@@ -813,6 +1179,7 @@ offset = [12, -12]
 alpha_range = { start = 0, end = 96 }
 is_anim_synced = true
 frame_size = [24, 28]
+frame_range = { start = 0, end = 10 }
 
 [12-12]
 alpha_range = { start = 0, end = 96 }
@@ -820,15 +1187,18 @@ frame_range = { start = 0, end = 1 }
 
 [12-13]
 alpha_range = { start = 0, end = 96 }
+frame_range = { start = 0, end = 1 }
 
 [12-14]
 frame_size = [25, 72]
 offset = [0, 24]
+frame_range = { start = 0, end = 1 }
 
 [12-15]
 alpha_range = { start = 0, end = 96 }
 frame_size = [24, 26]
 offset = [0, -1]
+frame_range = { start = 0, end = 6 }
 
 [12-16]
 is_anim_synced = true
@@ -836,22 +1206,27 @@ frame_range = { start = 0, end = 1 }
 
 [12-17]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [12-18]
 blend_mode = "Add"
 is_anim_synced = true
+frame_range = { start = 0, end = 2 }
 
 [12-19]
 blend_mode = "Add"
 is_anim_synced = true
+frame_range = { start = 0, end = 2 }
 
 [12-20]
 blend_mode = "Add"
 is_anim_synced = true
+frame_range = { start = 0, end = 2 }
 
 [12-21]
 blend_mode = "Add"
 is_anim_synced = true
+frame_range = { start = 0, end = 2 }
 
 ################################################################################
 # Bank 13 Robots
@@ -875,48 +1250,96 @@ frame_size = [48, 48]
 frame_range = { start = 0, end = 1 }
 offset = [12, 12]
 
+[13-5]
+frame_range = { start = 0, end = 6 }
+
 [13-6]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [13-7]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [13-8]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [13-9]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [13-10]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [13-11]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [13-12]
 is_anim_synced = true
+frame_range = { start = 0, end = 3 }
 
 [13-13]
 is_anim_synced = true
+frame_range = { start = 0, end = 16 }
 
 [13-14]
 is_anim_synced = true
+frame_range = { start = 0, end = 6 }
 
 ################################################################################
 # Bank 14 Earth Beings
 ################################################################################
 
+[14-1]
+frame_range = { start = 0, end = 12 }
+
 [14-2]
 is_anim_synced = true
+frame_range = { start = 0, end = 12 }
+
+[14-3]
+frame_range = { start = 0, end = 7 }
+
+[14-4]
+frame_range = { start = 0, end = 7 }
+
+[14-5]
+frame_range = { start = 0, end = 12 }
+
+[14-6]
+frame_range = { start = 0, end = 7 }
+
+[14-7]
+frame_range = { start = 0, end = 12 }
 
 [14-8]
 is_anim_synced = true
+frame_range = { start = 0, end = 7 }
+
+[14-9]
+frame_range = { start = 0, end = 8 }
 
 [14-10]
 frame_range = { start = 0, end = 17 }
 
 [14-11]
 is_anim_synced = true
+frame_range = { start = 0, end = 10 }
+
+[14-12]
+frame_range = { start = 0, end = 14 }
+
+[14-13]
+frame_range = { start = 0, end = 7 }
+
+[14-14]
+frame_range = { start = 0, end = 8 }
+
+[14-15]
+frame_range = { start = 0, end = 7 }
 
 [14-16]
 frame_size = [120, 72]
@@ -926,6 +1349,7 @@ offset_combine = "Replace"
 
 [14-17]
 is_anim_synced = true
+frame_range = { start = 0, end = 6 }
 
 [14-18]
 frame_size = [120, 72]
@@ -959,81 +1383,133 @@ frame_range = { start = 1, end = 5 }
 # Bank 15 Objects & Areas
 ################################################################################
 
+[15-1]
+frame_range = { start = 0, end = 1 }
+
+[15-2]
+frame_range = { start = 0, end = 1 }
+
+[15-3]
+frame_range = { start = 0, end = 1 }
+
+[15-4]
+frame_range = { start = 0, end = 1 }
+
 [15-5]
 blend_mode = "Add"
+frame_range = { start = 0, end = 21 }
 
 [15-6]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [15-7]
 is_anim_synced = true
+frame_range = { start = 0, end = 24 }
 
 [15-8]
 path = "Bank15/Object1.png"
+frame_range = { start = 0, end = 1 }
 
 [15-9]
 path = "Bank15/Object2.png"
+frame_range = { start = 0, end = 1 }
 
 [15-10]
 path = "Bank15/Object3.png"
+frame_range = { start = 0, end = 1 }
 
 [15-11]
 path = "Bank15/Object4.png"
+frame_range = { start = 0, end = 1 }
+
+[15-12]
+frame_range = { start = 0, end = 1 }
 
 [15-13]
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-14]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-15]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-16]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-17]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-18]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-19]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-20]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-21]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
 
 [15-22]
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
+
+[15-23]
+frame_range = { start = 0, end = 1 }
+
+[15-24]
+frame_range = { start = 0, end = 1 }
 
 [15-25]
 alpha_range = { start = 0, end = 80 }
+frame_range = { start = 0, end = 1 }
 
 [15-26]
 frame_size = [24, 48]
 offset = [0, 12]
+frame_range = { start = 0, end = 1 }
+
+[15-27]
+frame_range = { start = 0, end = 1 }
+
+[15-28]
+frame_range = { start = 0, end = 1 }
+
+[15-29]
+frame_range = { start = 0, end = 1 }
+
+[15-30]
+frame_range = { start = 0, end = 1 }
 
 [15-31]
 is_anim_synced = true
@@ -1059,8 +1535,12 @@ frame_range = { start = 0, end = 10 }
 is_anim_synced = true
 frame_range = { start = 0, end = 10 }
 
+[15-37]
+frame_range = { start = 0, end = 1 }
+
 [15-38]
 path = "Bank15/Object4.png"
+frame_range = { start = 0, end = 1 }
 
 ################################################################################
 # Bank 16 Invisible
@@ -1068,93 +1548,123 @@ path = "Bank15/Object4.png"
 
 [16-1]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-2]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-3]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-4]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-5]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-6]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-7]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-8]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-9]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-10]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-11]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-12]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-13]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-14]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-15]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-16]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-17]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-18]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-19]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-20]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-21]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-22]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-23]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-24]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-25]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-26]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-27]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-28]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-29]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 [16-30]
 is_editor_only = true
+frame_range = { start = 0, end = 1 }
 
 ################################################################################
 # Bank 17 Creepy
@@ -1182,6 +1692,7 @@ frame_range = { start = 0, end = 1 }
 
 [17-6]
 is_anim_synced = true
+frame_range = { start = 0, end = 9 }
 
 [17-7]
 is_anim_synced = true
@@ -1217,18 +1728,23 @@ offset_combine = "Replace"
 
 [18-1]
 is_anim_synced = true
+frame_range = { start = 0, end = 8 }
 
 [18-2]
 is_anim_synced = true
+frame_range = { start = 0, end = 4 }
 
 [18-3]
 is_anim_synced = true
+frame_range = { start = 0, end = 8 }
 
 [18-4]
 is_anim_synced = true
+frame_range = { start = 0, end = 8 }
 
 [18-5]
 is_anim_synced = true
+frame_range = { start = 0, end = 4 }
 
 [18-6]
 is_anim_synced = true # synced with 17-3
@@ -1246,30 +1762,37 @@ limit = { pick = "Random", n = 1 }
 [19-1]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-2]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-3]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-4]
 alpha_range = { start = 0, end = 255 }
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 1 }
 
 [19-5]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-6]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 4 }
 
 [19-7]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 7 }
 
 [19-8]
 is_anim_synced = true
@@ -1278,6 +1801,7 @@ limit = { pick = "First", n = 1 }
 
 [19-9]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 12 }
 
 [19-10]
 is_anim_synced = true
@@ -1290,6 +1814,7 @@ limit = { pick = "First", n = 1 }
 
 [19-12]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 7 }
 
 [19-13]
 frame_range = { start = 0, end = 1 }
@@ -1301,18 +1826,23 @@ limit = { pick = "First", n = 1 }
 
 [19-15]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 6 }
 
 [19-16]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-17]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 6 }
 
 [19-18]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-19]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 14 }
 
 [19-20]
 frame_range = { start = 0, end = 1 }
@@ -1320,9 +1850,11 @@ limit = { pick = "First", n = 1 }
 
 [19-21]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 12 }
 
 [19-22]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 14 }
 
 [19-23]
 is_anim_synced = true
@@ -1340,6 +1872,7 @@ limit = { pick = "First", n = 1 }
 [19-26]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 8 }
 
 [19-27]
 is_anim_synced = true
@@ -1394,6 +1927,7 @@ limit = { pick = "First", n = 1 }
 
 [19-39]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 5 }
 
 [19-40]
 frame_range = { start = 4, end = 8 }
@@ -1402,10 +1936,12 @@ limit = { pick = "First", n = 1 }
 [19-41]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 12 }
 
 [19-42]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 7 }
 
 [19-43]
 frame_range = { start = 0, end = 17 }
@@ -1413,9 +1949,11 @@ limit = { pick = "First", n = 1 }
 
 [19-44]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 14 }
 
 [19-45]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 7 }
 
 [19-46]
 frame_range = { start = 5, end = 6 }
@@ -1433,6 +1971,7 @@ limit = { pick = "First", n = 1 }
 
 [19-49]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 7 }
 
 [19-50]
 frame_size = [24, 48]
@@ -1445,701 +1984,850 @@ limit = { pick = "Random", n = 1 }
 [19-51]
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-52]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-53]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-54]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-55]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-56]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-57]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-58]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-59]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-60]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-61]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-62]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-63]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-64]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-65]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-66]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-67]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-68]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-69]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-70]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-71]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-72]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-73]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-74]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-75]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-76]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-77]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-78]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-79]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-80]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-81]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-82]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-83]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-84]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-85]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-86]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-87]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-88]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-89]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-90]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-91]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-92]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-93]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-94]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-95]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-96]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-97]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-98]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-99]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-100]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-101]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-102]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-103]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-104]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-105]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-106]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-107]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-108]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-109]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-110]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-111]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-112]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-113]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-114]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-115]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-116]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-117]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-118]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-119]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-120]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-121]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-122]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-123]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-124]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-125]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-126]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-127]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-128]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-129]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-130]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-131]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-132]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-133]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-134]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-135]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-136]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-137]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-138]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-139]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-140]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-141]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-142]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-143]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-144]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-145]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-146]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-147]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-148]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-149]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 [19-150]
 path = "Bank19/Object51.png"
 is_anim_synced = true
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 9 }
 
 ##### Red Artifacts
 
 [19-151]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-152]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-153]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-154]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-155]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-156]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-157]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 ##### Yellow Artifacts
 
 [19-158]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-159]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-160]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-161]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-162]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-163]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-164]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 ##### Blue Artifacts
 
 [19-165]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-166]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-167]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-168]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-169]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-170]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-171]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 ##### Purple Artifacts
 
 [19-172]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-173]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-174]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-175]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-176]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-177]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-178]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 ##### Green Artifacts
 
 [19-179]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-180]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-181]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-182]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-183]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-184]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-185]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 ##### Pink Artifacts
 
 [19-186]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-187]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-188]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-189]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-190]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-191]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-192]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 ##### Cyan Artifacts
 
 [19-193]
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-194]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-195]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-196]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-197]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-198]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }
 
 [19-199]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
+frame_range = { start = 0, end = 15 }

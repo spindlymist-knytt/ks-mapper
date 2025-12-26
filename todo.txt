@@ -18,7 +18,7 @@ Bugs and Missing Features
 - Multiple ini sections not handled correctly
 
 Defs
-- Explicit frame ranges (for OCOs with differing spritesheet geometry)
+
 
 Other
 - Falling stuff (8-16)
@@ -26,4 +26,3 @@ Other
 - Crumbling gray block (15:38)
 
 Improvements
-- Multicore PNG encoding
