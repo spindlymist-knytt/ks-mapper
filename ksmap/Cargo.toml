@@ -14,7 +14,7 @@ libks = { path = "../../libks/libks" }
 libks_ini = { path = "../../libks/libks_ini" }
 mtpng = "0.4.1"
 petgraph = "0.6.5"
-png = { git = "https://github.com/image-rs/image-png" }
+png = { git = "https://github.com/spindlymist/image-png" }
 rand = "0.8.5"
 serde = { version = "1.0.208", features = ["derive"] }
 thiserror = "1.0.63"
