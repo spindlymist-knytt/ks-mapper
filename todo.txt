@@ -1,6 +1,5 @@
 Variations
 - Randomize direction (flip)
-- Use normal(?) distribution for random alpha
 
 Options
 - Global sync
@@ -8,7 +7,6 @@ Options
 - Show hidden (mole, spiky ghost block)
 
 Bugs and Missing Features
-- Handle tRNS chunks correctly
 - Custom powers (the all-in-one version) are not implemented.
 - Custom coins and artifacts aren't either.
 - Tints aren't implemented.
@@ -26,3 +24,4 @@ Other
 - Crumbling gray block (15:38)
 
 Improvements
+- Better alpha randomization via simulation
