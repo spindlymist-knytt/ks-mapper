@@ -68,14 +68,6 @@ impl GraphicsLoader {
         }
     }
 
-    pub fn object_def(&self, id: &ObjectId) -> Option<&ObjectDef> {
-        self.object_defs.get(id)
-    }
-
-    pub fn object_defs(&self) -> &HashMap<ObjectId, ObjectDef> {
-        &self.object_defs
-    }
-
     pub fn tileset(&mut self, id: AssetId) -> Result<Option<Rc<RgbaImage>>> {
         let image = match self.tilesets.get(&id) {
             Some(cached) => cached.as_ref().map(Rc::clone),

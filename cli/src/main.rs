@@ -60,7 +60,7 @@ pub fn run() -> Result<()> {
         data_dir,
         &level_dir,
         &cli.templates_dir,
-        object_defs,
+        object_defs.clone(),
     );
 
     let screens = {
@@ -81,7 +81,7 @@ pub fn run() -> Result<()> {
         editor_only: cli.editor_only,
     };
 
-    drawing::draw_partitions(&screens, &partitions, &mut gfx, &ini, output_dir, &options)?;
+    drawing::draw_partitions(&screens, &partitions, &mut gfx, &object_defs, &ini, output_dir, &options)?;
 
     Ok(())
 }

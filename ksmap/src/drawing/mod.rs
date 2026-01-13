@@ -1,4 +1,4 @@
-use std::{fs, io::Write, ops::RangeInclusive, path::Path, rc::Rc};
+use std::{collections::HashMap, fs, io::Write, ops::RangeInclusive, path::Path, rc::Rc};
 
 use anyhow::{anyhow, Result};
 use image::{codecs::png::PngEncoder, imageops, GenericImage, ImageEncoder, RgbaImage, SubImage};
@@ -7,7 +7,7 @@ use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
 use crate::{
-    definitions::{DrawParams, ObjectId, ObjectKind},
+    definitions::{DrawParams, ObjectDef, ObjectId, ObjectKind},
     graphics::GraphicsLoader,
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
@@ -37,6 +37,7 @@ struct DrawContext<'a> {
     tileset_a: Option<Rc<RgbaImage>>,
     tileset_b: Option<Rc<RgbaImage>>,
     gfx: &'a mut GraphicsLoader,
+    defs: &'a HashMap<ObjectId, ObjectDef>,
     ini_section: Option<VirtualSection<'a>>,
     sync: ScreenSync,
     opts: &'a DrawOptions,
@@ -57,6 +58,7 @@ pub fn draw_partitions(
     screens: &ScreenMap,
     partitions: &[Partition],
     gfx: &mut GraphicsLoader,
+    defs: &HashMap<ObjectId, ObjectDef>,
     ini: &Ini,
     output_dir: impl AsRef<Path>,
     options: &DrawOptions,
@@ -71,7 +73,7 @@ pub fn draw_partitions(
         let _ = std::io::stdout().flush();
         for pos in partition {
             let Some(screen) = screens.get(pos) else { continue };
-            match draw_screen(screen, gfx, ini, options) {
+            match draw_screen(screen, gfx, defs, ini, options) {
                 Ok(screen_image) => {
                     let canvas_x: u32 = ((screen.position.0 as i64 - bounds.x.start) * 600).try_into().unwrap();
                     let canvas_y: u32 = ((screen.position.1 as i64 - bounds.y.start) * 240).try_into().unwrap();
@@ -165,7 +167,13 @@ fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn draw_screen(screen: &ScreenData, gfx: &mut GraphicsLoader, ini: &Ini, options: &DrawOptions) -> Result<RgbaImage> {
+pub fn draw_screen(
+    screen: &ScreenData,
+    gfx: &mut GraphicsLoader,
+    defs: &HashMap<ObjectId, ObjectDef>,
+    ini: &Ini,
+    options: &DrawOptions
+) -> Result<RgbaImage> {
     let ini_section = ini.section(&format!("x{}y{}", screen.position.0, screen.position.1));
     let is_overlay = ini_section
         .as_ref()
@@ -176,12 +184,13 @@ pub fn draw_screen(screen: &ScreenData, gfx: &mut GraphicsLoader, ini: &Ini, opt
         });
 
     // Create context
-    let sync = ScreenSync::new(screen, gfx.object_defs());
+    let sync = ScreenSync::new(screen, defs);
     let mut ctx = DrawContext {
         image: RgbaImage::new(600, 240),
         tileset_a: gfx.tileset(screen.assets.tileset_a)?,
         tileset_b: gfx.tileset(screen.assets.tileset_b)?,
         gfx,
+        defs,
         ini_section,
         sync,
         opts: options,
@@ -239,7 +248,7 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
         if tile.1 == 0 { continue }
 
         let actual_id = ObjectId(*tile, None);
-        let object_def = ctx.gfx.object_def(&actual_id);
+        let object_def = ctx.defs.get(&actual_id);
         let proxy_id = match object_def.map(|def| &def.kind) {
             Some(ObjectKind::OverrideObject(tile)) => ObjectId(*tile, None),
             _ => ObjectId(*tile, None),
@@ -281,7 +290,7 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
 
 #[inline]
 fn draw_object(ctx: &mut DrawContext, at_index: usize, object: ObjectId) -> Result<()> {
-    let draw_params = ctx.gfx.object_def(&object)
+    let draw_params = ctx.defs.get(&object)
         .map_or_else(Default::default, |def| def.draw_params.clone());
 
     draw_object_with_params(ctx, at_index, object, &draw_params)
@@ -397,7 +406,7 @@ fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeIncl
     let offset_x = rng.gen_range(range.clone());
     let offset_y = rng.gen_range(range);
 
-    let mut draw_params = ctx.gfx.object_def(&curs.actual_id)
+    let mut draw_params = ctx.defs.get(&curs.actual_id)
         .map_or_else(Default::default, |def| def.draw_params.clone());
     draw_params.offset = Some((offset_x, offset_y));
 
