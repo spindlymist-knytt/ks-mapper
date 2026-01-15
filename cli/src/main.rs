@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use clap::Parser;
 use libks::{map_bin, world_ini};
 
-use ksmap::definitions;
+use ksmap::{analysis, definitions};
 use ksmap::drawing::{self, DrawOptions};
 use ksmap::graphics::Graphics;
 use ksmap::screen_map::ScreenMap;
@@ -53,23 +53,27 @@ pub fn run() -> Result<()> {
         std::fs::create_dir(&output_dir)?;
     }
 
+    let screens = map_bin::parse_map_file(level_dir.join("Map.bin"))?;
     let mut object_defs = definitions::load_object_defs("mapper_objects.toml")?;
     definitions::insert_custom_obj_defs(&mut object_defs, &ini);
     
-    let gfx = Graphics::new(
+    let mut gfx = Graphics::new(
         data_dir,
         &level_dir,
         &cli.templates_dir,
         &object_defs,
     );
-
-    let screens = {
-        let screens = map_bin::parse_map_file(level_dir.join("Map.bin"))?;
-        ScreenMap::new(screens)
-    };
-
+    let assets_used = analysis::list_assets(&screens, &object_defs);
+    
+    print!("Loading assets...");
+    gfx.load_tilesets(&assets_used.tilesets)?;
+    gfx.load_gradients(&assets_used.gradients)?;
+    gfx.load_objects(&assets_used.objects)?;
+    println!(" Done");
+    
+    let screen_map = ScreenMap::new(screens);
     let strategy = cli.strategy.into_strategy(max_size);
-    let partitions = strategy.partitions(&screens)?;
+    let partitions = strategy.partitions(&screen_map)?;
 
     println!("The level was partitioned into these regions:");
     for (i, partition) in partitions.iter().enumerate() {
@@ -81,7 +85,7 @@ pub fn run() -> Result<()> {
         editor_only: cli.editor_only,
     };
 
-    drawing::draw_partitions(&screens, &partitions, &gfx, &object_defs, &ini, output_dir, &options)?;
+    drawing::draw_partitions(&screen_map, &partitions, &gfx, &object_defs, &ini, output_dir, &options)?;
 
     Ok(())
 }
