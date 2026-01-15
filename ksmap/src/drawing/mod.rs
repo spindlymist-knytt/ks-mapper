@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs, io::Write, ops::RangeInclusive, path::Path, rc::Rc};
+use std::{fs, io::Write, ops::RangeInclusive, path::Path, rc::Rc};
 
 use anyhow::{anyhow, Result};
 use image::{codecs::png::PngEncoder, imageops, GenericImage, ImageEncoder, RgbaImage, SubImage};
@@ -7,8 +7,8 @@ use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
 use crate::{
-    definitions::{DrawParams, ObjectDef, ObjectDefs, ObjectId, ObjectKind},
-    graphics::{Graphics, MaybeImage},
+    definitions::{DrawParams, ObjectDefs, ObjectId, ObjectKind},
+    graphics::Graphics,
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
     synchronization::ScreenSync,
@@ -34,8 +34,8 @@ pub fn screen_index_to_pixels(i: u8) -> (i64, i64) {
 
 struct DrawContext<'a> {
     image: RgbaImage,
-    tileset_a: MaybeImage,
-    tileset_b: MaybeImage,
+    tileset_a: Option<&'a RgbaImage>,
+    tileset_b: Option<&'a RgbaImage>,
     gfx: &'a Graphics<'a>,
     defs: &'a ObjectDefs,
     ini_section: Option<VirtualSection<'a>>,
@@ -198,7 +198,7 @@ pub fn draw_screen(
     
     // Draw gradient
     if let Some(gradient) = ctx.gfx.gradient(screen.assets.gradient) {
-        imageops::tile(&mut ctx.image, gradient.as_ref());
+        imageops::tile(&mut ctx.image, gradient);
     }
     
     // Draw tile layers
@@ -228,8 +228,8 @@ fn draw_tile_layer(ctx: &mut DrawContext, layer: &LayerData) {
         }
 
         let Some(tileset) = (match tile.0 {
-            0 => ctx.tileset_a.as_ref(),
-            1 => ctx.tileset_b.as_ref(),
+            0 => ctx.tileset_a,
+            1 => ctx.tileset_b,
             _ => None,
         }) else {
             continue;
@@ -238,7 +238,7 @@ fn draw_tile_layer(ctx: &mut DrawContext, layer: &LayerData) {
         let (tile_x, tile_y) = tileset_index_to_pixels(tile.1);        
         let (screen_x, screen_y) = screen_index_to_pixels(i as u8);
         
-        let tile_img = imageops::crop_imm(tileset.as_ref(), tile_x, tile_y, 24, 24);
+        let tile_img = imageops::crop_imm(tileset, tile_x, tile_y, 24, 24);
         imageops::overlay(&mut ctx.image, &*tile_img, screen_x, screen_y);
     }
 }
@@ -300,7 +300,7 @@ fn draw_object_with_params(ctx: &mut DrawContext, at_index: usize, object: Objec
     }
 }
 
-fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, anim_t: u32, obj_img: Rc<RgbaImage>) {
+fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, anim_t: u32, obj_img: &RgbaImage) {
     let frame = pick_frame(&obj_img, params, anim_t);
     let (screen_x, screen_y) = screen_index_to_pixels(at_index);
     let (offset_x, offset_y) = params.offset.unwrap_or_default();

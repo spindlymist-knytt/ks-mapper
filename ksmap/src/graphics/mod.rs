@@ -14,15 +14,13 @@ use crate::definitions::{ObjectDef, ObjectDefs, ObjectId, ObjectKind};
 
 mod png_decoder;
 
-pub type MaybeImage = Option<Rc<RgbaImage>>;
-
 pub struct Graphics<'a> {
     paths: Paths,
     object_defs: &'a ObjectDefs,
-    paths_loaded: HashMap<PathBuf, MaybeImage>,
-    tilesets: HashMap<AssetId, MaybeImage>,
-    gradients: HashMap<AssetId, MaybeImage>,
-    objects: HashMap<ObjectId, MaybeImage>,
+    paths_loaded: HashMap<PathBuf, Rc<RgbaImage>>,
+    tilesets: HashMap<AssetId, Rc<RgbaImage>>,
+    gradients: HashMap<AssetId, Rc<RgbaImage>>,
+    objects: HashMap<ObjectId, Rc<RgbaImage>>,
 }
 
 pub struct Paths {
@@ -74,18 +72,18 @@ impl<'a> Graphics<'a> {
     
     pub fn load_tilesets(&mut self, ids: &[AssetId]) -> Result<()> {
         for id in ids {
-            let image = load_tileset(&self.paths, *id)?
-                .map(Rc::new);
-            self.tilesets.insert(*id, image);
+            if let Some(image) = load_tileset(&self.paths, *id)? {
+                self.tilesets.insert(*id, Rc::new(image));
+            }
         }
         Ok(())
     }
     
     pub fn load_gradients(&mut self, ids: &[AssetId]) -> Result<()> {
         for id in ids {
-            let image = load_gradient(&self.paths, *id)?
-                .map(Rc::new);
-            self.gradients.insert(*id, image);
+            if let Some(image) = load_gradient(&self.paths, *id)? {
+                self.gradients.insert(*id, Rc::new(image));
+            }
         }
         Ok(())
     }
@@ -99,27 +97,26 @@ impl<'a> Graphics<'a> {
                 Some(ObjectKind::OverrideObject(_)) =>
                     load_override_object(&self.paths, def.unwrap(), &self.object_defs)?
             };
-            self.objects.insert(id.clone(), image.map(Rc::new));
+            if let Some(image) = image {
+                self.objects.insert(id.clone(), Rc::new(image));
+            }
         }
         Ok(())
     }
 
-    pub fn tileset(&self, id: AssetId) -> MaybeImage {
-        self.tilesets.get(&id)?
-            .as_ref()
-            .map(Rc::clone)
+    pub fn tileset(&self, id: AssetId) -> Option<&RgbaImage> {
+        self.tilesets.get(&id)
+            .map(Rc::as_ref)
     }
 
-    pub fn gradient(&self, id: AssetId) -> MaybeImage {
-        self.gradients.get(&id)?
-            .as_ref()
-            .map(Rc::clone)
+    pub fn gradient(&self, id: AssetId) -> Option<&RgbaImage> {
+        self.gradients.get(&id)
+            .map(Rc::as_ref)
     }
 
-    pub fn object(&self, id: &ObjectId) -> MaybeImage {
-        self.objects.get(&id)?
-            .as_ref()
-            .map(Rc::clone)
+    pub fn object(&self, id: &ObjectId) -> Option<&RgbaImage> {
+        self.objects.get(&id)
+            .map(Rc::as_ref)
     }
 }
 
