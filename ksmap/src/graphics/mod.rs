@@ -10,16 +10,19 @@ use anyhow::{Context, Result};
 use image::{DynamicImage, Rgba, RgbaImage};
 use libks::map_bin::AssetId;
 
-use crate::definitions::{ObjectDef, ObjectId, ObjectKind};
+use crate::definitions::{ObjectDef, ObjectDefs, ObjectId, ObjectKind};
 
 mod png_decoder;
 
-pub struct GraphicsLoader {
+pub type MaybeImage = Option<Rc<RgbaImage>>;
+
+pub struct Graphics<'a> {
     paths: Paths,
-    object_defs: HashMap<ObjectId, ObjectDef>,
-    tilesets: HashMap<AssetId, Option<Rc<RgbaImage>>>,
-    gradients: HashMap<AssetId, Option<Rc<RgbaImage>>>,
-    objects: HashMap<ObjectId, Option<Rc<RgbaImage>>>,
+    object_defs: &'a ObjectDefs,
+    paths_loaded: HashMap<PathBuf, MaybeImage>,
+    tilesets: HashMap<AssetId, MaybeImage>,
+    gradients: HashMap<AssetId, MaybeImage>,
+    objects: HashMap<ObjectId, MaybeImage>,
 }
 
 pub struct Paths {
@@ -46,12 +49,12 @@ impl Paths {
     }
 }
 
-impl GraphicsLoader {
+impl<'a> Graphics<'a> {
     pub fn new(
         data_dir: impl AsRef<Path>,
         level_dir: impl AsRef<Path>,
         templates_dir: impl AsRef<Path>,
-        object_defs: HashMap<ObjectId, ObjectDef>,
+        object_defs: &'a ObjectDefs,
     ) -> Self {
         let paths = Paths::new(
             data_dir.as_ref().to_owned(),
@@ -62,64 +65,61 @@ impl GraphicsLoader {
         Self {
             paths,
             object_defs,
+            paths_loaded: HashMap::new(),
             tilesets: HashMap::new(),
             gradients: HashMap::new(),
             objects: HashMap::new(),
         }
     }
-
-    pub fn tileset(&mut self, id: AssetId) -> Result<Option<Rc<RgbaImage>>> {
-        let image = match self.tilesets.get(&id) {
-            Some(cached) => cached.as_ref().map(Rc::clone),
-            None => {
-                let cached = load_tileset(&self.paths, id)?
-                    .map(Rc::new);
-                let image = cached.as_ref().map(Rc::clone);
-                self.tilesets.insert(id, cached);
-
-                image
-            }
-        };
-
-        Ok(image)
+    
+    pub fn load_tilesets(&mut self, ids: &[AssetId]) -> Result<()> {
+        for id in ids {
+            let image = load_tileset(&self.paths, *id)?
+                .map(Rc::new);
+            self.tilesets.insert(*id, image);
+        }
+        Ok(())
+    }
+    
+    pub fn load_gradients(&mut self, ids: &[AssetId]) -> Result<()> {
+        for id in ids {
+            let image = load_gradient(&self.paths, *id)?
+                .map(Rc::new);
+            self.gradients.insert(*id, image);
+        }
+        Ok(())
+    }
+    
+    pub fn load_objects(&mut self, ids: &[ObjectId]) -> Result<()> {
+        for id in ids {
+            let def = self.object_defs.get(id);
+            let image = match def.map(|def| &def.kind) {
+                Some(ObjectKind::Object) | None => load_stock_object(&self.paths, id, def)?,
+                Some(ObjectKind::CustomObject) => load_custom_object(&self.paths, def.unwrap())?,
+                Some(ObjectKind::OverrideObject(_)) =>
+                    load_override_object(&self.paths, def.unwrap(), &self.object_defs)?
+            };
+            self.objects.insert(id.clone(), image.map(Rc::new));
+        }
+        Ok(())
     }
 
-    pub fn gradient(&mut self, id: AssetId) -> Result<Option<Rc<RgbaImage>>> {
-        let image = match self.gradients.get(&id) {
-            Some(cached) => cached.as_ref().map(Rc::clone),
-            None => {
-                let cached = load_gradient(&self.paths, id)?
-                    .map(Rc::new);
-                let image = cached.as_ref().map(Rc::clone);
-                self.gradients.insert(id, cached);
-
-                image
-            }
-        };
-
-        Ok(image)
+    pub fn tileset(&self, id: AssetId) -> MaybeImage {
+        self.tilesets.get(&id)?
+            .as_ref()
+            .map(Rc::clone)
     }
 
-    pub fn object(&mut self, id: &ObjectId) -> Result<Option<Rc<RgbaImage>>> {
-        let image = match self.objects.get(id) {
-            Some(cached) => cached.as_ref().map(Rc::clone),
-            None => {
-                let def = self.object_defs.get(&id);
-                let cached = match def.map(|def| &def.kind) {
-                        Some(ObjectKind::Object) | None => load_stock_object(&self.paths, id, def)?,
-                        Some(ObjectKind::CustomObject) => load_custom_object(&self.paths, def.unwrap())?,
-                        Some(ObjectKind::OverrideObject(_)) =>
-                            load_override_object(&self.paths, def.unwrap(), &self.object_defs)?
-                    }
-                    .map(Rc::new);
-                let image = cached.as_ref().map(Rc::clone);
-                self.objects.insert(id.clone(), cached);
+    pub fn gradient(&self, id: AssetId) -> MaybeImage {
+        self.gradients.get(&id)?
+            .as_ref()
+            .map(Rc::clone)
+    }
 
-                image
-            }
-        };
-
-        Ok(image)
+    pub fn object(&self, id: &ObjectId) -> MaybeImage {
+        self.objects.get(&id)?
+            .as_ref()
+            .map(Rc::clone)
     }
 }
 
@@ -218,7 +218,7 @@ fn load_custom_object(paths: &Paths, def: &ObjectDef) -> Result<Option<RgbaImage
 fn load_override_object(
     paths: &Paths,
     def: &ObjectDef,
-    object_defs: &HashMap<ObjectId, ObjectDef>
+    object_defs: &ObjectDefs,
 ) -> Result<Option<RgbaImage>> {
     let mut image = 
         if def.ignore_oco_path {

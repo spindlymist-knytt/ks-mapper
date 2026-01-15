@@ -4,7 +4,7 @@ use libks::{map_bin, world_ini};
 
 use ksmap::definitions;
 use ksmap::drawing::{self, DrawOptions};
-use ksmap::graphics::GraphicsLoader;
+use ksmap::graphics::Graphics;
 use ksmap::screen_map::ScreenMap;
 
 mod cli;
@@ -56,11 +56,11 @@ pub fn run() -> Result<()> {
     let mut object_defs = definitions::load_object_defs("mapper_objects.toml")?;
     definitions::insert_custom_obj_defs(&mut object_defs, &ini);
     
-    let mut gfx = GraphicsLoader::new(
+    let gfx = Graphics::new(
         data_dir,
         &level_dir,
         &cli.templates_dir,
-        object_defs.clone(),
+        &object_defs,
     );
 
     let screens = {
@@ -81,7 +81,7 @@ pub fn run() -> Result<()> {
         editor_only: cli.editor_only,
     };
 
-    drawing::draw_partitions(&screens, &partitions, &mut gfx, &object_defs, &ini, output_dir, &options)?;
+    drawing::draw_partitions(&screens, &partitions, &gfx, &object_defs, &ini, output_dir, &options)?;
 
     Ok(())
 }

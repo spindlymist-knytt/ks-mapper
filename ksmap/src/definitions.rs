@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs, ops::{Range, RangeInclusive}, path::Path};
+use std::{collections::HashMap, fs, ops::{Deref, DerefMut, Range, RangeInclusive}, path::Path};
 
 use anyhow::Result;
 use libks::map_bin::Tile;
@@ -82,8 +82,37 @@ pub enum Limit {
     LogNPlusOne,
 }
 
-pub fn load_object_defs(path: impl AsRef<Path>) -> Result<HashMap<ObjectId, ObjectDef>> {
-    let mut objects = HashMap::<ObjectId, ObjectDef>::new();
+pub struct ObjectDefs {
+    pub defs: HashMap<ObjectId, ObjectDef>,
+    pub variants: HashMap<Tile, Vec<String>>,
+}
+
+impl ObjectDefs {
+    pub fn variants_of(&self, object: Tile) -> impl Iterator<Item = &String> {
+        match self.variants.get(&object) {
+            Some(variants) => variants.iter(),
+            None => [].iter(),
+        }
+    }
+}
+
+impl Deref for ObjectDefs {
+    type Target = HashMap<ObjectId, ObjectDef>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.defs
+    }
+}
+
+impl DerefMut for ObjectDefs {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.defs
+    }
+}
+
+pub fn load_object_defs(path: impl AsRef<Path>) -> Result<ObjectDefs> {
+    let mut defs = HashMap::<ObjectId, ObjectDef>::new();
+    let mut variants = HashMap::<Tile, Vec<String>>::new();
 
     let raw = fs::read_to_string(path)?;
     let table: toml::Table = raw.parse()?;
@@ -92,14 +121,24 @@ pub fn load_object_defs(path: impl AsRef<Path>) -> Result<HashMap<ObjectId, Obje
         if let toml::Value::Table(table) = value {
             let id = ObjectId::try_from(key)?;
             let def = table.try_into()?;
-            objects.insert(id, def);
+            
+            if let Some(variant) = id.1.as_ref() {
+                variants.entry(id.0)
+                    .or_insert(Vec::new())
+                    .push(variant.clone());
+            }
+            
+            defs.insert(id, def);
         }
     }
 
-    Ok(objects)
+    Ok(ObjectDefs {
+        defs,
+        variants,
+    })
 }
 
-pub fn insert_custom_obj_defs(defs: &mut HashMap<ObjectId, ObjectDef>, ini: &Ini) {
+pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
     for section in ini.iter_sections() {
         let key_lower = section.key().to_ascii_lowercase();
 

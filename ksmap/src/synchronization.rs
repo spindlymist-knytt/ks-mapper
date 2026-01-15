@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use rand::{seq::SliceRandom, thread_rng, Rng};
 use libks::map_bin::ScreenData;
 
-use crate::definitions::{Limit, ObjectDef, ObjectId};
+use crate::definitions::{Limit, ObjectDef, ObjectDefs, ObjectId};
 
 pub struct ScreenSync {
     pub anim_t: u32,
@@ -22,7 +22,7 @@ pub struct Limiter {
 // let mut n_19_50 = 0;
 
 impl ScreenSync {
-    pub fn new(screen: &ScreenData, object_defs: &HashMap<ObjectId, ObjectDef>) -> Self {
+    pub fn new(screen: &ScreenData, object_defs: &ObjectDefs) -> Self {
         let anim_t = thread_rng().gen();
         let mut limiters = HashMap::new();
         let mut counts = HashMap::new();

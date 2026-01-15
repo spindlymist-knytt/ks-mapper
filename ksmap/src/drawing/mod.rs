@@ -7,8 +7,8 @@ use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
 use crate::{
-    definitions::{DrawParams, ObjectDef, ObjectId, ObjectKind},
-    graphics::GraphicsLoader,
+    definitions::{DrawParams, ObjectDef, ObjectDefs, ObjectId, ObjectKind},
+    graphics::{Graphics, MaybeImage},
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
     synchronization::ScreenSync,
@@ -34,10 +34,10 @@ pub fn screen_index_to_pixels(i: u8) -> (i64, i64) {
 
 struct DrawContext<'a> {
     image: RgbaImage,
-    tileset_a: Option<Rc<RgbaImage>>,
-    tileset_b: Option<Rc<RgbaImage>>,
-    gfx: &'a mut GraphicsLoader,
-    defs: &'a HashMap<ObjectId, ObjectDef>,
+    tileset_a: MaybeImage,
+    tileset_b: MaybeImage,
+    gfx: &'a Graphics<'a>,
+    defs: &'a ObjectDefs,
     ini_section: Option<VirtualSection<'a>>,
     sync: ScreenSync,
     opts: &'a DrawOptions,
@@ -57,8 +57,8 @@ struct Cursor {
 pub fn draw_partitions(
     screens: &ScreenMap,
     partitions: &[Partition],
-    gfx: &mut GraphicsLoader,
-    defs: &HashMap<ObjectId, ObjectDef>,
+    gfx: &Graphics,
+    defs: &ObjectDefs,
     ini: &Ini,
     output_dir: impl AsRef<Path>,
     options: &DrawOptions,
@@ -169,8 +169,8 @@ fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
 
 pub fn draw_screen(
     screen: &ScreenData,
-    gfx: &mut GraphicsLoader,
-    defs: &HashMap<ObjectId, ObjectDef>,
+    gfx: &Graphics,
+    defs: &ObjectDefs,
     ini: &Ini,
     options: &DrawOptions
 ) -> Result<RgbaImage> {
@@ -187,8 +187,8 @@ pub fn draw_screen(
     let sync = ScreenSync::new(screen, defs);
     let mut ctx = DrawContext {
         image: RgbaImage::new(600, 240),
-        tileset_a: gfx.tileset(screen.assets.tileset_a)?,
-        tileset_b: gfx.tileset(screen.assets.tileset_b)?,
+        tileset_a: gfx.tileset(screen.assets.tileset_a),
+        tileset_b: gfx.tileset(screen.assets.tileset_b),
         gfx,
         defs,
         ini_section,
@@ -197,7 +197,7 @@ pub fn draw_screen(
     };
     
     // Draw gradient
-    if let Some(gradient) = ctx.gfx.gradient(screen.assets.gradient)? {
+    if let Some(gradient) = ctx.gfx.gradient(screen.assets.gradient) {
         imageops::tile(&mut ctx.image, gradient.as_ref());
     }
     
@@ -210,13 +210,13 @@ pub fn draw_screen(
     draw_tile_layer(&mut ctx, &screen.layers[3]);
 
     // Draw object layers
-    draw_object_layer(&mut ctx, &screen.layers[4])?;
-    draw_object_layer(&mut ctx, &screen.layers[5])?;
-    draw_object_layer(&mut ctx, &screen.layers[6])?;
+    draw_object_layer(&mut ctx, &screen.layers[4]);
+    draw_object_layer(&mut ctx, &screen.layers[5]);
+    draw_object_layer(&mut ctx, &screen.layers[6]);
     if is_overlay {
         draw_tile_layer(&mut ctx, &screen.layers[2]);
     }
-    draw_object_layer(&mut ctx, &screen.layers[7])?;
+    draw_object_layer(&mut ctx, &screen.layers[7]);
 
     Ok(ctx.image)
 }
@@ -243,7 +243,7 @@ fn draw_tile_layer(ctx: &mut DrawContext, layer: &LayerData) {
     }
 }
 
-fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
+fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
     for (i, tile) in layer.0.iter().enumerate() {
         if tile.1 == 0 { continue }
 
@@ -282,27 +282,22 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) -> Result<()> {
             Tile(8, 10) => draw_with_random_offset(ctx, curs, -6..=6),
             Tile(8, 15) => draw_with_random_offset(ctx, curs, -12..=12),
             _ => draw_object(ctx, curs.i, curs.actual_id),
-        }?;
+        }
     }
-
-    Ok(())
 }
 
 #[inline]
-fn draw_object(ctx: &mut DrawContext, at_index: usize, object: ObjectId) -> Result<()> {
+fn draw_object(ctx: &mut DrawContext, at_index: usize, object: ObjectId) {
     let draw_params = ctx.defs.get(&object)
         .map_or_else(Default::default, |def| def.draw_params.clone());
-
-    draw_object_with_params(ctx, at_index, object, &draw_params)
+    draw_object_with_params(ctx, at_index, object, &draw_params);
 }
 
 #[inline]
-fn draw_object_with_params(ctx: &mut DrawContext, at_index: usize, object: ObjectId, params: &DrawParams) -> Result<()> {
-    if let Some(obj_image) = ctx.gfx.object(&object)? {
+fn draw_object_with_params(ctx: &mut DrawContext, at_index: usize, object: ObjectId, params: &DrawParams) {
+    if let Some(obj_image) = ctx.gfx.object(&object) {
         draw_spritesheet(ctx, at_index as u8, params, ctx.sync.anim_t, obj_image);
     }
-
-    Ok(())
 }
 
 fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, anim_t: u32, obj_img: Rc<RgbaImage>) {
@@ -359,7 +354,7 @@ fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: u32) -
     imageops::crop_imm(object_img, frame_x, frame_y, frame_width, frame_height)
 }
 
-fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &str) -> Result<()> {
+fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &str) {
     let shift_visible = !ctx.ini_section
         .as_ref()
         .and_then(|section| section.get(vis_prop))
@@ -367,7 +362,7 @@ fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &s
         .eq_ignore_ascii_case("False");
 
     if !shift_visible {
-        return Ok(());
+        return;
     }
 
     let shift_type = match ctx.ini_section
@@ -382,26 +377,24 @@ fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &s
         _ => "Spot",
     };
 
-    draw_object(ctx, curs.i, curs.proxy_id.into_variant(shift_type))
+    draw_object(ctx, curs.i, curs.proxy_id.into_variant(shift_type));
 }
 
-fn draw_with_glow(ctx: &mut DrawContext, curs: Cursor) -> Result<()> {
-    draw_object(ctx, curs.i, curs.proxy_id.with_variant("Glow"))?;
-    draw_object(ctx, curs.i, curs.actual_id)?;
-
-    Ok(())
+fn draw_with_glow(ctx: &mut DrawContext, curs: Cursor) {
+    draw_object(ctx, curs.i, curs.proxy_id.with_variant("Glow"));
+    draw_object(ctx, curs.i, curs.actual_id);
 }
 
-fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) -> Result<()> {
+fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) {
     let mut rng = thread_rng();
     let variant = &["A", "B", "C", "D"]
         .choose(&mut rng)
         .unwrap();
 
-    draw_object(ctx, curs.i, curs.proxy_id.into_variant(variant))
+    draw_object(ctx, curs.i, curs.proxy_id.into_variant(variant));
 }
 
-fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeInclusive<i64>) -> Result<()> {
+fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeInclusive<i64>) {
     let mut rng = thread_rng();
     let offset_x = rng.gen_range(range.clone());
     let offset_y = rng.gen_range(range);
@@ -410,5 +403,5 @@ fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeIncl
         .map_or_else(Default::default, |def| def.draw_params.clone());
     draw_params.offset = Some((offset_x, offset_y));
 
-    draw_object_with_params(ctx, curs.i, curs.actual_id, &draw_params)
+    draw_object_with_params(ctx, curs.i, curs.actual_id, &draw_params);
 }
