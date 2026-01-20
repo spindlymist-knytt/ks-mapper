@@ -328,13 +328,14 @@ fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, an
 fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: u32) -> SubImage<&'a RgbaImage> {
     let size = object_img.dimensions();
     let (frame_width, frame_height) = params.frame_size.unwrap_or((24, 24));
-    let frames_per_row = (size.0 / frame_width).max(1);
-
-    let frame_range = params.frame_range.clone().unwrap_or_else(|| {
-        let n_rows = size.1 / frame_height;
+    let frames_per_row = u32::max(1, size.0 / frame_width);
+    let n_rows = u32::max(1, size.1 / frame_height);
+    let n_frames_max = n_rows * frames_per_row;
+    let mut frame_range = params.frame_range.clone().unwrap_or_else(|| {
         let n_frames = n_rows * frames_per_row;
         0..n_frames
     });
+    frame_range.end = u32::min(n_frames_max, frame_range.end);
 
     let frame = 
         if frame_range.is_empty() {
