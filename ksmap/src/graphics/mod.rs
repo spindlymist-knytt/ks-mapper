@@ -258,6 +258,7 @@ impl<'a> Graphics<'a> {
                     pixel.0[1] = new[1];
                     pixel.0[2] = new[2];
                     // Alpha channel is preserved
+                    break;
                 }
             }
         }
