@@ -1,27 +1,9 @@
-Variations
-- Randomize direction (flip)
-
 Options
 - Global sync
 - Exaggerated decorations
 - Show hidden (mole, spiky ghost block)
 
-Bugs and Missing Features
-- Custom powers (the all-in-one version) are not implemented.
-- Custom coins and artifacts aren't either.
-- Tints aren't implemented.
-- Bank 7 OCOs
-- Gold creature particles
-- Blinking
-- Multiple ini sections not handled correctly
-
-Defs
-
-
 Other
 - Falling stuff (8-16)
 - White explosion (8-17)
 - Crumbling gray block (15:38)
-
-Improvements
-- Better alpha randomization via simulation
