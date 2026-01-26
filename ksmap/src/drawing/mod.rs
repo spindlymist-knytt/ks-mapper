@@ -341,7 +341,7 @@ fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: u32) -
         if frame_range.is_empty() {
             0
         }
-        else if params.sync_within_screen {
+        else if params.is_anim_synced {
             let n_frames = frame_range.end - frame_range.start;
             (anim_t % n_frames) + frame_range.start
         }
