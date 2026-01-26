@@ -158,12 +158,13 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         };
 
         let bank = section.get("Bank")
-            .and_then(|v| str::parse(v).ok());
+            .and_then(|v| str::parse(v).ok())
+            .unwrap_or(0);
         let object = section.get("Object")
             .and_then(|v| str::parse(v).ok());
 
         let path = section.get("Image").map(|v| v.to_owned());
-        if path.is_none() && bank != Some(7) {
+        if path.is_none() && bank != 7 {
             continue;
         }
 
@@ -205,9 +206,9 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         let color_offsets = Vec::new();
         let mut replace_colors = Vec::new();
 
-        if let (Some(bank), Some(obj)) = (bank, object) {
-            kind = ObjectKind::OverrideObject(Tile(bank, obj));
-            let oco_id = ObjectId(Tile(bank, obj), None);
+        if let Some(object) = object {
+            kind = ObjectKind::OverrideObject(Tile(bank, object));
+            let oco_id = ObjectId(Tile(bank, object), None);
 
             if let Some(oco_def) = defs.get(&oco_id) {
                 is_anim_synced = oco_def.draw_params.is_anim_synced;
