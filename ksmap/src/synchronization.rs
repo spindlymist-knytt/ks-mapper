@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use rand::{seq::SliceRandom, thread_rng, Rng};
+use rand::{rng, RngCore, seq::SliceRandom};
 use libks::map_bin::ScreenData;
 
-use crate::definitions::{Limit, ObjectDef, ObjectDefs, ObjectId};
+use crate::definitions::{Limit, ObjectDefs, ObjectId};
 
 pub struct ScreenSync {
     pub anim_t: u32,
@@ -15,15 +15,9 @@ pub struct Limiter {
     chosen: Vec<usize>,
 }
 
-// let mut n_8_10 = 0;
-// let mut n_8_15 = 0;
-// let mut n_17_3 = 0;
-// let mut n_18_6 = 0;
-// let mut n_19_50 = 0;
-
 impl ScreenSync {
     pub fn new(screen: &ScreenData, object_defs: &ObjectDefs) -> Self {
-        let anim_t = thread_rng().gen();
+        let anim_t = rng().next_u32();
         let mut limiters = HashMap::new();
         let mut counts = HashMap::new();
 
@@ -92,7 +86,7 @@ impl Limiter {
         }
 
         let mut all = Vec::from_iter(0..total);
-        let (shuffled, _) = all.partial_shuffle(&mut thread_rng(), n);
+        let (shuffled, _) = all.partial_shuffle(&mut rng(), n);
 
         Self::new(shuffled.to_owned())
     }

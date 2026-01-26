@@ -1,8 +1,8 @@
-use std::{fs, io::Write, ops::RangeInclusive, path::Path, rc::Rc};
+use std::{fs, io::Write, ops::RangeInclusive, path::Path};
 
 use anyhow::{anyhow, Result};
 use image::{codecs::png::PngEncoder, imageops, GenericImage, ImageEncoder, RgbaImage, SubImage};
-use rand::{thread_rng, Rng, seq::SliceRandom};
+use rand::{prelude::*, rng};
 use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
@@ -317,7 +317,7 @@ fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, an
     };
 
     if let Some(alpha_range) = params.alpha_range.as_ref() {
-        let alpha = thread_rng().gen_range(alpha_range.clone()) as f32 / 255.0;
+        let alpha = rng().random_range(alpha_range.clone()) as f32 / 255.0;
         blend_modes::overlay_with_alpha(&mut ctx.image, &*frame, final_x, final_y, params.blend_mode, alpha);
     }
     else {
@@ -341,12 +341,12 @@ fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: u32) -
         if frame_range.is_empty() {
             0
         }
-        else if params.is_anim_synced {
+        else if params.sync_within_screen {
             let n_frames = frame_range.end - frame_range.start;
             (anim_t % n_frames) + frame_range.start
         }
         else {
-            thread_rng().gen_range(frame_range)
+            rng().random_range(frame_range)
         };
 
     let frame_x = (frame % frames_per_row) * frame_width;
@@ -387,7 +387,7 @@ fn draw_with_glow(ctx: &mut DrawContext, curs: Cursor) {
 }
 
 fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) {
-    let mut rng = thread_rng();
+    let mut rng = rng();
     let variant = &["A", "B", "C", "D"]
         .choose(&mut rng)
         .unwrap();
@@ -396,9 +396,9 @@ fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) {
 }
 
 fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeInclusive<i64>) {
-    let mut rng = thread_rng();
-    let offset_x = rng.gen_range(range.clone());
-    let offset_y = rng.gen_range(range);
+    let mut rng = rng();
+    let offset_x = rng.random_range(range.clone());
+    let offset_y = rng.random_range(range);
 
     let mut draw_params = ctx.defs.get(&curs.actual_id)
         .map_or_else(Default::default, |def| def.draw_params.clone());
