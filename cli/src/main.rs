@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Result};
 use clap::Parser;
+use ksmap::synchronization::WorldSync;
 use libks::{map_bin, world_ini};
 
 use ksmap::{analysis, definitions};
@@ -84,8 +85,10 @@ pub fn run() -> Result<()> {
     let options = DrawOptions {
         editor_only: cli.editor_only,
     };
+    
+    let world_sync = WorldSync::new(&screen_map, &object_defs);
 
-    drawing::draw_partitions(&screen_map, &partitions, &gfx, &object_defs, &ini, output_dir, &options)?;
+    drawing::draw_partitions(&screen_map, &partitions, &gfx, &object_defs, &ini, output_dir, &options, &world_sync)?;
 
     Ok(())
 }
