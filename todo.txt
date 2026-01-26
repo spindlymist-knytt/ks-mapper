@@ -1,5 +1,4 @@
 Options
-- Global sync
 - Exaggerated decorations
 - Show hidden (mole, spiky ghost block)
 

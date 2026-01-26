@@ -3,7 +3,7 @@
 ################################################################################
 
 [0-1]
-is_anim_synced = true
+sync_to = "Screen"
 blend_mode = "Add"
 frame_range = { start = 0, end = 9 }
 
@@ -12,35 +12,35 @@ is_editor_only = true
 frame_range = { start = 0, end = 1 }
 
 [0-3]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 12 }
 
 [0-4]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-5]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 7 }
 
 [0-6]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 [0-7]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-8]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-9]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-10]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-11]
@@ -56,7 +56,7 @@ is_editor_only = true
 frame_range = { start = 0, end = 1 }
 
 ["0-14 Spot"]
-is_anim_synced = true
+sync_to = "Screen"
 blend_mode = "Add"
 frame_range = { start = 0, end = 9 }
 
@@ -64,7 +64,7 @@ frame_range = { start = 0, end = 9 }
 frame_range = { start = 0, end = 1 }
 
 ["0-14 Circle"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 ["0-14 Square"]
@@ -72,7 +72,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-15 Spot"]
 path = "Bank0/Object14_Spot.png"
-is_anim_synced = true
+sync_to = "Screen"
 blend_mode = "Add"
 frame_range = { start = 0, end = 9 }
 
@@ -82,7 +82,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-15 Circle"]
 path = "Bank0/Object14_Circle.png"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 ["0-15 Square"]
@@ -91,7 +91,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-16 Spot"]
 path = "Bank0/Object14_Spot.png"
-is_anim_synced = true
+sync_to = "Screen"
 blend_mode = "Add"
 frame_range = { start = 0, end = 9 }
 
@@ -101,7 +101,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-16 Circle"]
 path = "Bank0/Object14_Circle.png"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 ["0-16 Square"]
@@ -125,19 +125,19 @@ is_editor_only = true
 frame_range = { start = 0, end = 1 }
 
 [0-21]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-22]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-23]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-24]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-25]
@@ -169,7 +169,7 @@ is_editor_only = true
 frame_range = { start = 0, end = 1 }
 
 ["0-32 Spot"]
-is_anim_synced = true
+sync_to = "Screen"
 blend_mode = "Add"
 frame_range = { start = 0, end = 9 }
 
@@ -179,7 +179,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-32 Circle"]
 path = "Bank0/Object14_Circle.png"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 ["0-32 Square"]
@@ -188,7 +188,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-33 Spot"]
 path = "Bank0/Object32_Spot.png"
-is_anim_synced = true
+sync_to = "Screen"
 blend_mode = "Add"
 frame_range = { start = 0, end = 9 }
 
@@ -198,7 +198,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-33 Circle"]
 path = "Bank0/Object14_Circle.png"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 ["0-33 Square"]
@@ -207,7 +207,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-34 Spot"]
 path = "Bank0/Object32_Spot.png"
-is_anim_synced = true
+sync_to = "Screen"
 blend_mode = "Add"
 frame_range = { start = 0, end = 9 }
 
@@ -217,7 +217,7 @@ frame_range = { start = 0, end = 1 }
 
 ["0-34 Circle"]
 path = "Bank0/Object14_Circle.png"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 ["0-34 Square"]
@@ -225,7 +225,7 @@ path = "Bank0/Object14_Square.png"
 frame_range = { start = 0, end = 1 }
 
 [0-35]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [0-36]
@@ -358,10 +358,12 @@ frame_range = { start = 0, end = 1 }
 frame_range = { start = 0, end = 1 }
 
 [1-10]
+sync_west = ["1-10"]
+sync_east = ["1-10"]
 frame_range = { start = 0, end = 32 }
 
 ["1-10 Glow"]
-is_anim_synced = true
+sync_to = "Group"
 blend_mode = "Add"
 frame_size = [24, 96]
 offset = [0, -36]
@@ -371,11 +373,13 @@ frame_range = { start = 0, end = 2 }
 frame_range = { start = 0, end = 1 }
 
 [1-12]
+sync_west = ["1-12"]
+sync_east = ["1-12"]
 frame_range = { start = 0, end = 32 }
 
 ["1-12 Glow"]
 path = "Bank1/Object10_Glow.png"
-is_anim_synced = true
+sync_to = "Group"
 blend_mode = "Add"
 frame_size = [24, 96]
 offset = [0, -36]
@@ -411,10 +415,12 @@ frame_range = { start = 0, end = 21 }
 frame_range = { start = 0, end = 1 }
 
 [1-22]
+sync_west = ["1-22"]
+sync_east = ["1-22"]
 frame_range = { start = 0, end = 24 }
 
 ["1-22 Glow"]
-is_anim_synced = true
+sync_to = "Group"
 blend_mode = "Add"
 frame_size = [24, 72]
 offset = [0, -24]
@@ -444,11 +450,11 @@ frame_range = { start = 0, end = 1 }
 ################################################################################
 
 [2-1]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [2-2]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [2-3]
@@ -460,15 +466,15 @@ blend_mode = "Sub"
 frame_range = { start = 0, end = 1 }
 
 [2-5]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [2-6]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [2-7]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [2-8]
@@ -476,19 +482,19 @@ alpha_range = { start = 0, end = 255 }
 frame_range = { start = 0, end = 17 }
 
 [2-9]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 12 }
 
 [2-10]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 12 }
 
 [2-11]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [2-12]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [2-13]
@@ -496,89 +502,89 @@ alpha_range = { start = 0, end = 255 }
 frame_range = { start = 0, end = 33 }
 
 [2-14]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [2-15]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 4 }
 
 [2-16]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 4 }
 
 [2-17]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 4 }
 
 ["2-18 A"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 19 }
 
 ["2-18 B"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 13 }
 
 ["2-18 C"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 ["2-18 D"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 ["2-19 A"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 17 }
 
 ["2-19 B"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 12 }
 
 ["2-19 C"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 14 }
 
 ["2-19 D"]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 [2-20]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 7 }
 
 [2-21]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 7 }
 
 [2-22]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [2-23]
 frame_range = { start = 0, end = 19 }
 
 [2-24]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 4 }
 
 [2-25]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 [2-26]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 [2-27]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 [2-28]
 frame_range = { start = 0, end = 12 }
 
 [2-29]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 [2-30]
@@ -588,7 +594,7 @@ frame_range = { start = 0, end = 19 }
 frame_range = { start = 0, end = 16 }
 
 [2-32]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 4 }
 
 ################################################################################
@@ -683,7 +689,7 @@ frame_range = { start = 0, end = 11 }
 frame_range = { start = 0, end = 9 }
 
 [3-30]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 [3-31]
@@ -739,15 +745,15 @@ frame_range = { start = 0, end = 1 }
 frame_range = { start = 0, end = 1 }
 
 [4-3]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 [4-4]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 5 }
 
 [4-5]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 5 }
 
 [4-6]
@@ -771,7 +777,7 @@ frame_range = { start = 0, end = 8 }
 frame_range = { start = 0, end = 8 }
 
 [4-12]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [4-13]
@@ -781,11 +787,11 @@ frame_range = { start = 0, end = 1 }
 frame_range = { start = 0, end = 11 }
 
 [4-15]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [4-16]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 5, end = 13 }
 
 [4-17]
@@ -973,23 +979,31 @@ frame_range = { start = 0, end = 1 }
 ################################################################################
 
 [8-1]
-is_anim_synced = true
+sync_to = "Group"
+sync_west = ["8-1"]
+sync_east = ["8-1"]
 frame_range = { start = 0, end = 3 }
 
 [8-2]
-is_anim_synced = true
+sync_to = "Group"
+sync_north = ["8-2"]
+sync_south = ["8-2"]
 frame_range = { start = 0, end = 3 }
 
 [8-3]
-is_anim_synced = true
+sync_to = "Group"
+sync_east = ["8-4", "8-5"]
 frame_range = { start = 0, end = 3 }
 
 [8-4]
-is_anim_synced = true
+sync_to = "Group"
+sync_west = ["8-3", "8-4"]
+sync_east = ["8-4", "8-5"]
 frame_range = { start = 0, end = 3 }
 
 [8-5]
-is_anim_synced = true
+sync_to = "Group"
+sync_west = ["8-3", "8-4"]
 frame_range = { start = 0, end = 3 }
 
 [8-6]
@@ -1018,7 +1032,7 @@ frame_range = { start = 0, end = 24 }
 frame_range = { start = 0, end = 8 }
 
 [8-12]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 [8-13]
@@ -1144,13 +1158,13 @@ frame_range = { start = 0, end = 5 }
 
 [12-1]
 alpha_range = { start = 0, end = 96 }
-is_anim_synced = true
+sync_to = "Screen"
 frame_size = [24, 28]
 frame_range = { start = 0, end = 10 }
 
 [12-2]
 alpha_range = { start = 0, end = 96 }
-is_anim_synced = true
+sync_to = "Screen"
 frame_size = [24, 28]
 frame_range = { start = 0, end = 10 }
 
@@ -1159,7 +1173,7 @@ frame_range = { start = 0, end = 6 }
 
 [12-4]
 alpha_range = { start = 0, end = 96 }
-is_anim_synced = true
+sync_to = "Screen"
 frame_size = [24, 29]
 offset = [0, -2]
 frame_range = { start = 0, end = 10 }
@@ -1176,14 +1190,14 @@ frame_range = { start = 0, end = 14 }
 
 [12-7]
 alpha_range = { start = 0, end = 96 }
-is_anim_synced = true
+sync_to = "Screen"
 frame_size = [24, 28]
 offset = [0, -2]
 frame_range = { start = 0, end = 8 }
 
 [12-8]
 alpha_range = { start = 0, end = 96 }
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 18 }
 
 [12-9]
@@ -1199,7 +1213,7 @@ offset = [12, -12]
 
 [12-11]
 alpha_range = { start = 0, end = 96 }
-is_anim_synced = true
+sync_to = "Screen"
 frame_size = [24, 28]
 frame_range = { start = 0, end = 10 }
 
@@ -1223,7 +1237,7 @@ offset = [0, -1]
 frame_range = { start = 0, end = 6 }
 
 [12-16]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 
 [12-17]
@@ -1232,22 +1246,22 @@ frame_range = { start = 0, end = 1 }
 
 [12-18]
 blend_mode = "Add"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 2 }
 
 [12-19]
 blend_mode = "Add"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 2 }
 
 [12-20]
 blend_mode = "Add"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 2 }
 
 [12-21]
 blend_mode = "Add"
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 2 }
 
 ################################################################################
@@ -1255,11 +1269,11 @@ frame_range = { start = 0, end = 2 }
 ################################################################################
 
 [13-1]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 [13-2]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 [13-3]
@@ -1276,43 +1290,55 @@ offset = [12, 12]
 frame_range = { start = 0, end = 6 }
 
 [13-6]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [13-7]
-is_anim_synced = true
+sync_to = "Group"
+sync_west = ["13-7"]
+sync_east = ["13-7"]
 frame_range = { start = 0, end = 3 }
 
 [13-8]
 path = "Bank13/Object7.png"
-is_anim_synced = true
+sync_to = "Group"
+sync_west = ["13-8"]
+sync_east = ["13-8"]
 frame_range = { start = 0, end = 3 }
 
 [13-9]
 path = "Bank13/Object7.png"
-is_anim_synced = true
+sync_to = "Group"
+sync_west = ["13-9"]
+sync_east = ["13-9"]
 frame_range = { start = 0, end = 3 }
 
 [13-10]
-is_anim_synced = true
+sync_to = "Group"
+sync_north = ["13-10"]
+sync_south = ["13-10"]
 frame_range = { start = 0, end = 3 }
 
 [13-11]
 path = "Bank13/Object10.png"
-is_anim_synced = true
+sync_to = "Group"
+sync_north = ["13-11"]
+sync_south = ["13-11"]
 frame_range = { start = 0, end = 3 }
 
 [13-12]
 path = "Bank13/Object10.png"
-is_anim_synced = true
+sync_to = "Group"
+sync_north = ["13-12"]
+sync_south = ["13-12"]
 frame_range = { start = 0, end = 3 }
 
 [13-13]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 16 }
 
 [13-14]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 ################################################################################
@@ -1323,7 +1349,7 @@ frame_range = { start = 0, end = 6 }
 frame_range = { start = 0, end = 12 }
 
 [14-2]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 12 }
 
 [14-3]
@@ -1342,7 +1368,7 @@ frame_range = { start = 0, end = 7 }
 frame_range = { start = 0, end = 12 }
 
 [14-8]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 7 }
 
 [14-9]
@@ -1352,7 +1378,7 @@ frame_range = { start = 0, end = 8 }
 frame_range = { start = 0, end = 17 }
 
 [14-11]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [14-12]
@@ -1374,7 +1400,7 @@ offset = [0, -24]
 offset_combine = "Replace"
 
 [14-17]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
 
 [14-18]
@@ -1390,19 +1416,19 @@ frame_range = { start = 5, end = 6 }
 frame_range = { start = 5, end = 6 }
 
 [14-21]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 4, end = 5 }
 
 [14-22]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 4, end = 5 }
 
 [14-23]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 4, end = 5 }
 
 [14-24]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 4, end = 5 }
 
 ################################################################################
@@ -1430,7 +1456,7 @@ is_editor_only = true
 frame_range = { start = 0, end = 1 }
 
 [15-7]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 24 }
 
 [15-8]
@@ -1538,27 +1564,27 @@ frame_range = { start = 0, end = 1 }
 frame_range = { start = 0, end = 1 }
 
 [15-31]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [15-32]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [15-33]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [15-34]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [15-35]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [15-36]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 10 }
 
 [15-37]
@@ -1697,14 +1723,14 @@ frame_range = { start = 0, end = 1 }
 ################################################################################
 
 [17-1]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 6, end = 13 }
 
 [17-2]
 frame_range = { start = 0, end = 7 }
 
 [17-3]
-is_anim_synced = true # synced with 18-6
+sync_to = "Screen" # synced with 18-6
 frame_size = [24, 48]
 frame_range = { start = 0, end = 16 }
 offset = [0, 12]
@@ -1717,11 +1743,11 @@ frame_range = { start = 0, end = 1 }
 frame_range = { start = 0, end = 1 }
 
 [17-6]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 9 }
 
 [17-7]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 17 }
 
 [17-8]
@@ -1753,27 +1779,27 @@ offset_combine = "Replace"
 ################################################################################
 
 [18-1]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [18-2]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 4 }
 
 [18-3]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [18-4]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
 
 [18-5]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 4 }
 
 [18-6]
-is_anim_synced = true # synced with 17-3
+sync_to = "Screen" # synced with 17-3
 frame_size = [24, 48]
 frame_range = { start = 0, end = 16 }
 offset = [0, 12]
@@ -1786,17 +1812,17 @@ limit = { pick = "Random", n = 1 }
 ### Golden Creatures
 
 [19-1]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-2]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-3]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
@@ -1806,22 +1832,22 @@ limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 1 }
 
 [19-5]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-6]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 4 }
 
 [19-7]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 7 }
 
 [19-8]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 limit = { pick = "First", n = 1 }
 
@@ -1830,7 +1856,7 @@ limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 12 }
 
 [19-10]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
 limit = { pick = "First", n = 1 }
 
@@ -1883,7 +1909,7 @@ limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 14 }
 
 [19-23]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 0, end = 5 }
 limit = { pick = "First", n = 1 }
 
@@ -1896,12 +1922,12 @@ frame_range = { start = 0, end = 8 }
 limit = { pick = "First", n = 1 }
 
 [19-26]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 8 }
 
 [19-27]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 5, end = 13 }
 limit = { pick = "First", n = 1 }
 
@@ -1960,12 +1986,12 @@ frame_range = { start = 4, end = 8 }
 limit = { pick = "First", n = 1 }
 
 [19-41]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 12 }
 
 [19-42]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 7 }
 
@@ -1986,12 +2012,12 @@ frame_range = { start = 5, end = 6 }
 limit = { pick = "First", n = 1 }
 
 [19-47]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 4, end = 5 }
 limit = { pick = "First", n = 1 }
 
 [19-48]
-is_anim_synced = true
+sync_to = "Screen"
 frame_range = { start = 6, end = 13 }
 limit = { pick = "First", n = 1 }
 
@@ -2008,601 +2034,601 @@ limit = { pick = "Random", n = 1 }
 ### Coins
 
 [19-51]
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-52]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-53]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-54]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-55]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-56]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-57]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-58]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-59]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-60]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-61]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-62]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-63]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-64]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-65]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-66]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-67]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-68]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-69]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-70]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-71]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-72]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-73]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-74]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-75]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-76]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-77]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-78]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-79]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-80]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-81]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-82]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-83]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-84]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-85]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-86]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-87]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-88]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-89]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-90]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-91]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-92]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-93]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-94]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-95]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-96]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-97]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-98]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-99]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-100]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-101]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-102]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-103]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-104]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-105]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-106]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-107]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-108]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-109]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-110]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-111]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-112]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-113]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-114]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-115]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-116]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-117]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-118]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-119]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-120]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-121]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-122]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-123]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-124]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-125]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-126]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-127]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-128]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-129]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-130]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-131]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-132]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-133]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-134]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-135]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-136]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-137]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-138]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-139]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-140]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-141]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-142]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-143]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-144]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-145]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-146]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-147]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-148]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-149]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 
 [19-150]
 path = "Bank19/Object51.png"
-is_anim_synced = true
+sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 

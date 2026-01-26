@@ -7,11 +7,11 @@ use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
 use crate::{
-    definitions::{DrawParams, ObjectDefs, ObjectId, ObjectKind},
+    definitions::{AnimSync, DrawParams, ObjectDef, ObjectDefs, ObjectId, ObjectKind, SyncParams},
     graphics::Graphics,
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
-    synchronization::ScreenSync,
+    synchronization::{ScreenSync, WorldSync},
     timespan::Timespan,
 };
 
@@ -48,10 +48,11 @@ pub struct DrawOptions {
 }
 
 #[derive(Debug, Clone)]
-struct Cursor {
+struct Cursor<'a> {
     i: usize,
     actual_id: ObjectId,
     proxy_id: ObjectId,
+    object_def: Option<&'a ObjectDef>,
 }
 
 pub fn draw_partitions(
@@ -62,6 +63,7 @@ pub fn draw_partitions(
     ini: &Ini,
     output_dir: impl AsRef<Path>,
     options: &DrawOptions,
+    world_sync: &WorldSync,
 ) -> Result<()> {
     for partition in partitions {        
         let bounds = partition.bounds();
@@ -73,7 +75,7 @@ pub fn draw_partitions(
         let _ = std::io::stdout().flush();
         for pos in partition {
             let Some(screen) = screens.get(pos) else { continue };
-            match draw_screen(screen, gfx, defs, ini, options) {
+            match draw_screen(screen, gfx, defs, ini, options, world_sync) {
                 Ok(screen_image) => {
                     let canvas_x: u32 = ((screen.position.0 as i64 - bounds.x.start) * 600).try_into().unwrap();
                     let canvas_y: u32 = ((screen.position.1 as i64 - bounds.y.start) * 240).try_into().unwrap();
@@ -172,7 +174,8 @@ pub fn draw_screen(
     gfx: &Graphics,
     defs: &ObjectDefs,
     ini: &Ini,
-    options: &DrawOptions
+    options: &DrawOptions,
+    world_sync: &WorldSync,
 ) -> Result<RgbaImage> {
     let ini_section = ini.section(&format!("x{}y{}", screen.position.0, screen.position.1));
     let is_overlay = ini_section
@@ -184,7 +187,8 @@ pub fn draw_screen(
         });
 
     // Create context
-    let sync = ScreenSync::new(screen, defs);
+    let group_anim_t = world_sync.group_anim_ts.get(&screen.position).cloned();
+    let sync = ScreenSync::new(screen, defs, group_anim_t);
     let mut ctx = DrawContext {
         image: RgbaImage::new(600, 240),
         tileset_a: gfx.tileset(screen.assets.tileset_a),
@@ -257,6 +261,7 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
             i,
             actual_id,
             proxy_id,
+            object_def,
         };
 
         if ctx.sync.limiters.get_mut(&curs.actual_id)
@@ -288,19 +293,31 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
 
 #[inline]
 fn draw_object(ctx: &mut DrawContext, at_index: usize, object: ObjectId) {
-    let draw_params = ctx.defs.get(&object)
-        .map_or_else(Default::default, |def| def.draw_params.clone());
-    draw_object_with_params(ctx, at_index, object, &draw_params);
+    let (draw_params, sync_params) = match ctx.defs.get(&object) {
+        Some(def) => (&def.draw_params, &def.sync_params),
+        None => (&DrawParams::default(), &SyncParams::default()),
+    };
+    draw_object_with_params(ctx, at_index, object, draw_params, sync_params);
 }
 
 #[inline]
-fn draw_object_with_params(ctx: &mut DrawContext, at_index: usize, object: ObjectId, params: &DrawParams) {
-    if let Some(obj_image) = ctx.gfx.object(&object) {
-        draw_spritesheet(ctx, at_index as u8, params, ctx.sync.anim_t, obj_image);
-    }
+fn draw_object_with_params(
+    ctx: &mut DrawContext,
+    at_index: usize,
+    object: ObjectId,
+    draw_params: &DrawParams,
+    sync_params: &SyncParams,
+) {
+    let Some(obj_image) = ctx.gfx.object(&object) else { return };
+    let anim_t = match sync_params.sync_to {
+        AnimSync::None => None,
+        AnimSync::Screen => Some(ctx.sync.anim_t),
+        AnimSync::Group => ctx.sync.group_anim_t.or(Some(ctx.sync.anim_t)),
+    };
+    draw_spritesheet(ctx, at_index as u8, draw_params, anim_t, obj_image);
 }
 
-fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, anim_t: u32, obj_img: &RgbaImage) {
+fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, anim_t: Option<u32>, obj_img: &RgbaImage) {
     let frame = pick_frame(&obj_img, params, anim_t);
     let (screen_x, screen_y) = screen_index_to_pixels(at_index);
     let (offset_x, offset_y) = params.offset.unwrap_or_default();
@@ -325,7 +342,7 @@ fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, an
     }
 }
 
-fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: u32) -> SubImage<&'a RgbaImage> {
+fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: Option<u32>) -> SubImage<&'a RgbaImage> {
     let size = object_img.dimensions();
     let (frame_width, frame_height) = params.frame_size.unwrap_or((24, 24));
     let frames_per_row = u32::max(1, size.0 / frame_width);
@@ -341,7 +358,7 @@ fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: u32) -
         if frame_range.is_empty() {
             0
         }
-        else if params.is_anim_synced {
+        else if let Some(anim_t) = anim_t {
             let n_frames = frame_range.end - frame_range.start;
             (anim_t % n_frames) + frame_range.start
         }
@@ -400,9 +417,11 @@ fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeIncl
     let offset_x = rng.random_range(range.clone());
     let offset_y = rng.random_range(range);
 
-    let mut draw_params = ctx.defs.get(&curs.actual_id)
-        .map_or_else(Default::default, |def| def.draw_params.clone());
+    let (mut draw_params, sync_params) = match curs.object_def {
+        Some(def) => (def.draw_params.clone(), &def.sync_params),
+        None => (DrawParams::default(), &SyncParams::default()),
+    };
     draw_params.offset = Some((offset_x, offset_y));
 
-    draw_object_with_params(ctx, curs.i, curs.actual_id, &draw_params);
+    draw_object_with_params(ctx, curs.i, curs.actual_id, &draw_params, sync_params);
 }

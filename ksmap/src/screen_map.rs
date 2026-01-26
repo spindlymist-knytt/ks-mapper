@@ -4,26 +4,31 @@ use libks::{ScreenCoord, map_bin::ScreenData};
 
 pub struct ScreenMap {
     screens: Vec<ScreenData>,
-    map: HashMap<ScreenCoord, usize>,
+    indices: HashMap<ScreenCoord, usize>,
 }
 
 impl ScreenMap {
     pub fn new(screens: Vec<ScreenData>) -> Self {
-        let mut map = HashMap::new();
+        let mut indices = HashMap::new();
 
         for (i, screen) in screens.iter().enumerate() {
-            map.insert(screen.position, i);
+            indices.insert(screen.position, i);
         }
 
         Self {
             screens,
-            map,
+            indices,
         }
     }
 
     pub fn get(&self, position: &ScreenCoord) -> Option<&ScreenData> {
-        self.map.get(position)
+        self.indices.get(position)
             .map(|i| &self.screens[*i])
+    }
+    
+    pub fn index(&self, position: &ScreenCoord) -> Option<usize> {
+        self.indices.get(position)
+            .cloned()
     }
 
     pub fn len(&self) -> usize {

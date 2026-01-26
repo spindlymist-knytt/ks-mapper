@@ -15,6 +15,8 @@ pub struct ObjectDef {
     #[serde(default)]
     pub is_editor_only: bool,
     #[serde(flatten)]
+    pub sync_params: SyncParams,
+    #[serde(flatten)]
     pub draw_params: DrawParams,
     #[serde(default)]
     pub offset_combine: OffsetCombine,
@@ -29,7 +31,7 @@ pub struct ObjectDef {
     pub replace_colors: Vec<([u8; 3], [u8; 3])>,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Copy, Default)]
 pub enum ObjectKind {
     #[default]
     Object,
@@ -40,10 +42,6 @@ pub enum ObjectKind {
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct DrawParams {
     #[serde(default)]
-    pub is_anim_synced: bool,
-    #[serde(default)]
-    pub sync_offset: u32,
-    #[serde(default)]
     pub blend_mode: BlendMode,
     pub alpha_range: Option<RangeInclusive<u8>>,
     pub frame_size: Option<(u32, u32)>,
@@ -51,7 +49,32 @@ pub struct DrawParams {
     pub offset: Option<(i64, i64)>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct SyncParams {
+    #[serde(default)]
+    pub sync_to: AnimSync,
+    #[serde(default)]
+    pub sync_west: Vec<ObjectId>,
+    #[serde(default)]
+    pub sync_east: Vec<ObjectId>,
+    #[serde(default)]
+    pub sync_north: Vec<ObjectId>,
+    #[serde(default)]
+    pub sync_south: Vec<ObjectId>,
+    #[serde(default)]
+    pub sync_offset: u32,
+}
+
+#[derive(Debug, Clone, Copy, Default, Deserialize)]
+pub enum AnimSync {
+    #[default]
+    None,
+    Screen,
+    Group,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
+#[serde(try_from = "String")]
 pub struct ObjectId(pub Tile, pub Option<String>);
 
 impl ObjectId {
@@ -198,8 +221,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         
         let kind;
         let frame_range;
-        let is_anim_synced;
-        let mut sync_offset = 0;
+        let sync_params;
         let limit;
         let ignore_oco_path;
         let color_base = None;
@@ -211,8 +233,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             let oco_id = ObjectId(Tile(bank, object), None);
 
             if let Some(oco_def) = defs.get(&oco_id) {
-                is_anim_synced = oco_def.draw_params.is_anim_synced;
-                sync_offset = 0;
+                sync_params = oco_def.sync_params.clone();
                 frame_range = oco_def.draw_params.frame_range.clone();
                 limit = oco_def.limit;
                 ignore_oco_path = oco_def.ignore_oco_path;
@@ -239,8 +260,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 }
             }
             else {
-                is_anim_synced = false;
-                sync_offset = 0;
+                sync_params = SyncParams::default();
                 frame_range = None;
                 offset_x = 0;
                 offset_y = 0;
@@ -255,14 +275,15 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 (_, Some(_)) => Some(anim_from..anim_from + 1),
                 _ => Some(0..1),
             };
-            is_anim_synced = true;
+            sync_params = SyncParams {
+                sync_to: AnimSync::Screen,
+                ..Default::default()
+            };
             limit = Limit::None;
             ignore_oco_path = false;
         }
 
-        let draw = DrawParams {
-            is_anim_synced,
-            sync_offset,
+        let draw_params = DrawParams {
             blend_mode: BlendMode::Over,
             alpha_range: None,
             frame_size: Some((frame_width, frame_height)),
@@ -274,7 +295,8 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             kind, 
             path,
             is_editor_only: false,
-            draw_params: draw,
+            sync_params,
+            draw_params,
             offset_combine: OffsetCombine::Replace,
             ignore_oco_path,
             limit,
