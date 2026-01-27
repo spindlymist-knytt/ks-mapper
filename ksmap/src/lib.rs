@@ -5,4 +5,5 @@ pub mod partition;
 pub mod synchronization;
 pub mod screen_map;
 pub mod analysis;
+pub mod id;
 mod timespan;

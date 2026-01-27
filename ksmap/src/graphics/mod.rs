@@ -10,7 +10,10 @@ use anyhow::{Context, Result};
 use image::{DynamicImage, Rgba, RgbaImage};
 use libks::map_bin::AssetId;
 
-use crate::definitions::{ObjectDef, ObjectDefs, ObjectId, ObjectKind, ObjectVariant};
+use crate::{
+    definitions::{ObjectDef, ObjectDefs, ObjectKind},
+    id::{ObjectId, ObjectVariant},
+};
 
 mod png_decoder;
 

@@ -4,7 +4,11 @@ use petgraph::unionfind::UnionFind;
 use rand::{prelude::*, rng};
 use libks::{ScreenCoord, constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
 
-use crate::{definitions::{Limit, ObjectDefs, ObjectId}, screen_map::ScreenMap};
+use crate::{
+    definitions::{Limit, ObjectDefs},
+    id::ObjectId,
+    screen_map::ScreenMap,
+};
 
 pub struct WorldSync {
     pub group_anim_ts: HashMap<ScreenCoord, u32>,

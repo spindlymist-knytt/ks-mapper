@@ -7,8 +7,9 @@ use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
 use crate::{
-    definitions::{AnimSync, DrawParams, ObjectDef, ObjectDefs, ObjectId, ObjectKind, ObjectVariant, SyncParams},
+    definitions::{AnimSync, DrawParams, ObjectDef, ObjectDefs, ObjectKind, SyncParams},
     graphics::Graphics,
+    id::{ObjectId, ObjectVariant},
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
     synchronization::{ScreenSync, WorldSync},

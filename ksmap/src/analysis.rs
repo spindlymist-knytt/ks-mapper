@@ -2,7 +2,8 @@ use std::collections::HashSet;
 
 use libks::map_bin::{AssetId, LayerData, ScreenData};
 
-use crate::definitions::{ObjectDefs, ObjectId, ObjectKind};
+use crate::definitions::{ObjectDefs, ObjectKind};
+use crate::id::ObjectId;
 
 pub struct AssetsUsed {
     pub tilesets: Vec<AssetId>,
