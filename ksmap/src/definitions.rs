@@ -233,7 +233,35 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             let oco_id = ObjectId(Tile(bank, object), None);
 
             if let Some(oco_def) = defs.get(&oco_id) {
-                sync_params = oco_def.sync_params.clone();
+                let mut sync_north = Vec::new();
+                if oco_def.sync_params.sync_north.contains(&oco_id) {
+                    sync_north.push(ObjectId(tile, None));
+                }
+                
+                let mut sync_south = Vec::new();
+                if oco_def.sync_params.sync_south.contains(&oco_id) {
+                    sync_south.push(ObjectId(tile, None));
+                }
+                
+                let mut sync_west = Vec::new();
+                if oco_def.sync_params.sync_west.contains(&oco_id) {
+                    sync_west.push(ObjectId(tile, None));
+                }
+                
+                let mut sync_east = Vec::new();
+                if oco_def.sync_params.sync_east.contains(&oco_id) {
+                    sync_east.push(ObjectId(tile, None));
+                }
+                
+                sync_params = SyncParams {
+                    sync_to: oco_def.sync_params.sync_to,
+                    sync_west,
+                    sync_east,
+                    sync_north,
+                    sync_south,
+                    sync_offset: oco_def.sync_params.sync_offset,
+                };
+                
                 frame_range = oco_def.draw_params.frame_range.clone();
                 limit = oco_def.limit;
                 ignore_oco_path = oco_def.ignore_oco_path;
