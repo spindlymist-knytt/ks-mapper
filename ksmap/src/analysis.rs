@@ -30,12 +30,12 @@ pub fn list_assets(screens: &[ScreenData], defs: &ObjectDefs) -> AssetsUsed {
         for LayerData(layer) in &screen.layers[4..] {
             for tile in layer {
                 if tile.1 > 0 {
-                    let id = ObjectId(*tile, None);
+                    let id = ObjectId::from(tile);
                     objects.insert(id.clone());
                     if let Some(def) = defs.get(&id)
                         && let ObjectKind::OverrideObject(orig_tile) = &def.kind
                     {
-                        objects.insert(ObjectId(*orig_tile, None));
+                        objects.insert(ObjectId::from(orig_tile));
                     }
                 }
             }
@@ -60,7 +60,7 @@ pub fn list_assets(screens: &[ScreenData], defs: &ObjectDefs) -> AssetsUsed {
     
     for i in 0..objects.len() {
         for variant in defs.variants_of(objects[i].0) {
-            objects.push(objects[i].with_variant(variant));
+            objects.push(objects[i].to_variant(*variant));
         }
     }
     

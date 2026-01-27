@@ -4,7 +4,7 @@ use petgraph::unionfind::UnionFind;
 use rand::{prelude::*, rng};
 use libks::{ScreenCoord, constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
 
-use crate::{definitions::{Limit, ObjectDefs, ObjectId, ObjectKind}, screen_map::ScreenMap};
+use crate::{definitions::{Limit, ObjectDefs, ObjectId}, screen_map::ScreenMap};
 
 pub struct WorldSync {
     pub group_anim_ts: HashMap<ScreenCoord, u32>,
@@ -41,7 +41,7 @@ impl WorldSync {
                 let screen_north = &screens[index_north];
                 'north: for LayerData(layer) in &screen.layers {
                     for i in TOP_LEFT..=TOP_RIGHT {
-                        let id = ObjectId(layer[i], None);
+                        let id = ObjectId::from(layer[i]);
                         let Some(def) = object_defs.get(&id) else { continue };
                         let j = i + OFFSET_NORTH_TO_SOUTH;
                         for ObjectId(sync_tile, _) in &def.sync_params.sync_north {
@@ -67,7 +67,7 @@ impl WorldSync {
                 let screen_west = &screens[index_west];
                 'west: for LayerData(layer) in &screen.layers {
                     for i in (TOP_LEFT..=BOTTOM_LEFT).step_by(SCREEN_WIDTH) {
-                        let id = ObjectId(layer[i], None);
+                        let id = ObjectId::from(layer[i]);
                         let Some(def) = object_defs.get(&id) else { continue };
                         let j = i + OFFSET_WEST_TO_EAST;
                         for ObjectId(sync_tile, _) in &def.sync_params.sync_west {
@@ -93,7 +93,7 @@ impl WorldSync {
                 let screen_east = &screens[index_east];
                 'east: for LayerData(layer) in &screen.layers {
                     for i in (TOP_RIGHT..=BOTTOM_RIGHT).step_by(SCREEN_WIDTH) {
-                        let id = ObjectId(layer[i], None);
+                        let id = ObjectId::from(layer[i]);
                         let Some(def) = object_defs.get(&id) else { continue };
                         let j = i - OFFSET_WEST_TO_EAST;
                         for ObjectId(sync_tile, _) in &def.sync_params.sync_east {
@@ -119,7 +119,7 @@ impl WorldSync {
                 let screen_south = &screens[index_south];
                 'south: for LayerData(layer) in &screen.layers {
                     for i in BOTTOM_LEFT..=BOTTOM_RIGHT {
-                        let id = ObjectId(layer[i], None);
+                        let id = ObjectId::from(layer[i]);
                         let Some(def) = object_defs.get(&id) else { continue };
                         let j = i - OFFSET_NORTH_TO_SOUTH;
                         for ObjectId(sync_tile, _) in &def.sync_params.sync_south {
@@ -177,7 +177,7 @@ impl ScreenSync {
         }
 
         for (tile, count) in counts {
-            let id = ObjectId(tile, None);
+            let id = ObjectId::from(tile);
 
             let Some(def) = object_defs.get(&id) else {
                 continue

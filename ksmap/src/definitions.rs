@@ -73,19 +73,36 @@ pub enum AnimSync {
     Group,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize)]
 #[serde(try_from = "String")]
-pub struct ObjectId(pub Tile, pub Option<String>);
+pub struct ObjectId(pub Tile, pub ObjectVariant);
 
 impl ObjectId {
-    pub fn into_variant(mut self, variant: &str) -> Self {
-        self.1 = Some(variant.to_owned());
+    pub fn into_variant(mut self, variant: ObjectVariant) -> Self {
+        self.1 = variant;
         self
     }
 
-    pub fn with_variant(&self, variant: &str) -> Self {
-        Self(self.0, Some(variant.to_owned()))
+    pub fn to_variant(&self, variant: ObjectVariant) -> Self {
+        Self(self.0, variant)
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Deserialize)]
+#[serde(try_from = "String")]
+pub enum ObjectVariant {
+    #[default]
+    None,
+    Left,
+    Glow,
+    Spot,
+    Floor,
+    Circle,
+    Square,
+    A,
+    B,
+    C,
+    D,
 }
 
 #[derive(Debug, Clone, Copy, Default, Deserialize)]
@@ -107,14 +124,14 @@ pub enum Limit {
 
 pub struct ObjectDefs {
     pub defs: HashMap<ObjectId, ObjectDef>,
-    pub variants: HashMap<Tile, Vec<String>>,
+    pub variants: HashMap<Tile, Vec<ObjectVariant>>,
 }
 
 impl ObjectDefs {
-    pub fn variants_of(&self, object: Tile) -> impl Iterator<Item = &String> {
+    pub fn variants_of(&self, object: Tile) -> &[ObjectVariant] {
         match self.variants.get(&object) {
-            Some(variants) => variants.iter(),
-            None => [].iter(),
+            Some(variants) => &variants,
+            None => &[],
         }
     }
 }
@@ -135,7 +152,7 @@ impl DerefMut for ObjectDefs {
 
 pub fn load_object_defs(path: impl AsRef<Path>) -> Result<ObjectDefs> {
     let mut defs = HashMap::<ObjectId, ObjectDef>::new();
-    let mut variants = HashMap::<Tile, Vec<String>>::new();
+    let mut variants = HashMap::<Tile, Vec<ObjectVariant>>::new();
 
     let raw = fs::read_to_string(path)?;
     let table: toml::Table = raw.parse()?;
@@ -145,10 +162,10 @@ pub fn load_object_defs(path: impl AsRef<Path>) -> Result<ObjectDefs> {
             let id = ObjectId::try_from(key)?;
             let def = table.try_into()?;
             
-            if let Some(variant) = id.1.as_ref() {
+            if id.1 != ObjectVariant::None {
                 variants.entry(id.0)
                     .or_insert(Vec::new())
-                    .push(variant.clone());
+                    .push(id.1);
             }
             
             defs.insert(id, def);
@@ -230,27 +247,27 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
 
         if let Some(object) = object {
             kind = ObjectKind::OverrideObject(Tile(bank, object));
-            let oco_id = ObjectId(Tile(bank, object), None);
+            let oco_id = ObjectId::from(Tile(bank, object));
 
             if let Some(oco_def) = defs.get(&oco_id) {
                 let mut sync_north = Vec::new();
                 if oco_def.sync_params.sync_north.contains(&oco_id) {
-                    sync_north.push(ObjectId(tile, None));
+                    sync_north.push(ObjectId::from(tile));
                 }
                 
                 let mut sync_south = Vec::new();
                 if oco_def.sync_params.sync_south.contains(&oco_id) {
-                    sync_south.push(ObjectId(tile, None));
+                    sync_south.push(ObjectId::from(tile));
                 }
                 
                 let mut sync_west = Vec::new();
                 if oco_def.sync_params.sync_west.contains(&oco_id) {
-                    sync_west.push(ObjectId(tile, None));
+                    sync_west.push(ObjectId::from(tile));
                 }
                 
                 let mut sync_east = Vec::new();
                 if oco_def.sync_params.sync_east.contains(&oco_id) {
-                    sync_east.push(ObjectId(tile, None));
+                    sync_east.push(ObjectId::from(tile));
                 }
                 
                 sync_params = SyncParams {
@@ -333,7 +350,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             replace_colors,
         };
 
-        defs.insert(ObjectId(tile, None), def);
+        defs.insert(ObjectId::from(tile), def);
     }
 }
 
@@ -349,10 +366,28 @@ fn unpack_color(mut color: i64) -> [u8; 3] {
 
 impl std::fmt::Display for ObjectId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.1.as_ref() {
-            Some(variant) => write!(f, "{}-{} {}", self.0.0, self.0.1, variant),
-            None => write!(f, "{}-{}", self.0.0, self.0.1),
+        match self.1 {
+            ObjectVariant::None => write!(f, "{}-{}", self.0.0, self.0.1),
+            _ => write!(f, "{}-{} {}", self.0.0, self.0.1, self.1),
         }
+    }
+}
+
+impl From<(u8, u8)> for ObjectId {
+    fn from(value: (u8, u8)) -> Self {
+        Self(Tile(value.0, value.1), ObjectVariant::None)
+    }
+}
+
+impl From<Tile> for ObjectId {
+    fn from(value: Tile) -> Self {
+        Self(value, ObjectVariant::None)
+    }
+}
+
+impl From<&Tile> for ObjectId {
+    fn from(value: &Tile) -> Self {
+        Self(*value, ObjectVariant::None)
     }
 }
 
@@ -361,8 +396,8 @@ impl TryFrom<&str> for ObjectId {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let (bank_and_index, variant) = match value.split_once(' ') {
-            Some((id, variant)) => (id, Some(variant.to_owned())),
-            None => (value, None),
+            Some((id, variant)) => (id, ObjectVariant::try_from(variant)?),
+            None => (value, ObjectVariant::None),
         };
 
         let Some((bank, index)) = bank_and_index.split_once('-') else {
@@ -397,4 +432,61 @@ pub enum ObjectIdParseError {
     MissingSeparator(String),
     #[error("Invalid ObjectId: failed to parse bank or object index")]
     InvalidIndex(String),
+    #[error(transparent)]
+    ObjectVariantParse(#[from] ObjectVariantParseError),
+}
+
+impl std::fmt::Display for ObjectVariant {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            ObjectVariant::None => "",
+            ObjectVariant::Left => "Left",
+            ObjectVariant::Glow => "Glow",
+            ObjectVariant::Spot => "Spot",
+            ObjectVariant::Floor => "Floor",
+            ObjectVariant::Circle => "Circle",
+            ObjectVariant::Square => "Square",
+            ObjectVariant::A => "A",
+            ObjectVariant::B => "B",
+            ObjectVariant::C => "C",
+            ObjectVariant::D => "D",
+        };
+        f.write_str(s)
+    }
+}
+
+impl TryFrom<&str> for ObjectVariant {
+    type Error = ObjectVariantParseError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let variant = match value {
+            "" => ObjectVariant::None,
+            "Left" => ObjectVariant::Left,
+            "Glow" => ObjectVariant::Glow,
+            "Spot" => ObjectVariant::Spot,
+            "Floor" => ObjectVariant::Floor,
+            "Circle" => ObjectVariant::Circle,
+            "Square" => ObjectVariant::Square,
+            "A" => ObjectVariant::A,
+            "B" => ObjectVariant::B,
+            "C" => ObjectVariant::C,
+            "D" => ObjectVariant::D,
+            _ => return Err(ObjectVariantParseError::UnknownVariant(value.to_owned())),
+        };
+        Ok(variant)
+    }
+}
+
+impl TryFrom<String> for ObjectVariant {
+    type Error = ObjectVariantParseError;
+
+    fn try_from(value: String) -> std::result::Result<Self, Self::Error> {
+        ObjectVariant::try_from(value.as_str())
+    }
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ObjectVariantParseError {
+    #[error("Unknown object variant: {0}")]
+    UnknownVariant(String),
 }

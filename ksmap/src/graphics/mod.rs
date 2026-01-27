@@ -10,7 +10,7 @@ use anyhow::{Context, Result};
 use image::{DynamicImage, Rgba, RgbaImage};
 use libks::map_bin::AssetId;
 
-use crate::definitions::{ObjectDef, ObjectDefs, ObjectId, ObjectKind};
+use crate::definitions::{ObjectDef, ObjectDefs, ObjectId, ObjectKind, ObjectVariant};
 
 mod png_decoder;
 
@@ -204,8 +204,8 @@ impl<'a> Graphics<'a> {
         let suffix = match def.and_then(|def| def.path.as_ref()) {
             Some(path) => path,
             None => match variant {
-                Some(variant) => &format!("Bank{}/Object{}_{}.png", tile.0, tile.1, variant),
-                None => &format!("Bank{}/Object{}.png", tile.0, tile.1),
+                ObjectVariant::None => &format!("Bank{}/Object{}.png", tile.0, tile.1),
+                _ => &format!("Bank{}/Object{}_{}.png", tile.0, tile.1, variant),
             },
         };
         
@@ -233,7 +233,7 @@ impl<'a> Graphics<'a> {
                 let ObjectKind::OverrideObject(original_tile) = def.kind else {
                     return Ok(None);
                 };
-                let original_id = ObjectId(original_tile, None);
+                let original_id = ObjectId::from(original_tile);
                 let Some(original_def) = self.object_defs.get(&original_id) else {
                     return Ok(None);
                 };

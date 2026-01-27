@@ -7,7 +7,7 @@ use libks::map_bin::{LayerData, ScreenData, Tile};
 use libks_ini::{Ini, VirtualSection};
 
 use crate::{
-    definitions::{AnimSync, DrawParams, ObjectDef, ObjectDefs, ObjectId, ObjectKind, SyncParams},
+    definitions::{AnimSync, DrawParams, ObjectDef, ObjectDefs, ObjectId, ObjectKind, ObjectVariant, SyncParams},
     graphics::Graphics,
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
@@ -251,11 +251,11 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
     for (i, tile) in layer.0.iter().enumerate() {
         if tile.1 == 0 { continue }
 
-        let actual_id = ObjectId(*tile, None);
+        let actual_id = ObjectId::from(tile);
         let object_def = ctx.defs.get(&actual_id);
         let proxy_id = match object_def.map(|def| &def.kind) {
-            Some(ObjectKind::OverrideObject(tile)) => ObjectId(*tile, None),
-            _ => ObjectId(*tile, None),
+            Some(ObjectKind::OverrideObject(tile)) => ObjectId::from(tile),
+            _ => ObjectId::from(tile),
         };
         let curs = Cursor {
             i,
@@ -388,28 +388,28 @@ fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &s
         .and_then(|section| section.get(type_prop))
         .unwrap_or("0")
     {
-        "0" => "Spot",
-        "1" => "Floor",
-        "2" => "Circle",
-        "3" => "Square",
-        _ => "Spot",
+        "0" => ObjectVariant::Spot,
+        "1" => ObjectVariant::Floor,
+        "2" => ObjectVariant::Circle,
+        "3" => ObjectVariant::Square,
+        _ => ObjectVariant::Spot,
     };
 
     draw_object(ctx, curs.i, curs.proxy_id.into_variant(shift_type));
 }
 
 fn draw_with_glow(ctx: &mut DrawContext, curs: Cursor) {
-    draw_object(ctx, curs.i, curs.proxy_id.with_variant("Glow"));
+    draw_object(ctx, curs.i, curs.proxy_id.to_variant(ObjectVariant::Glow));
     draw_object(ctx, curs.i, curs.actual_id);
 }
 
 fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) {
     let mut rng = rng();
-    let variant = &["A", "B", "C", "D"]
+    let variant = [ObjectVariant::A, ObjectVariant::B, ObjectVariant::C, ObjectVariant::D]
         .choose(&mut rng)
         .unwrap();
 
-    draw_object(ctx, curs.i, curs.proxy_id.into_variant(variant));
+    draw_object(ctx, curs.i, curs.proxy_id.into_variant(*variant));
 }
 
 fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeInclusive<i64>) {
