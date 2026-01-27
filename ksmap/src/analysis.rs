@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
-use libks::map_bin::{AssetId, ScreenData};
+use libks::map_bin::{AssetId, LayerData, ScreenData};
 
-use crate::definitions::{ObjectDefs, ObjectId};
+use crate::definitions::{ObjectDefs, ObjectId, ObjectKind};
 
 pub struct AssetsUsed {
     pub tilesets: Vec<AssetId>,
@@ -26,12 +26,16 @@ pub fn list_assets(screens: &[ScreenData], defs: &ObjectDefs) -> AssetsUsed {
             }
         }
         
-        for layer in &screen.layers[4..] {
-            for tile in &layer.0 {
+        
+        for LayerData(layer) in &screen.layers[4..] {
+            for tile in layer {
                 if tile.1 > 0 {
-                    objects.insert(ObjectId(*tile, None));
-                    for variant in defs.variants_of(*tile) {
-                        objects.insert(ObjectId(*tile, Some(variant.clone())));
+                    let id = ObjectId(*tile, None);
+                    objects.insert(id.clone());
+                    if let Some(def) = defs.get(&id)
+                        && let ObjectKind::OverrideObject(orig_tile) = &def.kind
+                    {
+                        objects.insert(ObjectId(*orig_tile, None));
                     }
                 }
             }
@@ -52,7 +56,13 @@ pub fn list_assets(screens: &[ScreenData], defs: &ObjectDefs) -> AssetsUsed {
         .filter(|(_, used)| *used)
         .map(|(i, _)| i as AssetId)
         .collect();
-    let objects = objects.into_iter().collect();
+    let mut objects: Vec<_> = objects.into_iter().collect();
+    
+    for i in 0..objects.len() {
+        for variant in defs.variants_of(objects[i].0) {
+            objects.push(objects[i].with_variant(variant));
+        }
+    }
     
     AssetsUsed {
         tilesets,
