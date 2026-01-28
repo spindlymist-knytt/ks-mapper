@@ -5,7 +5,7 @@ use rand::{prelude::*, rng};
 use libks::{constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
 
 use crate::{
-    analysis::list_laser_phases, definitions::{LaserPhase, Limit, ObjectDefs}, id::ObjectId, screen_map::ScreenMap
+    analysis::count_laser_phases, definitions::{LaserPhase, Limit, ObjectDefs}, id::ObjectId, screen_map::ScreenMap
 };
 
 pub struct WorldSync {
@@ -34,7 +34,7 @@ impl WorldSync {
         const TOP_LEFT: usize = 0;
         const TOP_RIGHT: usize = SCREEN_WIDTH - 1;
         const BOTTOM_LEFT: usize = TILES_PER_LAYER - SCREEN_WIDTH;
-        const BOTTOM_RIGHT: usize = TILES_PER_LAYER - 1;
+        const _BOTTOM_RIGHT: usize = TILES_PER_LAYER - 1;
         const OFFSET_NORTH_TO_SOUTH: usize = BOTTOM_LEFT - TOP_LEFT;
         const OFFSET_WEST_TO_EAST: usize = TOP_RIGHT - TOP_LEFT;
         
@@ -42,9 +42,7 @@ impl WorldSync {
         
         for (index_current, screen) in screens.iter().enumerate() {
             // Northern border
-            if let Some(index_north) = screens.index_of(&(screen.position.0, screen.position.1 - 1))
-                && uf.find_mut(index_current) != uf.find_mut(index_north)
-            {
+            if let Some(index_north) = screens.index_of(&(screen.position.0, screen.position.1 - 1)) {
                 let screen_north = &screens[index_north];
                 'north: for LayerData(layer) in &screen.layers {
                     for i in TOP_LEFT..=TOP_RIGHT {
@@ -66,9 +64,7 @@ impl WorldSync {
             }
             
             // Western border
-            if let Some(index_west) = screens.index_of(&(screen.position.0 - 1, screen.position.1))
-                && uf.find_mut(index_current) != uf.find_mut(index_west)
-            {
+            if let Some(index_west) = screens.index_of(&(screen.position.0 - 1, screen.position.1)) {
                 let screen_west = &screens[index_west];
                 'west: for LayerData(layer) in &screen.layers {
                     for i in (TOP_LEFT..=BOTTOM_LEFT).step_by(SCREEN_WIDTH) {
@@ -83,54 +79,6 @@ impl WorldSync {
                             {
                                 uf.union(index_current, index_west);
                                 break 'west;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Eastern border
-            if let Some(index_east) = screens.index_of(&(screen.position.0 + 1, screen.position.1))
-                && uf.find_mut(index_current) != uf.find_mut(index_east)
-            {
-                let screen_east = &screens[index_east];
-                'east: for LayerData(layer) in &screen.layers {
-                    for i in (TOP_RIGHT..=BOTTOM_RIGHT).step_by(SCREEN_WIDTH) {
-                        let id = ObjectId::from(layer[i]);
-                        let Some(def) = object_defs.get(&id) else { continue };
-                        let j = i - OFFSET_WEST_TO_EAST;
-                        for ObjectId(sync_tile, _) in &def.sync_params.sync_east {
-                            if screen_east.layers[4].0[j] == *sync_tile
-                                || screen_east.layers[5].0[j] == *sync_tile
-                                || screen_east.layers[6].0[j] == *sync_tile
-                                || screen_east.layers[7].0[j] == *sync_tile
-                            {
-                                uf.union(index_current, index_east);
-                                break 'east;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Southern border
-            if let Some(index_south) = screens.index_of(&(screen.position.0, screen.position.1 + 1))
-                && uf.find_mut(index_current) != uf.find_mut(index_south)
-            {
-                let screen_south = &screens[index_south];
-                'south: for LayerData(layer) in &screen.layers {
-                    for i in BOTTOM_LEFT..=BOTTOM_RIGHT {
-                        let id = ObjectId::from(layer[i]);
-                        let Some(def) = object_defs.get(&id) else { continue };
-                        let j = i - OFFSET_NORTH_TO_SOUTH;
-                        for ObjectId(sync_tile, _) in &def.sync_params.sync_south {
-                            if screen_south.layers[4].0[j] == *sync_tile
-                                || screen_south.layers[5].0[j] == *sync_tile
-                                || screen_south.layers[6].0[j] == *sync_tile
-                                || screen_south.layers[7].0[j] == *sync_tile
-                            {
-                                uf.union(index_current, index_south);
-                                break 'south;
                             }
                         }
                     }
