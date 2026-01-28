@@ -173,14 +173,12 @@ fn pick_laser_phase(rng: &mut impl Rng, laser_phases: &[[bool; 2]], members: &[u
         phases_found[1] |= laser_phases[*index_member][1];
     }
     
-    let possible_phases = match phases_found {
-        [true, true] => [LaserPhase::Red, LaserPhase::Green].as_slice(),
-        [true, false] => [LaserPhase::Red].as_slice(),
-        [false, true] => [LaserPhase::Green].as_slice(),
-        [false, false] => [LaserPhase::Red].as_slice(),
-    };
-    
-    *possible_phases.choose(rng).unwrap()
+    match phases_found {
+        [true, true] => *[LaserPhase::Red, LaserPhase::Green].choose(rng).unwrap(),
+        [true, false] => LaserPhase::Red,
+        [false, true] => LaserPhase::Green,
+        [false, false] => LaserPhase::Red,
+    }
 }
 
 impl ScreenSync {
