@@ -75,8 +75,9 @@ pub fn draw_partitions(
         print!("    Drawing screens");
         let _ = std::io::stdout().flush();
         for pos in partition {
-            let Some(screen) = screens.get(pos) else { continue };
-            match draw_screen(screen, gfx, defs, ini, options, world_sync) {
+            let Some(index_screen) = screens.index_of(pos) else { continue };
+            let screen = &screens[index_screen];
+            match draw_screen(screen, index_screen, gfx, defs, ini, options, world_sync) {
                 Ok(screen_image) => {
                     let canvas_x: u32 = ((screen.position.0 as i64 - bounds.x.start) * 600).try_into().unwrap();
                     let canvas_y: u32 = ((screen.position.1 as i64 - bounds.y.start) * 240).try_into().unwrap();
@@ -172,6 +173,7 @@ fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
 
 pub fn draw_screen(
     screen: &ScreenData,
+    index_screen: usize,
     gfx: &Graphics,
     defs: &ObjectDefs,
     ini: &Ini,
@@ -188,8 +190,8 @@ pub fn draw_screen(
         });
 
     // Create context
-    let group_anim_t = world_sync.group_anim_ts.get(&screen.position).cloned();
-    let sync = ScreenSync::new(screen, defs, group_anim_t);
+    let group = world_sync.groups[index_screen];
+    let sync = ScreenSync::new(screen, defs, group);
     let mut ctx = DrawContext {
         image: RgbaImage::new(600, 240),
         tileset_a: gfx.tileset(screen.assets.tileset_a),
@@ -275,6 +277,12 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
         {
             continue;
         }
+        if let Some(def) = object_def
+            && let Some(phase) = &def.sync_params.laser_phase
+            && *phase != ctx.sync.group.laser_phase
+        {
+            continue;
+        }
 
         match curs.proxy_id.0 {
             Tile(0, 14) => draw_shift(ctx, curs, "ShiftVisible(A)", "ShiftType(A)"),
@@ -313,7 +321,7 @@ fn draw_object_with_params(
     let anim_t = match sync_params.sync_to {
         AnimSync::None => None,
         AnimSync::Screen => Some(ctx.sync.anim_t),
-        AnimSync::Group => ctx.sync.group_anim_t.or(Some(ctx.sync.anim_t)),
+        AnimSync::Group => Some(ctx.sync.group.anim_t),
     };
     draw_spritesheet(ctx, at_index as u8, draw_params, anim_t, obj_image);
 }

@@ -2,21 +2,25 @@ use std::collections::HashMap;
 
 use petgraph::unionfind::UnionFind;
 use rand::{prelude::*, rng};
-use libks::{ScreenCoord, constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
+use libks::{constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
 
 use crate::{
-    definitions::{Limit, ObjectDefs},
-    id::ObjectId,
-    screen_map::ScreenMap,
+    analysis::list_laser_phases, definitions::{LaserPhase, Limit, ObjectDefs}, id::ObjectId, screen_map::ScreenMap
 };
 
 pub struct WorldSync {
-    pub group_anim_ts: HashMap<ScreenCoord, u32>,
+    pub groups: Vec<GroupSync>,
+}
+
+#[derive(Clone, Copy, Default)]
+pub struct GroupSync {
+    pub anim_t: u32,
+    pub laser_phase: LaserPhase,
 }
 
 pub struct ScreenSync {
+    pub group: GroupSync,
     pub anim_t: u32,
-    pub group_anim_t: Option<u32>,
     pub limiters: HashMap<ObjectId, Limiter>,
 }
 
@@ -27,9 +31,6 @@ pub struct Limiter {
 
 impl WorldSync {
     pub fn new(screens: &ScreenMap, object_defs: &ObjectDefs) -> Self {
-        let mut groups = UnionFind::<usize>::new(screens.len());
-        let mut has_group = vec![false; screens.len()];
-        
         const TOP_LEFT: usize = 0;
         const TOP_RIGHT: usize = SCREEN_WIDTH - 1;
         const BOTTOM_LEFT: usize = TILES_PER_LAYER - SCREEN_WIDTH;
@@ -37,10 +38,12 @@ impl WorldSync {
         const OFFSET_NORTH_TO_SOUTH: usize = BOTTOM_LEFT - TOP_LEFT;
         const OFFSET_WEST_TO_EAST: usize = TOP_RIGHT - TOP_LEFT;
         
+        let mut uf = UnionFind::<usize>::new(screens.len());
+        
         for (index_current, screen) in screens.iter().enumerate() {
             // Northern border
-            if let Some(index_north) = screens.index(&(screen.position.0, screen.position.1 - 1))
-                && groups.find_mut(index_current) != groups.find_mut(index_north)
+            if let Some(index_north) = screens.index_of(&(screen.position.0, screen.position.1 - 1))
+                && uf.find_mut(index_current) != uf.find_mut(index_north)
             {
                 let screen_north = &screens[index_north];
                 'north: for LayerData(layer) in &screen.layers {
@@ -54,9 +57,7 @@ impl WorldSync {
                                 || screen_north.layers[6].0[j] == *sync_tile
                                 || screen_north.layers[7].0[j] == *sync_tile
                             {
-                                groups.union(index_current, index_north);
-                                has_group[index_current] = true;
-                                has_group[index_north] = true;
+                                uf.union(index_current, index_north);
                                 break 'north;
                             }
                         }
@@ -65,8 +66,8 @@ impl WorldSync {
             }
             
             // Western border
-            if let Some(index_west) = screens.index(&(screen.position.0 - 1, screen.position.1))
-                && groups.find_mut(index_current) != groups.find_mut(index_west)
+            if let Some(index_west) = screens.index_of(&(screen.position.0 - 1, screen.position.1))
+                && uf.find_mut(index_current) != uf.find_mut(index_west)
             {
                 let screen_west = &screens[index_west];
                 'west: for LayerData(layer) in &screen.layers {
@@ -80,9 +81,7 @@ impl WorldSync {
                                 || screen_west.layers[6].0[j] == *sync_tile
                                 || screen_west.layers[7].0[j] == *sync_tile
                             {
-                                groups.union(index_current, index_west);
-                                has_group[index_current] = true;
-                                has_group[index_west] = true;
+                                uf.union(index_current, index_west);
                                 break 'west;
                             }
                         }
@@ -91,8 +90,8 @@ impl WorldSync {
             }
             
             // Eastern border
-            if let Some(index_east) = screens.index(&(screen.position.0 + 1, screen.position.1))
-                && groups.find_mut(index_current) != groups.find_mut(index_east)
+            if let Some(index_east) = screens.index_of(&(screen.position.0 + 1, screen.position.1))
+                && uf.find_mut(index_current) != uf.find_mut(index_east)
             {
                 let screen_east = &screens[index_east];
                 'east: for LayerData(layer) in &screen.layers {
@@ -106,9 +105,7 @@ impl WorldSync {
                                 || screen_east.layers[6].0[j] == *sync_tile
                                 || screen_east.layers[7].0[j] == *sync_tile
                             {
-                                groups.union(index_current, index_east);
-                                has_group[index_current] = true;
-                                has_group[index_east] = true;
+                                uf.union(index_current, index_east);
                                 break 'east;
                             }
                         }
@@ -117,8 +114,8 @@ impl WorldSync {
             }
             
             // Southern border
-            if let Some(index_south) = screens.index(&(screen.position.0, screen.position.1 + 1))
-                && groups.find_mut(index_current) != groups.find_mut(index_south)
+            if let Some(index_south) = screens.index_of(&(screen.position.0, screen.position.1 + 1))
+                && uf.find_mut(index_current) != uf.find_mut(index_south)
             {
                 let screen_south = &screens[index_south];
                 'south: for LayerData(layer) in &screen.layers {
@@ -132,9 +129,7 @@ impl WorldSync {
                                 || screen_south.layers[6].0[j] == *sync_tile
                                 || screen_south.layers[7].0[j] == *sync_tile
                             {
-                                groups.union(index_current, index_south);
-                                has_group[index_current] = true;
-                                has_group[index_south] = true;
+                                uf.union(index_current, index_south);
                                 break 'south;
                             }
                         }
@@ -143,31 +138,53 @@ impl WorldSync {
             }
         }
         
-        let mut anim_ts: HashMap<ScreenCoord, u32> = HashMap::new();
-        let mut rng = rng();
-        let labeling = groups.into_labeling();
+        let mut groups_by_rep = HashMap::<usize, Vec<usize>>::new();
+        for (index_member, index_rep) in uf.into_labeling().into_iter().enumerate() {
+            let members = groups_by_rep.entry(index_rep)
+                .or_insert_with(|| Vec::new());
+            members.push(index_member);
+        }
         
-        for (index_screen, index_rep) in labeling.into_iter().enumerate() {
-            if !has_group[index_screen] { continue }
-            
-            let screen_rep = &screens[index_rep];
-            let anim_t = *anim_ts.entry(screen_rep.position)
-                .or_insert_with(|| rng.random());
-            
-            if index_screen != index_rep {
-                let screen = &screens[index_screen];
-                anim_ts.insert(screen.position, anim_t);
+        let mut groups = vec![GroupSync::default(); screens.len()];
+        let laser_phases = list_laser_phases(screens, object_defs);
+        let mut rng = rng();
+        for (_index_rep, members) in groups_by_rep {
+            let anim_t = rng.next_u32();
+            let laser_phase = pick_laser_phase(&mut rng, &laser_phases, &members);           
+            let group_sync = GroupSync {
+                anim_t,
+                laser_phase,
+            };
+            for index_member in members {
+                groups[index_member] = group_sync;
             }
         }
         
         Self {
-            group_anim_ts: anim_ts,
+            groups,
         }
     }
 }
 
+fn pick_laser_phase(rng: &mut impl Rng, laser_phases: &[[bool; 2]], members: &[usize]) -> LaserPhase {
+    let mut phases_found = [false; 2];
+    for index_member in members {
+        phases_found[0] |= laser_phases[*index_member][0];
+        phases_found[1] |= laser_phases[*index_member][1];
+    }
+    
+    let possible_phases = match phases_found {
+        [true, true] => [LaserPhase::Red, LaserPhase::Green].as_slice(),
+        [true, false] => [LaserPhase::Red].as_slice(),
+        [false, true] => [LaserPhase::Green].as_slice(),
+        [false, false] => [LaserPhase::Red].as_slice(),
+    };
+    
+    *possible_phases.choose(rng).unwrap()
+}
+
 impl ScreenSync {
-    pub fn new(screen: &ScreenData, object_defs: &ObjectDefs, group_anim_t: Option<u32>) -> Self {
+    pub fn new(screen: &ScreenData, object_defs: &ObjectDefs, group: GroupSync) -> Self {
         let anim_t = rng().next_u32();
         let mut limiters = HashMap::new();
         let mut counts = HashMap::new();
@@ -209,8 +226,8 @@ impl ScreenSync {
         }
     
         Self {
+            group,
             anim_t,
-            group_anim_t,
             limiters,
         }
     }

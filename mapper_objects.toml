@@ -1297,6 +1297,7 @@ frame_range = { start = 0, end = 9 }
 sync_to = "Group"
 sync_west = ["13-7"]
 sync_east = ["13-7"]
+laser_phase = "Red"
 frame_range = { start = 0, end = 3 }
 
 [13-8]
@@ -1304,6 +1305,7 @@ path = "Bank13/Object7.png"
 sync_to = "Group"
 sync_west = ["13-8"]
 sync_east = ["13-8"]
+laser_phase = "Green"
 frame_range = { start = 0, end = 3 }
 
 [13-9]
@@ -1317,6 +1319,7 @@ frame_range = { start = 0, end = 3 }
 sync_to = "Group"
 sync_north = ["13-10"]
 sync_south = ["13-10"]
+laser_phase = "Red"
 frame_range = { start = 0, end = 3 }
 
 [13-11]
@@ -1324,6 +1327,7 @@ path = "Bank13/Object10.png"
 sync_to = "Group"
 sync_north = ["13-11"]
 sync_south = ["13-11"]
+laser_phase = "Green"
 frame_range = { start = 0, end = 3 }
 
 [13-12]

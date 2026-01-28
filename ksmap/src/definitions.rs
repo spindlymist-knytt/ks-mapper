@@ -56,6 +56,8 @@ pub struct SyncParams {
     pub sync_south: Vec<ObjectId>,
     #[serde(default)]
     pub sync_offset: u32,
+    #[serde(default)]
+    pub laser_phase: Option<LaserPhase>,
 }
 
 #[derive(Debug, Clone, Copy, Default, Deserialize)]
@@ -91,6 +93,13 @@ pub enum Limit {
     First { n: usize },
     Random { n: usize },
     LogNPlusOne,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize)]
+pub enum LaserPhase {
+    #[default]
+    Red,
+    Green,
 }
 
 pub struct ObjectDefs {
@@ -248,6 +257,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                     sync_north,
                     sync_south,
                     sync_offset: oco_def.sync_params.sync_offset,
+                    laser_phase: oco_def.sync_params.laser_phase,
                 };
                 
                 frame_range = oco_def.draw_params.frame_range.clone();
