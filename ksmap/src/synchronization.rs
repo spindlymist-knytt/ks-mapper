@@ -29,8 +29,12 @@ pub struct Limiter {
     chosen: Vec<usize>,
 }
 
+pub struct SyncOptions {
+    pub maximize_visible_lasers: bool,
+}
+
 impl WorldSync {
-    pub fn new(screens: &ScreenMap, object_defs: &ObjectDefs) -> Self {
+    pub fn new(screens: &ScreenMap, object_defs: &ObjectDefs, options: &SyncOptions) -> Self {
         const TOP_LEFT: usize = 0;
         const TOP_RIGHT: usize = SCREEN_WIDTH - 1;
         const BOTTOM_LEFT: usize = TILES_PER_LAYER - SCREEN_WIDTH;
@@ -94,11 +98,11 @@ impl WorldSync {
         }
         
         let mut groups = vec![GroupSync::default(); screens.len()];
-        let laser_phases = list_laser_phases(screens, object_defs);
+        let laser_phases = count_laser_phases(screens, object_defs);
         let mut rng = rng();
         for (_index_rep, members) in groups_by_rep {
             let anim_t = rng.next_u32();
-            let laser_phase = pick_laser_phase(&mut rng, &laser_phases, &members);           
+            let laser_phase = pick_laser_phase(&mut rng, &laser_phases, &members, options.maximize_visible_lasers);           
             let group_sync = GroupSync {
                 anim_t,
                 laser_phase,
@@ -114,18 +118,31 @@ impl WorldSync {
     }
 }
 
-fn pick_laser_phase(rng: &mut impl Rng, laser_phases: &[[bool; 2]], members: &[usize]) -> LaserPhase {
-    let mut phases_found = [false; 2];
+fn pick_laser_phase(
+    rng: &mut impl Rng,
+    phase_counts: &[[usize; 2]],
+    members: &[usize],
+    maximize: bool
+) -> LaserPhase {
+    let mut total_red = 0;
+    let mut total_green = 0;
+    
     for index_member in members {
-        phases_found[0] |= laser_phases[*index_member][0];
-        phases_found[1] |= laser_phases[*index_member][1];
+        total_red += phase_counts[*index_member][LaserPhase::Red as usize];
+        total_green += phase_counts[*index_member][LaserPhase::Green as usize];
     }
     
-    match phases_found {
-        [true, true] => *[LaserPhase::Red, LaserPhase::Green].choose(rng).unwrap(),
-        [true, false] => LaserPhase::Red,
-        [false, true] => LaserPhase::Green,
-        [false, false] => LaserPhase::Red,
+    if total_red == 0 && total_green == 0 {
+        LaserPhase::Red
+    }
+    else if maximize && (total_red > total_green) {
+        LaserPhase::Red
+    }
+    else if maximize && (total_green > total_red) {
+        LaserPhase::Green
+    }
+    else {
+        *[LaserPhase::Red, LaserPhase::Green].choose(rng).unwrap()
     }
 }
 

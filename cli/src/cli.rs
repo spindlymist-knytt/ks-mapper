@@ -23,6 +23,9 @@ pub struct Cli {
     /// Draw objects that are only visible in the editor
     #[arg(short, long)]
     pub editor_only: bool,
+    /// Always pick a random laser phase (red/green) rather than the one with the most lasers.
+    #[arg(short, long)]
+    pub randomize_lasers: bool,
     /// Path to the KS data directory. If unspecified, it will be located relative to the level directory
     #[arg(long = "data")]
     pub data_dir: Option<PathBuf>,

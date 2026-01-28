@@ -80,12 +80,12 @@ pub fn list_assets(screens: &[ScreenData], defs: &ObjectDefs) -> AssetsUsed {
     }
 }
 
-pub fn list_laser_phases(screens: &[ScreenData], defs: &ObjectDefs) -> Vec<[bool; 2]> {
-    let mut laser_phases_found = vec![[false; 2]; screens.len()];
+pub fn count_laser_phases(screens: &[ScreenData], defs: &ObjectDefs) -> Vec<[usize; 2]> {
+    let mut counts = vec![[0; 2]; screens.len()];
     let laser_objects: Vec<_> = defs.iter()
         .filter_map(|(id, def)| {
-            let group = def.sync_params.laser_phase?;
-            Some((id.clone(), group))
+            let phase = def.sync_params.laser_phase?;
+            Some((id.clone(), phase))
         })
         .collect();
     
@@ -93,9 +93,9 @@ pub fn list_laser_phases(screens: &[ScreenData], defs: &ObjectDefs) -> Vec<[bool
         for LayerData(layer) in &screen.layers[4..] {
             for tile in layer {
                 if tile.1 == 0 { continue }
-                for (id, group) in &laser_objects {
+                for (id, phase) in &laser_objects {
                     if id.0 == *tile {
-                        laser_phases_found[index_screen][*group as usize] = true;
+                        counts[index_screen][*phase as usize] += 1;
                         break;
                     }
                 }
@@ -103,5 +103,5 @@ pub fn list_laser_phases(screens: &[ScreenData], defs: &ObjectDefs) -> Vec<[bool
         }
     }
     
-    laser_phases_found
+    counts
 }
