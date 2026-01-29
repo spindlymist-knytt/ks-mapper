@@ -163,22 +163,6 @@ pub fn load_object_defs(path: impl AsRef<Path>) -> Result<ObjectDefs> {
 }
 
 pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
-    // Handle special graphics overrides for coins, artifacts, and powerups
-    if let Some(world_section) = ini.section("World") {
-        for def in defs.values_mut() {
-            if let Some(override_key) = &def.override_key
-                && let Some(override_path) = world_section.get(override_key)
-                && !override_path.is_empty()
-            {
-                def.is_overridden = true;
-                def.path.replace(override_path.to_owned());
-                if let Some(frame_range) = def.override_frame_range.take() {
-                    def.draw_params.frame_range.replace(frame_range);
-                }
-            }
-        }
-    }
-    
     for section in ini.iter_sections() {
         let key_lower = section.key().to_ascii_lowercase();
 
@@ -355,6 +339,23 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         };
 
         defs.insert(ObjectId::from(tile), def);
+    }
+    
+    // Handle special graphics overrides for coins, artifacts, and powerups
+    // This needs to be done after parsing CO defs so OCOs don't inherit the changes
+    if let Some(world_section) = ini.section("World") {
+        for def in defs.values_mut() {
+            if let Some(override_key) = &def.override_key
+                && let Some(override_path) = world_section.get(override_key)
+                && !override_path.is_empty()
+            {
+                def.is_overridden = true;
+                def.path.replace(override_path.to_owned());
+                if let Some(frame_range) = def.override_frame_range.take() {
+                    def.draw_params.frame_range.replace(frame_range);
+                }
+            }
+        }
     }
 }
 
