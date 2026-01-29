@@ -32,6 +32,10 @@ pub struct ObjectDef {
     pub color_offsets: Vec<i64>,
     #[serde(skip)]
     pub replace_colors: Vec<([u8; 3], [u8; 3])>,
+    pub override_key: Option<String>,
+    pub override_frame_range: Option<Range<u32>>,
+    #[serde(skip)]
+    pub is_overridden: bool,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -159,6 +163,22 @@ pub fn load_object_defs(path: impl AsRef<Path>) -> Result<ObjectDefs> {
 }
 
 pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
+    // Handle special graphics overrides for coins, artifacts, and powerups
+    if let Some(world_section) = ini.section("World") {
+        for def in defs.values_mut() {
+            if let Some(override_key) = &def.override_key
+                && let Some(override_path) = world_section.get(override_key)
+                && !override_path.is_empty()
+            {
+                def.is_overridden = true;
+                def.path.replace(override_path.to_owned());
+                if let Some(frame_range) = def.override_frame_range.take() {
+                    def.draw_params.frame_range.replace(frame_range);
+                }
+            }
+        }
+    }
+    
     for section in ini.iter_sections() {
         let key_lower = section.key().to_ascii_lowercase();
 
@@ -329,6 +349,9 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             color_base,
             color_offsets,
             replace_colors,
+            override_key: None,
+            override_frame_range: None,
+            is_overridden: false,
         };
 
         defs.insert(ObjectId::from(tile), def);

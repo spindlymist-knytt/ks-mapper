@@ -14,34 +14,50 @@ frame_range = { start = 0, end = 1 }
 [0-3]
 sync_to = "Screen"
 frame_range = { start = 0, end = 12 }
+override_key = "Powers"
+override_frame_range = { start = 0, end = 8 }
 
 [0-4]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 8, end = 16 }
 
 [0-5]
 sync_to = "Screen"
 frame_range = { start = 0, end = 7 }
+override_key = "Powers"
+override_frame_range = { start = 16, end = 24 }
 
 [0-6]
 sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
+override_key = "Powers"
+override_frame_range = { start = 24, end = 32 }
 
 [0-7]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 32, end = 40 }
 
 [0-8]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 40, end = 48 }
 
 [0-9]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 48, end = 56 }
 
 [0-10]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 56, end = 64 }
 
 [0-11]
 is_editor_only = true
@@ -127,18 +143,26 @@ frame_range = { start = 0, end = 1 }
 [0-21]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 72, end = 73 }
 
 [0-22]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 73, end = 74 }
 
 [0-23]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 74, end = 75 }
 
 [0-24]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 75, end = 76 }
 
 [0-25]
 is_editor_only = true
@@ -227,6 +251,8 @@ frame_range = { start = 0, end = 1 }
 [0-35]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+override_key = "Powers"
+override_frame_range = { start = 64, end = 72 }
 
 [0-36]
 is_editor_only = true
@@ -2041,849 +2067,999 @@ limit = { pick = "Random", n = 1 }
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-52]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-53]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-54]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-55]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-56]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-57]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-58]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-59]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-60]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-61]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-62]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-63]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-64]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-65]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-66]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-67]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-68]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-69]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-70]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-71]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-72]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-73]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-74]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-75]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-76]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-77]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-78]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-79]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-80]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-81]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-82]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-83]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-84]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-85]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-86]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-87]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-88]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-89]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-90]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-91]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-92]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-93]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-94]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-95]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-96]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-97]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-98]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-99]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-100]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-101]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-102]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-103]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-104]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-105]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-106]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-107]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-108]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-109]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-110]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-111]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-112]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-113]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-114]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-115]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-116]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-117]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-118]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-119]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-120]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-121]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-122]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-123]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-124]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-125]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-126]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-127]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-128]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-129]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-130]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-131]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-132]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-133]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-134]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-135]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-136]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-137]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-138]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-139]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-140]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-141]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-142]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-143]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-144]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-145]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-146]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-147]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-148]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-149]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 [19-150]
 path = "Bank19/Object51.png"
 sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
+override_key = "Coin"
 
 ##### Red Artifacts
 
 [19-151]
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact1"
 
 [19-152]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact1"
 
 [19-153]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact1"
 
 [19-154]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact1"
 
 [19-155]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact1"
 
 [19-156]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact1"
 
 [19-157]
 path = "Bank19/Object151.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact1"
 
 ##### Yellow Artifacts
 
 [19-158]
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact2"
 
 [19-159]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact2"
 
 [19-160]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact2"
 
 [19-161]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact2"
 
 [19-162]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact2"
 
 [19-163]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact2"
 
 [19-164]
 path = "Bank19/Object158.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact2"
 
 ##### Blue Artifacts
 
 [19-165]
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact3"
 
 [19-166]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact3"
 
 [19-167]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact3"
 
 [19-168]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact3"
 
 [19-169]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact3"
 
 [19-170]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact3"
 
 [19-171]
 path = "Bank19/Object165.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact3"
 
 ##### Purple Artifacts
+
 
 [19-172]
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact4"
 
 [19-173]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact4"
 
 [19-174]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact4"
 
 [19-175]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact4"
 
 [19-176]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact4"
 
 [19-177]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact4"
 
 [19-178]
 path = "Bank19/Object172.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact4"
 
 ##### Green Artifacts
 
 [19-179]
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact5"
 
 [19-180]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact5"
 
 [19-181]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact5"
 
 [19-182]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact5"
 
 [19-183]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact5"
 
 [19-184]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact5"
 
 [19-185]
 path = "Bank19/Object179.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact5"
 
 ##### Pink Artifacts
 
 [19-186]
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact6"
 
 [19-187]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact6"
 
 [19-188]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact6"
 
 [19-189]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact6"
 
 [19-190]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact6"
 
 [19-191]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact6"
 
 [19-192]
 path = "Bank19/Object186.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact6"
 
 ##### Cyan Artifacts
 
 [19-193]
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact7"
 
 [19-194]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact7"
 
 [19-195]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact7"
 
 [19-196]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact7"
 
 [19-197]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact7"
 
 [19-198]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact7"
 
 [19-199]
 path = "Bank19/Object193.png"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 15 }
+override_key = "Artifact7"

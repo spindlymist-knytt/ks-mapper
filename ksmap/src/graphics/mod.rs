@@ -203,6 +203,10 @@ impl<'a> Graphics<'a> {
         id: &ObjectId,
         def: Option<&ObjectDef>,
     ) -> Result<MaybeImage> {
+        if let Some(def) = def && def.is_overridden {
+            return self.load_custom_object(def);
+        }
+        
         let ObjectId(tile, variant) = id;
         let suffix = match def.and_then(|def| def.path.as_ref()) {
             Some(path) => path,
