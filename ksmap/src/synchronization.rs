@@ -132,13 +132,10 @@ fn pick_laser_phase(
         total_green += phase_counts[*index_member][LaserPhase::Green as usize];
     }
     
-    if total_red == 0 && total_green == 0 {
+    if total_green == 0 || (maximize && total_red > total_green) {
         LaserPhase::Red
     }
-    else if maximize && (total_red > total_green) {
-        LaserPhase::Red
-    }
-    else if maximize && (total_green > total_red) {
+    else if total_red == 0 || (maximize && total_green > total_red) {
         LaserPhase::Green
     }
     else {
