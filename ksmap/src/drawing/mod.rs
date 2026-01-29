@@ -331,16 +331,12 @@ fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, an
     let (screen_x, screen_y) = screen_index_to_pixels(at_index);
     let (offset_x, offset_y) = params.offset.unwrap_or_default();
 
-    let (final_x, final_y) = match params.frame_size {
-        Some((frame_width, frame_height)) => (
-            screen_x + 12 - (frame_width as i64 / 2) + offset_x,
-            screen_y + 12 - (frame_height as i64 / 2) + offset_y,
-        ),
-        None => (
-            screen_x + offset_x,
-            screen_y + offset_y,
-        ),
-    };
+    let (image_width, image_height) = obj_img.dimensions();
+    let (mut frame_width, mut frame_height) = params.frame_size.unwrap_or((24, 24));
+    frame_width = u32::min(frame_width, image_width);
+    frame_height = u32::min(frame_height, image_height);
+    let final_x = screen_x + offset_x + 12 - (frame_width / 2) as i64;
+    let final_y = screen_y + offset_y + 12 - (frame_height / 2) as i64;
 
     if let Some(alpha_range) = params.alpha_range.as_ref() {
         let alpha = rng().random_range(alpha_range.clone()) as f32 / 255.0;
@@ -352,10 +348,14 @@ fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, an
 }
 
 fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: Option<u32>) -> SubImage<&'a RgbaImage> {
-    let size = object_img.dimensions();
-    let (frame_width, frame_height) = params.frame_size.unwrap_or((24, 24));
-    let frames_per_row = u32::max(1, size.0 / frame_width);
-    let n_rows = u32::max(1, size.1 / frame_height);
+    let (image_width, image_height) = object_img.dimensions();
+    let (mut frame_width, mut frame_height) = params.frame_size.unwrap_or((24, 24));
+    frame_width = u32::min(frame_width, image_width);
+    frame_height = u32::min(frame_height, image_height);
+    
+    let frames_per_row = image_width / frame_width;
+    let n_rows = image_height / frame_height;
+    
     let n_frames_max = n_rows * frames_per_row;
     let mut frame_range = params.frame_range.clone().unwrap_or_else(|| {
         let n_frames = n_rows * frames_per_row;
