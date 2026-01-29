@@ -257,7 +257,7 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
         let actual_id = ObjectId::from(tile);
         let object_def = ctx.defs.get(&actual_id);
         let proxy_id = match object_def.map(|def| &def.kind) {
-            Some(ObjectKind::OverrideObject(tile)) => ObjectId::from(tile),
+            Some(ObjectKind::OverrideObject(tile_original)) => ObjectId::from(tile_original),
             _ => ObjectId::from(tile),
         };
         let curs = Cursor {
@@ -267,7 +267,7 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
             object_def,
         };
 
-        if ctx.sync.limiters.get_mut(&curs.actual_id)
+        if ctx.sync.limiters.get_mut(&curs.proxy_id)
             .is_some_and(|limiter| !limiter.increment())
         {
             continue;

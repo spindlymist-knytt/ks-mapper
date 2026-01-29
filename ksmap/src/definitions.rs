@@ -92,7 +92,7 @@ pub enum OffsetCombine {
     Replace,
 }
 
-#[derive(Debug, Clone, Copy, Default, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize)]
 #[serde(tag = "pick")]
 pub enum Limit {
     #[default]

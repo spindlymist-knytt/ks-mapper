@@ -5,7 +5,7 @@ use rand::{prelude::*, rng};
 use libks::{constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
 
 use crate::{
-    analysis::count_laser_phases, definitions::{LaserPhase, Limit, ObjectDefs}, id::ObjectId, screen_map::ScreenMap
+    analysis::count_laser_phases, definitions::{LaserPhase, Limit, ObjectDefs, ObjectKind}, id::ObjectId, screen_map::ScreenMap
 };
 
 pub struct WorldSync {
@@ -149,21 +149,25 @@ impl ScreenSync {
         let mut limiters = HashMap::new();
         let mut counts = HashMap::new();
 
-        for layer in &screen.layers[4..] {
-            for tile in &layer.0 {
-                counts.entry(*tile)
-                    .and_modify(|count| *count += 1)
-                    .or_insert(1);
+        for LayerData(layer) in &screen.layers[4..] {
+            for tile in layer {
+                if tile.1 > 0
+                    && let Some(def) = object_defs.get(&ObjectId::from(tile))
+                    && def.limit != Limit::None
+                {
+                    let id = match &def.kind {
+                        ObjectKind::OverrideObject(tile_original) => ObjectId::from(tile_original),
+                        _ => ObjectId::from(tile),
+                    };
+                    counts.entry(id)
+                        .and_modify(|count| *count += 1)
+                        .or_insert(1);
+                }
             }
         }
 
-        for (tile, count) in counts {
-            let id = ObjectId::from(tile);
-
-            let Some(def) = object_defs.get(&id) else {
-                continue
-            };
-
+        for (id, count) in counts {
+            let Some(def) = object_defs.get(&id) else { continue };
             match def.limit {
                 Limit::None => {},
                 Limit::First { n } => {
