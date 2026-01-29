@@ -301,33 +301,52 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
 }
 
 #[inline]
-fn draw_object(ctx: &mut DrawContext, at_index: usize, object: ObjectId) {
-    let (draw_params, sync_params) = match ctx.defs.get(&object) {
-        Some(def) => (&def.draw_params, &def.sync_params),
-        None => (&DrawParams::default(), &SyncParams::default()),
-    };
-    draw_object_with_params(ctx, at_index, object, draw_params, sync_params);
-}
-
-#[inline]
-fn draw_object_with_params(
+fn draw_object(
     ctx: &mut DrawContext,
     at_index: usize,
     object: ObjectId,
-    draw_params: &DrawParams,
-    sync_params: &SyncParams,
 ) {
+    draw_object_with_offset(ctx, at_index, object, (0, 0));
+}
+
+#[inline]
+fn draw_object_with_offset(
+    ctx: &mut DrawContext,
+    at_index: usize,
+    mut object: ObjectId,
+    offset: (i64, i64),
+) {
+    let def = match ctx.defs.get(&object) {
+        Some(def) => def,
+        None => &ObjectDef::default(),
+    };
+    
+    let mut flip = def.draw_params.flip && rng().random();
+    if flip && let Some(variant) = def.draw_params.flip_variant {
+        object = object.into_variant(variant);
+        flip = false;
+        // Should technically fetch the variant def here but it doesn't matter for any existing object
+    }
     let Some(obj_image) = ctx.gfx.object(&object) else { return };
-    let anim_t = match sync_params.sync_to {
+    
+    let anim_t = match &def.sync_params.sync_to {
         AnimSync::None => None,
         AnimSync::Screen => Some(ctx.sync.anim_t),
         AnimSync::Group => Some(ctx.sync.group.anim_t),
     };
-    draw_spritesheet(ctx, at_index as u8, draw_params, anim_t, obj_image);
+    draw_spritesheet(ctx, at_index as u8, &def.draw_params, anim_t, obj_image, offset, flip);
 }
 
-fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, anim_t: Option<u32>, obj_img: &RgbaImage) {
-    let frame = pick_frame(&obj_img, params, anim_t);
+fn draw_spritesheet(
+    ctx: &mut DrawContext,
+    at_index: u8,
+    params: &DrawParams,
+    anim_t: Option<u32>,
+    obj_img: &RgbaImage,
+    offset: (i64, i64),
+    flip: bool,
+) {
+    let mut frame = pick_frame(&obj_img, params, anim_t);
     let (screen_x, screen_y) = screen_index_to_pixels(at_index);
     let (offset_x, offset_y) = params.offset.unwrap_or_default();
 
@@ -335,8 +354,21 @@ fn draw_spritesheet(ctx: &mut DrawContext, at_index: u8, params: &DrawParams, an
     let (mut frame_width, mut frame_height) = params.frame_size.unwrap_or((24, 24));
     frame_width = u32::min(frame_width, image_width);
     frame_height = u32::min(frame_height, image_height);
-    let final_x = screen_x + offset_x + 12 - (frame_width / 2) as i64;
-    let final_y = screen_y + offset_y + 12 - (frame_height / 2) as i64;
+    let final_x = (screen_x + 12) + (offset_x + offset.0) - (frame_width / 2) as i64;
+    let final_y = (screen_y + 12) + (offset_y + offset.1) - (frame_height / 2) as i64;
+    
+    let flipped = if flip {
+            let mut flipped = frame.to_image();
+            imageops::flip_horizontal_in_place(&mut flipped);
+            Some(flipped)
+        }
+        else {
+            None
+        };
+    frame = match flipped.as_ref() {
+        Some(flipped) => imageops::crop_imm(flipped, 0, 0, flipped.width(), flipped.height()),
+        None => frame,
+    };
 
     if let Some(alpha_range) = params.alpha_range.as_ref() {
         let alpha = rng().random_range(alpha_range.clone()) as f32 / 255.0;
@@ -425,12 +457,5 @@ fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeIncl
     let mut rng = rng();
     let offset_x = rng.random_range(range.clone());
     let offset_y = rng.random_range(range);
-
-    let (mut draw_params, sync_params) = match curs.object_def {
-        Some(def) => (def.draw_params.clone(), &def.sync_params),
-        None => (DrawParams::default(), &SyncParams::default()),
-    };
-    draw_params.offset = Some((offset_x, offset_y));
-
-    draw_object_with_params(ctx, curs.i, curs.actual_id, &draw_params, sync_params);
+    draw_object_with_offset(ctx, curs.i, curs.actual_id, (offset_x, offset_y));
 }

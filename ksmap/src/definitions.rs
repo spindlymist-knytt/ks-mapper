@@ -80,6 +80,9 @@ pub struct DrawParams {
     pub frame_size: Option<(u32, u32)>,
     pub frame_range: Option<Range<u32>>,
     pub offset: Option<(i64, i64)>,
+    #[serde(default)]
+    pub flip: bool,
+    pub flip_variant: Option<ObjectVariant>,
 }
 
 #[derive(Debug, Clone, Copy, Default, Deserialize)]
@@ -228,6 +231,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         let color_base = None;
         let color_offsets = Vec::new();
         let mut replace_colors = Vec::new();
+        let flip;
 
         if let Some(object) = object {
             kind = ObjectKind::OverrideObject(Tile(bank, object));
@@ -267,6 +271,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 frame_range = oco_def.draw_params.frame_range.clone();
                 limit = oco_def.limit;
                 ignore_oco_path = oco_def.ignore_oco_path;
+                flip = oco_def.draw_params.flip;
 
                 if let Some(offset) = oco_def.draw_params.offset {
                     match oco_def.offset_combine {
@@ -296,6 +301,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 offset_y = 0;
                 limit = Limit::None;
                 ignore_oco_path = false;
+                flip = false;
             }
         }
         else {
@@ -311,6 +317,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             };
             limit = Limit::None;
             ignore_oco_path = false;
+            flip = false;
         }
 
         let draw_params = DrawParams {
@@ -319,6 +326,8 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             frame_size: Some((frame_width, frame_height)),
             frame_range,
             offset: Some((offset_x, offset_y)),
+            flip,
+            flip_variant: None,
         };
 
         let def = ObjectDef {
