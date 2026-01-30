@@ -1205,6 +1205,7 @@ frame_range = { start = 0, end = 8 }
 [8-12]
 sync_to = "Screen"
 frame_range = { start = 0, end = 6 }
+oco_support = "None"
 
 [8-13]
 frame_range = { start = 0, end = 13 }
