@@ -6,10 +6,12 @@
 sync_to = "Screen"
 blend_mode = "Add"
 frame_range = { start = 0, end = 9 }
+oco_support = "None"
 
 [0-2]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-3]
 sync_to = "Screen"
@@ -62,14 +64,20 @@ override_frame_range = { start = 56, end = 64 }
 [0-11]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-12]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-13]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
+
+[0-14]
+oco_support = "None"
 
 ["0-14 Spot"]
 sync_to = "Screen"
@@ -85,6 +93,9 @@ frame_range = { start = 0, end = 1 }
 
 ["0-14 Square"]
 frame_range = { start = 0, end = 1 }
+
+[0-15]
+oco_support = "None"
 
 ["0-15 Spot"]
 path = "Bank0/Object14_Spot.png"
@@ -104,6 +115,9 @@ frame_range = { start = 0, end = 1 }
 ["0-15 Square"]
 path = "Bank0/Object14_Square.png"
 frame_range = { start = 0, end = 1 }
+
+[0-16]
+oco_support = "None"
 
 ["0-16 Spot"]
 path = "Bank0/Object14_Spot.png"
@@ -127,18 +141,22 @@ frame_range = { start = 0, end = 1 }
 [0-17]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-18]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-19]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-20]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-21]
 sync_to = "Screen"
@@ -167,30 +185,40 @@ override_frame_range = { start = 75, end = 76 }
 [0-25]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-26]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-27]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-28]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-29]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-30]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-31]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
+
+[0-32]
+oco_support = "None"
 
 ["0-32 Spot"]
 sync_to = "Screen"
@@ -210,6 +238,9 @@ frame_range = { start = 0, end = 1 }
 path = "Bank0/Object14_Square.png"
 frame_range = { start = 0, end = 1 }
 
+[0-33]
+oco_support = "None"
+
 ["0-33 Spot"]
 path = "Bank0/Object32_Spot.png"
 sync_to = "Screen"
@@ -228,6 +259,9 @@ frame_range = { start = 0, end = 1 }
 ["0-33 Square"]
 path = "Bank0/Object14_Square.png"
 frame_range = { start = 0, end = 1 }
+
+[0-34]
+oco_support = "None"
 
 ["0-34 Spot"]
 path = "Bank0/Object32_Spot.png"
@@ -257,94 +291,117 @@ override_frame_range = { start = 64, end = 72 }
 [0-36]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-37]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-38]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-39]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-40]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-41]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-42]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-43]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-44]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-45]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-46]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-47]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-48]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-49]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-247]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-248]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-249]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-250]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-251]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-252]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-253]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-254]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [0-255]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 ################################################################################
 # Bank 1 Liquids
@@ -376,12 +433,15 @@ frame_range = { start = 0, end = 10 }
 
 [1-7]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-8]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-9]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-10]
 sync_west = ["1-10"]
@@ -397,6 +457,7 @@ frame_range = { start = 0, end = 2 }
 
 [1-11]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-12]
 sync_west = ["1-12"]
@@ -425,11 +486,13 @@ frame_range = { start = 0, end = 10 }
 
 [1-17]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-18]
 blend_mode = "Add"
 frame_size = [25, 24]
 frame_range = { start = 0, end = 30 }
+oco_support = "None"
 
 [1-19]
 frame_range = { start = 0, end = 24 }
@@ -439,6 +502,7 @@ frame_range = { start = 0, end = 21 }
 
 [1-21]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-22]
 sync_west = ["1-22"]
@@ -458,18 +522,22 @@ frame_range = { start = 0, end = 21 }
 
 [1-24]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-25]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-26]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [1-27]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 ################################################################################
 # Bank 2 Flyers
@@ -506,6 +574,7 @@ frame_range = { start = 0, end = 9 }
 [2-8]
 alpha_range = { start = 0, end = 255 }
 frame_range = { start = 0, end = 17 }
+oco_support = "None"
 
 [2-9]
 sync_to = "Screen"
@@ -528,6 +597,7 @@ frame_range = { start = 0, end = 10 }
 [2-13]
 alpha_range = { start = 0, end = 255 }
 frame_range = { start = 0, end = 33 }
+oco_support = "None"
 
 [2-14]
 sync_to = "Screen"
@@ -545,6 +615,9 @@ frame_range = { start = 0, end = 4 }
 sync_to = "Screen"
 frame_range = { start = 0, end = 4 }
 
+[2-18]
+oco_support = "None"
+
 ["2-18 A"]
 sync_to = "Screen"
 frame_range = { start = 0, end = 19 }
@@ -560,6 +633,9 @@ frame_range = { start = 0, end = 8 }
 ["2-18 D"]
 sync_to = "Screen"
 frame_range = { start = 0, end = 8 }
+
+[2-19]
+oco_support = "None"
 
 ["2-19 A"]
 sync_to = "Screen"
@@ -591,6 +667,7 @@ frame_range = { start = 0, end = 9 }
 
 [2-23]
 frame_range = { start = 0, end = 19 }
+oco_support = "None"
 
 [2-24]
 sync_to = "Screen"
@@ -743,6 +820,7 @@ flip = true
 [3-29]
 frame_range = { start = 0, end = 9 }
 flip = true
+oco_support = "None"
 
 [3-30]
 sync_to = "Screen"
@@ -892,17 +970,20 @@ frame_range = { start = 0, end = 12 }
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 8 }
+oco_support = "None"
 
 [5-2]
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 12 }
+oco_support = "None"
 flip = true
 
 [5-3]
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 12 }
+oco_support = "None"
 flip = true
 
 ################################################################################
@@ -972,90 +1053,91 @@ frame_range = { start = 0, end = 1 }
 [7-1]
 editor_only = true
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-2]
 frame_range = { start = 0, end = 13 }
 color_base = 0
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-3]
 editor_only = true
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-4]
 color_base = 14408667
-ignore_oco_path = true
 frame_range = { start = 0, end = 1 }
+oco_support = "NoCustomGraphics"
 
 [7-5]
 alpha_range = { start = 0, end = 40 }
 frame_size = [20, 98]
 offset = [-2, 37]
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-6]
 editor_only = true
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-7]
 frame_range = { start = 0, end = 23 }
 color_base = 10639221
 color_offsets = [989204, -1970198]
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-8]
 editor_only = true
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-9]
 frame_range = { start = 0, end = 5 }
 color_base = 8944745
 color_offsets = [-1249551]
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-10]
 editor_only = true
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-11]
 frame_range = { start = 0, end = 23 }
 color_base = 2709554
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-12]
 editor_only = true
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-13]
 frame_range = { start = 0, end = 23 }
 color_base = 16711679
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-14]
 editor_only = true
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-15]
 color_base = 986895
-ignore_oco_path = true
 frame_range = { start = 0, end = 1 }
+oco_support = "NoCustomGraphics"
 
 [7-16]
 editor_only = true
 frame_range = { start = 0, end = 1 }
-ignore_oco_path = true
+oco_support = "NoCustomGraphics"
 
 [7-17]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 ################################################################################
 # Bank 8 Decoration
@@ -1066,28 +1148,33 @@ sync_to = "Group"
 sync_west = ["8-1"]
 sync_east = ["8-1"]
 frame_range = { start = 0, end = 3 }
+oco_support = "None"
 
 [8-2]
 sync_to = "Group"
 sync_north = ["8-2"]
 sync_south = ["8-2"]
 frame_range = { start = 0, end = 3 }
+oco_support = "None"
 
 [8-3]
 sync_to = "Group"
 sync_east = ["8-4", "8-5"]
 frame_range = { start = 0, end = 3 }
+oco_support = "None"
 
 [8-4]
 sync_to = "Group"
 sync_west = ["8-3", "8-4"]
 sync_east = ["8-4", "8-5"]
 frame_range = { start = 0, end = 3 }
+oco_support = "None"
 
 [8-5]
 sync_to = "Group"
 sync_west = ["8-3", "8-4"]
 frame_range = { start = 0, end = 3 }
+oco_support = "None"
 
 [8-6]
 blend_mode = "Add"
@@ -1127,14 +1214,17 @@ frame_range = { start = 0, end = 8 }
 [8-15]
 frame_range = { start = 0, end = 5 }
 limit = { pick = "LogNPlusOne" }
+oco_support = "None"
 
 [8-16]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [8-17]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 ################################################################################
 # Bank 9 Flowers
@@ -1257,6 +1347,7 @@ alpha_range = { start = 0, end = 96 }
 sync_to = "Screen"
 frame_size = [24, 28]
 frame_range = { start = 0, end = 10 }
+oco_support = "None"
 flip = true
 
 [12-2]
@@ -1264,10 +1355,12 @@ alpha_range = { start = 0, end = 96 }
 sync_to = "Screen"
 frame_size = [24, 28]
 frame_range = { start = 0, end = 10 }
+oco_support = "None"
 flip = true
 
 [12-3]
 frame_range = { start = 0, end = 6 }
+oco_support = "None"
 flip = true
 
 [12-4]
@@ -1276,16 +1369,19 @@ sync_to = "Screen"
 frame_size = [24, 29]
 offset = [0, -2]
 frame_range = { start = 0, end = 10 }
+oco_support = "None"
 
 [12-5]
 alpha_range = { start = 0, end = 56 }
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [12-6]
 alpha_range = { start = 0, end = 96 }
 frame_size = [48, 24]
 offset = [12, 0]
 frame_range = { start = 0, end = 14 }
+oco_support = "None"
 flip = true
 
 [12-7]
@@ -1294,22 +1390,26 @@ sync_to = "Screen"
 frame_size = [24, 28]
 offset = [0, -2]
 frame_range = { start = 0, end = 8 }
+oco_support = "None"
 
 [12-8]
 alpha_range = { start = 0, end = 96 }
 sync_to = "Screen"
 frame_range = { start = 0, end = 18 }
+oco_support = "None"
 
 [12-9]
 alpha_range = { start = 0, end = 96 }
 frame_size = [48, 24]
 offset = [12, 0]
 frame_range = { start = 0, end = 14 }
+oco_support = "None"
 flip = true
 
 [12-10]
 frame_size = [48, 48]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 offset = [12, -12]
 
 [12-11]
@@ -1317,55 +1417,66 @@ alpha_range = { start = 0, end = 96 }
 sync_to = "Screen"
 frame_size = [24, 28]
 frame_range = { start = 0, end = 10 }
+oco_support = "None"
 flip = true
 
 [12-12]
 alpha_range = { start = 0, end = 96 }
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [12-13]
 alpha_range = { start = 0, end = 96 }
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [12-14]
 frame_size = [25, 72]
 offset = [0, 24]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [12-15]
 alpha_range = { start = 0, end = 96 }
 frame_size = [24, 26]
 offset = [0, -1]
 frame_range = { start = 0, end = 6 }
+oco_support = "None"
 flip = true
 
 [12-16]
 sync_to = "Screen"
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [12-17]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [12-18]
 blend_mode = "Add"
 sync_to = "Screen"
 frame_range = { start = 0, end = 2 }
+oco_support = "None"
 
 [12-19]
 blend_mode = "Add"
 sync_to = "Screen"
 frame_range = { start = 0, end = 2 }
+oco_support = "None"
 
 [12-20]
 blend_mode = "Add"
 sync_to = "Screen"
 frame_range = { start = 0, end = 2 }
+oco_support = "None"
 
 [12-21]
 blend_mode = "Add"
 sync_to = "Screen"
 frame_range = { start = 0, end = 2 }
+oco_support = "None"
 
 ################################################################################
 # Bank 13 Robots
@@ -1561,15 +1672,19 @@ frame_range = { start = 4, end = 5 }
 
 [15-1]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-2]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-3]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-4]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-5]
 blend_mode = "Add"
@@ -1578,26 +1693,32 @@ frame_range = { start = 0, end = 21 }
 [15-6]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-7]
 sync_to = "Screen"
 frame_range = { start = 0, end = 24 }
+oco_support = "None"
 
 [15-8]
 path = "Bank15/Object1.png"
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-9]
 path = "Bank15/Object2.png"
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-10]
 path = "Bank15/Object3.png"
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-11]
 path = "Bank15/Object4.png"
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-12]
 frame_range = { start = 0, end = 1 }
@@ -1606,54 +1727,63 @@ frame_range = { start = 0, end = 1 }
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-14]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-15]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-16]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-17]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-18]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-19]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-20]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-21]
 path = "Bank15/Object13.png"
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-22]
 frame_size = [24, 48]
@@ -1669,11 +1799,13 @@ frame_range = { start = 0, end = 1 }
 [15-25]
 alpha_range = { start = 0, end = 80 }
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-26]
 frame_size = [24, 48]
 offset = [0, 12]
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [15-27]
 frame_range = { start = 0, end = 1 }
@@ -1725,122 +1857,152 @@ frame_range = { start = 0, end = 1 }
 [16-1]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-2]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-3]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-4]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-5]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-6]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-7]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-8]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-9]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-10]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-11]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-12]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-13]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-14]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-15]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-16]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-17]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-18]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-19]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-20]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-21]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-22]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-23]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-24]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-25]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-26]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-27]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-28]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-29]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 [16-30]
 editor_only = true
 frame_range = { start = 0, end = 1 }
+oco_support = "None"
 
 ################################################################################
 # Bank 17 Creepy
@@ -1957,6 +2119,7 @@ frame_range = { start = 0, end = 9 }
 alpha_range = { start = 0, end = 255 }
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 1 }
+oco_support = "NoCustomGraphics"
 
 [19-5]
 sync_to = "Screen"
@@ -2186,6 +2349,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-52]
 path = "Bank19/Object51.png"
@@ -2193,6 +2357,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-53]
 path = "Bank19/Object51.png"
@@ -2200,6 +2365,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-54]
 path = "Bank19/Object51.png"
@@ -2207,6 +2373,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-55]
 path = "Bank19/Object51.png"
@@ -2214,6 +2381,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-56]
 path = "Bank19/Object51.png"
@@ -2221,6 +2389,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-57]
 path = "Bank19/Object51.png"
@@ -2228,6 +2397,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-58]
 path = "Bank19/Object51.png"
@@ -2235,6 +2405,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-59]
 path = "Bank19/Object51.png"
@@ -2242,6 +2413,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-60]
 path = "Bank19/Object51.png"
@@ -2249,6 +2421,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-61]
 path = "Bank19/Object51.png"
@@ -2256,6 +2429,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-62]
 path = "Bank19/Object51.png"
@@ -2263,6 +2437,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-63]
 path = "Bank19/Object51.png"
@@ -2270,6 +2445,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-64]
 path = "Bank19/Object51.png"
@@ -2277,6 +2453,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-65]
 path = "Bank19/Object51.png"
@@ -2284,6 +2461,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-66]
 path = "Bank19/Object51.png"
@@ -2291,6 +2469,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-67]
 path = "Bank19/Object51.png"
@@ -2298,6 +2477,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-68]
 path = "Bank19/Object51.png"
@@ -2305,6 +2485,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-69]
 path = "Bank19/Object51.png"
@@ -2312,6 +2493,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-70]
 path = "Bank19/Object51.png"
@@ -2319,6 +2501,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-71]
 path = "Bank19/Object51.png"
@@ -2326,6 +2509,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-72]
 path = "Bank19/Object51.png"
@@ -2333,6 +2517,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-73]
 path = "Bank19/Object51.png"
@@ -2340,6 +2525,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-74]
 path = "Bank19/Object51.png"
@@ -2347,6 +2533,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-75]
 path = "Bank19/Object51.png"
@@ -2354,6 +2541,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-76]
 path = "Bank19/Object51.png"
@@ -2361,6 +2549,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-77]
 path = "Bank19/Object51.png"
@@ -2368,6 +2557,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-78]
 path = "Bank19/Object51.png"
@@ -2375,6 +2565,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-79]
 path = "Bank19/Object51.png"
@@ -2382,6 +2573,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-80]
 path = "Bank19/Object51.png"
@@ -2389,6 +2581,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-81]
 path = "Bank19/Object51.png"
@@ -2396,6 +2589,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-82]
 path = "Bank19/Object51.png"
@@ -2403,6 +2597,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-83]
 path = "Bank19/Object51.png"
@@ -2410,6 +2605,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-84]
 path = "Bank19/Object51.png"
@@ -2417,6 +2613,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-85]
 path = "Bank19/Object51.png"
@@ -2424,6 +2621,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-86]
 path = "Bank19/Object51.png"
@@ -2431,6 +2629,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-87]
 path = "Bank19/Object51.png"
@@ -2438,6 +2637,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-88]
 path = "Bank19/Object51.png"
@@ -2445,6 +2645,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-89]
 path = "Bank19/Object51.png"
@@ -2452,6 +2653,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-90]
 path = "Bank19/Object51.png"
@@ -2459,6 +2661,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-91]
 path = "Bank19/Object51.png"
@@ -2466,6 +2669,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-92]
 path = "Bank19/Object51.png"
@@ -2473,6 +2677,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-93]
 path = "Bank19/Object51.png"
@@ -2480,6 +2685,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-94]
 path = "Bank19/Object51.png"
@@ -2487,6 +2693,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-95]
 path = "Bank19/Object51.png"
@@ -2494,6 +2701,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-96]
 path = "Bank19/Object51.png"
@@ -2501,6 +2709,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-97]
 path = "Bank19/Object51.png"
@@ -2508,6 +2717,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-98]
 path = "Bank19/Object51.png"
@@ -2515,6 +2725,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-99]
 path = "Bank19/Object51.png"
@@ -2522,6 +2733,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-100]
 path = "Bank19/Object51.png"
@@ -2529,6 +2741,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-101]
 path = "Bank19/Object51.png"
@@ -2536,6 +2749,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-102]
 path = "Bank19/Object51.png"
@@ -2543,6 +2757,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-103]
 path = "Bank19/Object51.png"
@@ -2550,6 +2765,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-104]
 path = "Bank19/Object51.png"
@@ -2557,6 +2773,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-105]
 path = "Bank19/Object51.png"
@@ -2564,6 +2781,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-106]
 path = "Bank19/Object51.png"
@@ -2571,6 +2789,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-107]
 path = "Bank19/Object51.png"
@@ -2578,6 +2797,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-108]
 path = "Bank19/Object51.png"
@@ -2585,6 +2805,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-109]
 path = "Bank19/Object51.png"
@@ -2592,6 +2813,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-110]
 path = "Bank19/Object51.png"
@@ -2599,6 +2821,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-111]
 path = "Bank19/Object51.png"
@@ -2606,6 +2829,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-112]
 path = "Bank19/Object51.png"
@@ -2613,6 +2837,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-113]
 path = "Bank19/Object51.png"
@@ -2620,6 +2845,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-114]
 path = "Bank19/Object51.png"
@@ -2627,6 +2853,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-115]
 path = "Bank19/Object51.png"
@@ -2634,6 +2861,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-116]
 path = "Bank19/Object51.png"
@@ -2641,6 +2869,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-117]
 path = "Bank19/Object51.png"
@@ -2648,6 +2877,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-118]
 path = "Bank19/Object51.png"
@@ -2655,6 +2885,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-119]
 path = "Bank19/Object51.png"
@@ -2662,6 +2893,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-120]
 path = "Bank19/Object51.png"
@@ -2669,6 +2901,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-121]
 path = "Bank19/Object51.png"
@@ -2676,6 +2909,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-122]
 path = "Bank19/Object51.png"
@@ -2683,6 +2917,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-123]
 path = "Bank19/Object51.png"
@@ -2690,6 +2925,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-124]
 path = "Bank19/Object51.png"
@@ -2697,6 +2933,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-125]
 path = "Bank19/Object51.png"
@@ -2704,6 +2941,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-126]
 path = "Bank19/Object51.png"
@@ -2711,6 +2949,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-127]
 path = "Bank19/Object51.png"
@@ -2718,6 +2957,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-128]
 path = "Bank19/Object51.png"
@@ -2725,6 +2965,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-129]
 path = "Bank19/Object51.png"
@@ -2732,6 +2973,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-130]
 path = "Bank19/Object51.png"
@@ -2739,6 +2981,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-131]
 path = "Bank19/Object51.png"
@@ -2746,6 +2989,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-132]
 path = "Bank19/Object51.png"
@@ -2753,6 +2997,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-133]
 path = "Bank19/Object51.png"
@@ -2760,6 +3005,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-134]
 path = "Bank19/Object51.png"
@@ -2767,6 +3013,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-135]
 path = "Bank19/Object51.png"
@@ -2774,6 +3021,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-136]
 path = "Bank19/Object51.png"
@@ -2781,6 +3029,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-137]
 path = "Bank19/Object51.png"
@@ -2788,6 +3037,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-138]
 path = "Bank19/Object51.png"
@@ -2795,6 +3045,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-139]
 path = "Bank19/Object51.png"
@@ -2802,6 +3053,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-140]
 path = "Bank19/Object51.png"
@@ -2809,6 +3061,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-141]
 path = "Bank19/Object51.png"
@@ -2816,6 +3069,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-142]
 path = "Bank19/Object51.png"
@@ -2823,6 +3077,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-143]
 path = "Bank19/Object51.png"
@@ -2830,6 +3085,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-144]
 path = "Bank19/Object51.png"
@@ -2837,6 +3093,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-145]
 path = "Bank19/Object51.png"
@@ -2844,6 +3101,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-146]
 path = "Bank19/Object51.png"
@@ -2851,6 +3109,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-147]
 path = "Bank19/Object51.png"
@@ -2858,6 +3117,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-148]
 path = "Bank19/Object51.png"
@@ -2865,6 +3125,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-149]
 path = "Bank19/Object51.png"
@@ -2872,6 +3133,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 [19-150]
 path = "Bank19/Object51.png"
@@ -2879,6 +3141,7 @@ sync_to = "Screen"
 limit = { pick = "First", n = 1 }
 frame_range = { start = 0, end = 9 }
 override_key = "Coin"
+oco_support = "None"
 
 ##### Red Artifacts
 

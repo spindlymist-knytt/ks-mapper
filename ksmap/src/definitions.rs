@@ -24,7 +24,7 @@ pub struct ObjectDef {
     #[serde(default)]
     pub offset_combine: OffsetCombine,
     #[serde(default)]
-    pub ignore_oco_path: bool,
+    pub oco_support: OcoSupport,
     #[serde(default)]
     pub limit: Limit,
     pub color_base: Option<i64>,
@@ -90,6 +90,14 @@ pub enum OffsetCombine {
     #[default]
     Add,
     Replace,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize)]
+pub enum OcoSupport {
+    #[default]
+    Full,
+    NoCustomGraphics,
+    None,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize)]
@@ -226,18 +234,22 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         let kind;
         let frame_range;
         let sync_params;
+        let oco_support;
         let limit;
-        let ignore_oco_path;
         let color_base = None;
         let color_offsets = Vec::new();
         let mut replace_colors = Vec::new();
         let flip;
 
         if let Some(object) = object {
-            kind = ObjectKind::OverrideObject(Tile(bank, object));
             let oco_id = ObjectId::from(Tile(bank, object));
 
-            if let Some(oco_def) = defs.get(&oco_id) {
+            if bank < 254
+                && let Some(oco_def) = defs.get(&oco_id)
+                && oco_def.oco_support != OcoSupport::None
+            {
+                kind = ObjectKind::OverrideObject(Tile(bank, object));
+                
                 let mut sync_north = Vec::new();
                 if oco_def.sync_params.sync_north.contains(&oco_id) {
                     sync_north.push(ObjectId::from(tile));
@@ -269,8 +281,8 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 };
                 
                 frame_range = oco_def.draw_params.frame_range.clone();
+                oco_support = oco_def.oco_support;
                 limit = oco_def.limit;
-                ignore_oco_path = oco_def.ignore_oco_path;
                 flip = oco_def.draw_params.flip;
 
                 if let Some(offset) = oco_def.draw_params.offset {
@@ -295,12 +307,13 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 }
             }
             else {
+                kind = ObjectKind::CustomObject;
                 sync_params = SyncParams::default();
-                frame_range = None;
+                frame_range = Some(0..1);
                 offset_x = 0;
                 offset_y = 0;
+                oco_support = OcoSupport::None;
                 limit = Limit::None;
-                ignore_oco_path = false;
                 flip = false;
             }
         }
@@ -315,8 +328,8 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 sync_to: AnimSync::Screen,
                 ..Default::default()
             };
+            oco_support = OcoSupport::None;
             limit = Limit::None;
-            ignore_oco_path = false;
             flip = false;
         }
 
@@ -337,7 +350,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             sync_params,
             draw_params,
             offset_combine: OffsetCombine::Replace,
-            ignore_oco_path,
+            oco_support,
             limit,
             color_base,
             color_offsets,

@@ -11,7 +11,7 @@ use image::{DynamicImage, Rgba, RgbaImage};
 use libks::map_bin::AssetId;
 
 use crate::{
-    definitions::{ObjectDef, ObjectDefs, ObjectKind},
+    definitions::{ObjectDef, ObjectDefs, ObjectKind, OcoSupport},
     id::{ObjectId, ObjectVariant},
 };
 
@@ -235,8 +235,8 @@ impl<'a> Graphics<'a> {
     }
 
     fn load_override_object(&mut self, def: &ObjectDef) -> Result<MaybeImage> {
-        let image = 
-            if def.ignore_oco_path {
+        let image = match def.oco_support {
+            OcoSupport::NoCustomGraphics => {
                 let ObjectKind::OverrideObject(original_tile) = def.kind else {
                     return Ok(None);
                 };
@@ -246,9 +246,8 @@ impl<'a> Graphics<'a> {
                 };
                 self.load_stock_object(&original_id, Some(original_def))?
             }
-            else {
-                self.load_custom_object(def)?
-            };
+            _ => self.load_custom_object(def)?
+        };
             
         if def.replace_colors.is_empty() {
             return Ok(image);
