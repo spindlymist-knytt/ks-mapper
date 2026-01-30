@@ -203,10 +203,10 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
             continue;
         }
 
-        let frame_width: u32 = section.get("Tile Width")
+        let mut frame_width: u32 = section.get("Tile Width")
             .and_then(|v| str::parse(v).ok())
             .unwrap_or(24);
-        let frame_height: u32 = section.get("Tile Height")
+        let mut frame_height: u32 = section.get("Tile Height")
             .and_then(|v| str::parse(v).ok())
             .unwrap_or(24);
         let mut offset_x: i64 = section.get("Offset X")
@@ -234,8 +234,10 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         let kind;
         let frame_range;
         let sync_params;
+        let editor_only;
         let oco_support;
         let limit;
+        let alpha_range;
         let color_base = None;
         let color_offsets = Vec::new();
         let mut replace_colors = Vec::new();
@@ -280,9 +282,15 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                     laser_phase: oco_def.sync_params.laser_phase,
                 };
                 
+                if oco_def.oco_support == OcoSupport::NoCustomGraphics {
+                    (frame_width, frame_height) = oco_def.draw_params.frame_size.unwrap_or((24, 24));
+                }
+                
                 frame_range = oco_def.draw_params.frame_range.clone();
+                editor_only = oco_def.editor_only;
                 oco_support = oco_def.oco_support;
                 limit = oco_def.limit;
+                alpha_range = oco_def.draw_params.alpha_range.clone();
                 flip = oco_def.draw_params.flip;
 
                 if let Some(offset) = oco_def.draw_params.offset {
@@ -312,8 +320,10 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 frame_range = Some(0..1);
                 offset_x = 0;
                 offset_y = 0;
+                editor_only = false;
                 oco_support = OcoSupport::None;
                 limit = Limit::None;
+                alpha_range = None;
                 flip = false;
             }
         }
@@ -328,14 +338,16 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
                 sync_to: AnimSync::Screen,
                 ..Default::default()
             };
+            editor_only = false;
             oco_support = OcoSupport::None;
             limit = Limit::None;
+            alpha_range = None;
             flip = false;
         }
 
         let draw_params = DrawParams {
             blend_mode: BlendMode::Over,
-            alpha_range: None,
+            alpha_range,
             frame_size: Some((frame_width, frame_height)),
             frame_range,
             offset: Some((offset_x, offset_y)),
@@ -346,7 +358,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         let def = ObjectDef {
             kind, 
             path,
-            editor_only: false,
+            editor_only,
             sync_params,
             draw_params,
             offset_combine: OffsetCombine::Replace,
