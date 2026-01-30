@@ -972,6 +972,7 @@ frame_range = { start = 0, end = 1 }
 [7-1]
 is_editor_only = true
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-2]
 frame_range = { start = 0, end = 13 }
@@ -981,6 +982,7 @@ ignore_oco_path = true
 [7-3]
 is_editor_only = true
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-4]
 color_base = 14408667
@@ -992,10 +994,12 @@ alpha_range = { start = 0, end = 40 }
 frame_size = [20, 98]
 offset = [-2, 37]
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-6]
 is_editor_only = true
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-7]
 frame_range = { start = 0, end = 23 }
@@ -1006,6 +1010,7 @@ ignore_oco_path = true
 [7-8]
 is_editor_only = true
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-9]
 frame_range = { start = 0, end = 5 }
@@ -1016,6 +1021,7 @@ ignore_oco_path = true
 [7-10]
 is_editor_only = true
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-11]
 frame_range = { start = 0, end = 23 }
@@ -1025,6 +1031,7 @@ ignore_oco_path = true
 [7-12]
 is_editor_only = true
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-13]
 frame_range = { start = 0, end = 23 }
@@ -1034,6 +1041,7 @@ ignore_oco_path = true
 [7-14]
 is_editor_only = true
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-15]
 color_base = 986895
@@ -1043,6 +1051,7 @@ frame_range = { start = 0, end = 1 }
 [7-16]
 is_editor_only = true
 frame_range = { start = 0, end = 1 }
+ignore_oco_path = true
 
 [7-17]
 is_editor_only = true
