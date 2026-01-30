@@ -273,7 +273,7 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
             continue;
         }
         if !ctx.opts.editor_only
-            && object_def.is_some_and(|object| object.is_editor_only)
+            && object_def.is_some_and(|object| object.editor_only)
         {
             continue;
         }

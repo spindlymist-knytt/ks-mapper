@@ -16,7 +16,7 @@ pub struct ObjectDef {
     pub kind: ObjectKind,
     pub path: Option<String>,
     #[serde(default)]
-    pub is_editor_only: bool,
+    pub editor_only: bool,
     #[serde(flatten)]
     pub sync_params: SyncParams,
     #[serde(flatten)]
@@ -333,7 +333,7 @@ pub fn insert_custom_obj_defs(defs: &mut ObjectDefs, ini: &Ini) {
         let def = ObjectDef {
             kind, 
             path,
-            is_editor_only: false,
+            editor_only: false,
             sync_params,
             draw_params,
             offset_combine: OffsetCombine::Replace,
