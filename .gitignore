@@ -2,3 +2,7 @@
 /.vscode
 /Mapper Templates
 /output
+/Knytt Stories/*
+!/Knytt Stories/Worlds
+/Knytt Stories/**/*.bkup
+/Knytt Stories/**/*.temp
