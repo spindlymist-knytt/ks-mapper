@@ -2,10 +2,9 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand, Args};
 
-use ksmap::partition::{
-    PartitionStrategy,
-    GridStrategy,
-    IslandsStrategy,
+use ksmap::{
+    partition::{GridStrategy, IslandsStrategy, PartitionStrategy},
+    seed::MapSeed,
 };
 
 #[derive(Parser)]
@@ -20,6 +19,9 @@ pub struct Cli {
     /// The maximum height (in pixels) of an output image
     #[arg(short = 'y', long, default_value = "48000")]
     pub max_height: u64,
+    /// RNG seed
+    #[arg(short = 's', long)]
+    pub seed: Option<String>,
     /// Draw objects that are only visible in the editor
     #[arg(short, long)]
     pub editor_only: bool,

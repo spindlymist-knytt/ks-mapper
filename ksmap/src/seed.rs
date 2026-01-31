@@ -47,6 +47,23 @@ impl Display for MapSeed {
     }
 }
 
+impl TryFrom<&str> for MapSeed {
+    type Error = std::num::ParseIntError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        u64::from_str_radix(&value, 16)
+            .map(|seed| MapSeed { seed })
+    }
+}
+
+impl TryFrom<String> for MapSeed {
+    type Error = std::num::ParseIntError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        MapSeed::try_from(value.as_str())
+    }
+}
+
 impl SeedHasher {
     pub fn into_rng(self) -> SmallRng {
         let seed = self.0.finish();

@@ -12,17 +12,6 @@ use ksmap::screen_map::ScreenMap;
 mod cli;
 
 fn main() -> Result<()> {
-    let result = run();
-    
-    match &result {
-        Ok(_) => println!("Success"),
-        Err(err) => eprintln!("Error: {err}"),
-    };
-
-    result
-}
-
-pub fn run() -> Result<()> {
     let cli = cli::Cli::parse();
 
     let max_size = (cli.max_width / 600, cli.max_height / 240);
@@ -55,7 +44,14 @@ pub fn run() -> Result<()> {
         std::fs::create_dir(&output_dir)?;
     }
     
-    let seed = MapSeed::random();
+    let seed = match cli.seed.map(|seed_str| MapSeed::try_from(seed_str)) {
+        Some(Ok(seed)) => seed,
+        Some(Err(err)) => {
+            eprintln!("Failed to parse seed. The seed must be 1-16 hex digits (0-9 A-F).");
+            return Err(err.into());
+        },
+        None => MapSeed::random(),
+    };
     println!("Seed: {seed}");
 
     let screens = map_bin::parse_map_file(level_dir.join("Map.bin"))?;
