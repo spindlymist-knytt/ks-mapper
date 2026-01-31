@@ -2,7 +2,7 @@ use std::{fs, io::Write, ops::RangeInclusive, path::Path};
 
 use anyhow::{anyhow, Result};
 use image::{codecs::png::PngEncoder, imageops, GenericImage, ImageEncoder, RgbaImage, SubImage};
-use rand::{prelude::*, rng};
+use rand::prelude::*;
 use libks::{ScreenCoord, map_bin::{LayerData, ScreenData, Tile}};
 use libks_ini::{Ini, VirtualSection};
 
@@ -53,11 +53,10 @@ pub struct DrawOptions {
 }
 
 #[derive(Debug, Clone)]
-struct Cursor<'a> {
+struct Cursor {
     i: usize,
     actual_id: ObjectId,
     proxy_id: ObjectId,
-    object_def: Option<&'a ObjectDef>,
 }
 
 pub fn draw_partitions(
@@ -127,7 +126,7 @@ fn make_canvas(bounds: &Bounds) -> Result<RgbaImage> {
     Ok(RgbaImage::new(width, height))
 }
 
-fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
+fn _export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -277,7 +276,6 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
             i,
             actual_id,
             proxy_id,
-            object_def,
         };
 
         if ctx.sync.limiters.get_mut(&curs.proxy_id)
