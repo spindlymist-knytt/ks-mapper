@@ -3,17 +3,18 @@ use std::{fs, io::Write, ops::RangeInclusive, path::Path};
 use anyhow::{anyhow, Result};
 use image::{codecs::png::PngEncoder, imageops, GenericImage, ImageEncoder, RgbaImage, SubImage};
 use rand::{prelude::*, rng};
-use libks::map_bin::{LayerData, ScreenData, Tile};
+use libks::{ScreenCoord, map_bin::{LayerData, ScreenData, Tile}};
 use libks_ini::{Ini, VirtualSection};
 
 use crate::{
-    definitions::{AnimSync, DrawParams, ObjectDef, ObjectDefs, ObjectKind, SyncParams},
+    definitions::{AnimSync, DrawParams, ObjectDef, ObjectDefs, ObjectKind},
     graphics::Graphics,
     id::{ObjectId, ObjectVariant},
     partition::{Bounds, Partition},
     screen_map::ScreenMap,
+    seed::{MapSeed, RngStep},
     synchronization::{ScreenSync, WorldSync},
-    timespan::Timespan,
+    timespan::Timespan
 };
 
 mod blend_modes;
@@ -34,6 +35,9 @@ pub fn screen_index_to_pixels(i: u8) -> (i64, i64) {
 }
 
 struct DrawContext<'a> {
+    seed: MapSeed,
+    screen_pos: ScreenCoord,
+    layer: u8,
     image: RgbaImage,
     tileset_a: Option<&'a RgbaImage>,
     tileset_b: Option<&'a RgbaImage>,
@@ -57,6 +61,7 @@ struct Cursor<'a> {
 }
 
 pub fn draw_partitions(
+    seed: MapSeed,
     screens: &ScreenMap,
     partitions: &[Partition],
     gfx: &Graphics,
@@ -77,7 +82,7 @@ pub fn draw_partitions(
         for pos in partition {
             let Some(index_screen) = screens.index_of(pos) else { continue };
             let screen = &screens[index_screen];
-            match draw_screen(screen, index_screen, gfx, defs, ini, options, world_sync) {
+            match draw_screen(seed, screen, index_screen, gfx, defs, ini, options, world_sync) {
                 Ok(screen_image) => {
                     let canvas_x: u32 = ((screen.position.0 as i64 - bounds.x.start) * 600).try_into().unwrap();
                     let canvas_y: u32 = ((screen.position.1 as i64 - bounds.y.start) * 240).try_into().unwrap();
@@ -172,6 +177,7 @@ fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
 }
 
 pub fn draw_screen(
+    seed: MapSeed,
     screen: &ScreenData,
     index_screen: usize,
     gfx: &Graphics,
@@ -191,8 +197,11 @@ pub fn draw_screen(
 
     // Create context
     let group = world_sync.groups[index_screen];
-    let sync = ScreenSync::new(screen, defs, group);
+    let sync = ScreenSync::new(seed, screen, defs, group);
     let mut ctx = DrawContext {
+        seed,
+        screen_pos: screen.position,
+        layer: 0,
         image: RgbaImage::new(600, 240),
         tileset_a: gfx.tileset(screen.assets.tileset_a),
         tileset_b: gfx.tileset(screen.assets.tileset_b),
@@ -217,12 +226,16 @@ pub fn draw_screen(
     draw_tile_layer(&mut ctx, &screen.layers[3]);
 
     // Draw object layers
+    ctx.layer = 4;
     draw_object_layer(&mut ctx, &screen.layers[4]);
+    ctx.layer = 5;
     draw_object_layer(&mut ctx, &screen.layers[5]);
+    ctx.layer = 6;
     draw_object_layer(&mut ctx, &screen.layers[6]);
     if is_overlay {
         draw_tile_layer(&mut ctx, &screen.layers[2]);
     }
+    ctx.layer = 7;
     draw_object_layer(&mut ctx, &screen.layers[7]);
 
     Ok(ctx.image)
@@ -321,7 +334,12 @@ fn draw_object_with_offset(
         None => &ObjectDef::default(),
     };
     
-    let mut flip = def.draw_params.flip && rng().random();
+    let mut rng_flip = ctx.seed.hasher(RngStep::Flip)
+        .write(ctx.screen_pos)
+        .write(ctx.layer)
+        .write(at_index)
+        .into_rng();
+    let mut flip = def.draw_params.flip && rng_flip.random();
     if flip && let Some(variant) = def.draw_params.flip_variant {
         object = object.into_variant(variant);
         flip = false;
@@ -346,7 +364,12 @@ fn draw_spritesheet(
     offset: (i64, i64),
     flip: bool,
 ) {
-    let mut frame = pick_frame(&obj_img, params, anim_t);
+    let mut rng_frame = ctx.seed.hasher(RngStep::Frame)
+        .write(ctx.screen_pos)
+        .write(ctx.layer)
+        .write(at_index)
+        .into_rng();
+    let mut frame = pick_frame(&mut rng_frame, &obj_img, params, anim_t);
     let (screen_x, screen_y) = screen_index_to_pixels(at_index);
     let (offset_x, offset_y) = params.offset.unwrap_or_default();
 
@@ -371,7 +394,12 @@ fn draw_spritesheet(
     };
 
     if let Some(alpha_range) = params.alpha_range.as_ref() {
-        let alpha = rng().random_range(alpha_range.clone()) as f32 / 255.0;
+        let mut rng_alpha = ctx.seed.hasher(RngStep::Alpha)
+            .write(ctx.screen_pos)
+            .write(ctx.layer)
+            .write(at_index)
+            .into_rng();
+        let alpha = rng_alpha.random_range(alpha_range.clone()) as f32 / 255.0;
         blend_modes::overlay_with_alpha(&mut ctx.image, &*frame, final_x, final_y, params.blend_mode, alpha);
     }
     else {
@@ -379,7 +407,7 @@ fn draw_spritesheet(
     }
 }
 
-fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: Option<u32>) -> SubImage<&'a RgbaImage> {
+fn pick_frame<'a>(rng: &mut impl Rng, object_img: &'a RgbaImage, params: &DrawParams, anim_t: Option<u32>) -> SubImage<&'a RgbaImage> {
     let (image_width, image_height) = object_img.dimensions();
     let (mut frame_width, mut frame_height) = params.frame_size.unwrap_or((24, 24));
     frame_width = u32::min(frame_width, image_width);
@@ -404,7 +432,7 @@ fn pick_frame<'a>(object_img: &'a RgbaImage, params: &DrawParams, anim_t: Option
             (anim_t % n_frames) + frame_range.start
         }
         else {
-            rng().random_range(frame_range)
+            rng.random_range(frame_range)
         };
 
     let frame_x = (frame % frames_per_row) * frame_width;
@@ -445,7 +473,11 @@ fn draw_with_glow(ctx: &mut DrawContext, curs: Cursor) {
 }
 
 fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) {
-    let mut rng = rng();
+    let mut rng = ctx.seed.hasher(RngStep::ElementalVariant)
+        .write(ctx.screen_pos)
+        .write(ctx.layer)
+        .write(curs.i)
+        .into_rng();
     let variant = [ObjectVariant::A, ObjectVariant::B, ObjectVariant::C, ObjectVariant::D]
         .choose(&mut rng)
         .unwrap();
@@ -454,7 +486,11 @@ fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) {
 }
 
 fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeInclusive<i64>) {
-    let mut rng = rng();
+    let mut rng = ctx.seed.hasher(RngStep::Offset)
+        .write(ctx.screen_pos)
+        .write(ctx.layer)
+        .write(curs.i)
+        .into_rng();
     let offset_x = rng.random_range(range.clone());
     let offset_y = rng.random_range(range);
     draw_object_with_offset(ctx, curs.i, curs.actual_id, (offset_x, offset_y));

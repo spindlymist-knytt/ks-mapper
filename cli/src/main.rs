@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Result};
 use clap::Parser;
+use ksmap::seed::MapSeed;
 use ksmap::synchronization::{SyncOptions, WorldSync};
 use libks::{map_bin, world_ini};
 
@@ -53,6 +54,9 @@ pub fn run() -> Result<()> {
     if !output_dir.exists() {
         std::fs::create_dir(&output_dir)?;
     }
+    
+    let seed = MapSeed::random();
+    println!("Seed: {seed}");
 
     let screens = map_bin::parse_map_file(level_dir.join("Map.bin"))?;
     let mut object_defs = definitions::load_object_defs("mapper_objects.toml")?;
@@ -85,12 +89,12 @@ pub fn run() -> Result<()> {
     let sync_options = SyncOptions {
         maximize_visible_lasers: !cli.randomize_lasers,
     };
-    let world_sync = WorldSync::new(&screen_map, &object_defs, &sync_options);
+    let world_sync = WorldSync::new(seed, &screen_map, &object_defs, &sync_options);
     
     let draw_options = DrawOptions {
         editor_only: cli.editor_only,
     };
-    drawing::draw_partitions(&screen_map, &partitions, &gfx, &object_defs, &ini, output_dir, &draw_options, &world_sync)?;
+    drawing::draw_partitions(seed, &screen_map, &partitions, &gfx, &object_defs, &ini, output_dir, &draw_options, &world_sync)?;
 
     Ok(())
 }

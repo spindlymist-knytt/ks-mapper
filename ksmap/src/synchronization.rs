@@ -1,10 +1,16 @@
+use std::hash::{Hash, Hasher};
+
+use rustc_hash::{FxHashMap, FxHasher};
 use petgraph::unionfind::UnionFind;
-use rand::{prelude::*, rng};
-use libks::{constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
-use rustc_hash::FxHashMap;
+use rand::prelude::*;
+use libks::{ScreenCoord, constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
 
 use crate::{
-    analysis::count_laser_phases, definitions::{LaserPhase, Limit, ObjectDefs, ObjectKind}, id::ObjectId, screen_map::ScreenMap
+    analysis::count_laser_phases,
+    definitions::{LaserPhase, Limit, ObjectDefs, ObjectKind},
+    id::ObjectId,
+    screen_map::ScreenMap,
+    seed::{MapSeed, RngStep},
 };
 
 pub struct WorldSync {
@@ -33,7 +39,7 @@ pub struct SyncOptions {
 }
 
 impl WorldSync {
-    pub fn new(screens: &ScreenMap, object_defs: &ObjectDefs, options: &SyncOptions) -> Self {
+    pub fn new(seed: MapSeed, screens: &ScreenMap, object_defs: &ObjectDefs, options: &SyncOptions) -> Self {
         const TOP_LEFT: usize = 0;
         const TOP_RIGHT: usize = SCREEN_WIDTH - 1;
         const BOTTOM_LEFT: usize = TILES_PER_LAYER - SCREEN_WIDTH;
@@ -96,29 +102,40 @@ impl WorldSync {
             members.push(index_member);
         }
         
-        let mut groups = vec![GroupSync::default(); screens.len()];
+        let mut group_syncs = vec![GroupSync::default(); screens.len()];
         let laser_phases = count_laser_phases(screens, object_defs);
-        let mut rng = rng();
-        for (_index_rep, members) in groups_by_rep {
-            let anim_t = rng.next_u32();
-            let laser_phase = pick_laser_phase(&mut rng, &laser_phases, &members, options.maximize_visible_lasers);           
+        for members in groups_by_rep.into_values() {
+            let group_hash = {
+                let mut hasher = FxHasher::default();
+                for index_member in &members {
+                    screens[*index_member].position.hash(&mut hasher);
+                }
+                hasher.finish()
+            };
+            
+            let anim_t = seed.hasher(RngStep::GroupAnimationTime)
+                .write(group_hash)
+                .next_u32();
+            let laser_phase = pick_laser_phase(seed, group_hash, &laser_phases, &members, options.maximize_visible_lasers);           
             let group_sync = GroupSync {
                 anim_t,
                 laser_phase,
             };
+            
             for index_member in members {
-                groups[index_member] = group_sync;
+                group_syncs[index_member] = group_sync;
             }
         }
         
         Self {
-            groups,
+            groups: group_syncs,
         }
     }
 }
 
 fn pick_laser_phase(
-    rng: &mut impl Rng,
+    seed: MapSeed,
+    group_hash: u64,
     phase_counts: &[[usize; 2]],
     members: &[usize],
     maximize: bool
@@ -138,13 +155,19 @@ fn pick_laser_phase(
         LaserPhase::Green
     }
     else {
-        *[LaserPhase::Red, LaserPhase::Green].choose(rng).unwrap()
+        let mut rng = seed.hasher(RngStep::LaserPhases)
+            .write(group_hash)
+            .into_rng();
+        *[LaserPhase::Red, LaserPhase::Green].choose(&mut rng).unwrap()
     }
 }
 
 impl ScreenSync {
-    pub fn new(screen: &ScreenData, object_defs: &ObjectDefs, group: GroupSync) -> Self {
-        let anim_t = rng().next_u32();
+    pub fn new(seed: MapSeed, screen: &ScreenData, object_defs: &ObjectDefs, group: GroupSync) -> Self {
+        let anim_t = seed.hasher(RngStep::ScreenAnimationTime)
+            .write(screen.position)
+            .next_u32();
+        
         let mut limiters = FxHashMap::default();
         let mut counts = FxHashMap::default();
 
@@ -166,6 +189,9 @@ impl ScreenSync {
         }
 
         for (id, count) in counts {
+            let mut rng = seed.hasher(RngStep::Limiters)
+                .write(id)
+                .into_rng();
             let Some(def) = object_defs.get(&id) else { continue };
             match def.limit {
                 Limit::None => {},
@@ -174,7 +200,7 @@ impl ScreenSync {
                     limiters.insert(id, limiter);
                 },
                 Limit::Random { n } => {
-                    let limiter = Limiter::choose_n(count, n);
+                    let limiter = Limiter::choose_n(&mut rng, count, n);
                     limiters.insert(id, limiter);
                 },
                 Limit::LogNPlusOne => {
@@ -182,7 +208,7 @@ impl ScreenSync {
                         .round()
                         .clamp(0.0, count as f32)
                         as usize;
-                    let limiter = Limiter::choose_n(count, n);
+                    let limiter = Limiter::choose_n(&mut rng, count, n);
                     limiters.insert(id, limiter);
                 },
             }
@@ -212,13 +238,13 @@ impl Limiter {
         }
     }
 
-    pub fn choose_n(total: usize, n: usize) -> Self {
+    pub fn choose_n(rng: &mut impl Rng, total: usize, n: usize) -> Self {
         if total == 0 || n == 0 {
             return Self { count: 0, chosen: Vec::new() };
         }
 
         let mut all = Vec::from_iter(0..total);
-        let (shuffled, _) = all.partial_shuffle(&mut rng(), n);
+        let (shuffled, _) = all.partial_shuffle(rng, n);
 
         Self::new(shuffled.to_owned())
     }
