@@ -2,10 +2,7 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand, Args};
 
-use ksmap::{
-    partition::{GridStrategy, IslandsStrategy, PartitionStrategy},
-    seed::MapSeed,
-};
+use ksmap::{partition::{GridStrategy, IslandsStrategy, PartitionStrategy}};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

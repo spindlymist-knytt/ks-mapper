@@ -3,7 +3,7 @@ use std::hash::{Hash, Hasher};
 use rustc_hash::{FxHashMap, FxHasher};
 use petgraph::unionfind::UnionFind;
 use rand::prelude::*;
-use libks::{ScreenCoord, constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
+use libks::{constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
 
 use crate::{
     analysis::count_laser_phases,
@@ -104,9 +104,12 @@ impl WorldSync {
         
         let mut group_syncs = vec![GroupSync::default(); screens.len()];
         let laser_phases = count_laser_phases(screens, object_defs);
-        for members in groups_by_rep.into_values() {
+        for mut members in groups_by_rep.into_values() {
             let group_hash = {
                 let mut hasher = FxHasher::default();
+                members.sort_by(|i, j| {
+                    screens[*i].position.cmp(&screens[*j].position)
+                });
                 for index_member in &members {
                     screens[*index_member].position.hash(&mut hasher);
                 }
