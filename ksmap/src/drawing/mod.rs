@@ -72,10 +72,15 @@ pub fn draw_partitions(
     gfx: &Graphics,
     defs: &ObjectDefs,
     ini: &Ini,
-    output_dir: impl AsRef<Path>,
+    output: impl AsRef<Path>,
     options: &DrawOptions,
     world_sync: &WorldSync,
 ) -> Result<()> {
+    let output_is_dir = partitions.len() > 1;
+    if output_is_dir {
+        fs::create_dir_all(&output)?;
+    }
+    
     for partition in partitions {        
         let bounds = partition.bounds();
         println!("{bounds}");
@@ -104,9 +109,16 @@ pub fn draw_partitions(
         let mut span_export = Timespan::begin();
         print!("    Saving canvas to disk");
         let _ = std::io::stdout().flush();
-        let file_name = format!("{bounds}.png");
-        let path = output_dir.as_ref().join(file_name);
-        export_canvas_multithreaded(canvas, &path)?;
+        
+        let path = if output_is_dir {
+                let file_name = format!("{bounds}.png");
+                &output.as_ref().join(file_name)
+            }
+            else {
+                &output.as_ref().with_extension("png")
+            };
+        export_canvas_multithreaded(canvas, path)?;
+        
         span_export.end();
         println!(" [{span_export}]\n");
     }
