@@ -9,6 +9,16 @@ pub struct GridStrategy {
     pub cols: Option<u64>,
 }
 
+impl Default for GridStrategy {
+    fn default() -> Self {
+        Self {
+            max_size: (48000, 48000),
+            rows: None,
+            cols: None,
+        }
+    }
+}
+
 impl PartitionStrategy for GridStrategy {
     fn partitions(&self, screens: &ScreenMap) -> Result<Vec<Partition>, anyhow::Error> {
         let bounds = Bounds::from_iter(screens.iter_positions());

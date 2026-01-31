@@ -52,6 +52,12 @@ pub struct DrawOptions {
     pub editor_only: bool,
 }
 
+impl Default for DrawOptions {
+    fn default() -> Self {
+        Self { editor_only: false }
+    }
+}
+
 #[derive(Debug, Clone)]
 struct Cursor {
     i: usize,

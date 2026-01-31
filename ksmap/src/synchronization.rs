@@ -38,6 +38,12 @@ pub struct SyncOptions {
     pub maximize_visible_lasers: bool,
 }
 
+impl Default for SyncOptions {
+    fn default() -> Self {
+        Self { maximize_visible_lasers: true }
+    }
+}
+
 impl WorldSync {
     pub fn new(seed: MapSeed, screens: &ScreenMap, object_defs: &ObjectDefs, options: &SyncOptions) -> Self {
         const TOP_LEFT: usize = 0;

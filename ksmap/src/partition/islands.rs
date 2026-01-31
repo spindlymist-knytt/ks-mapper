@@ -15,6 +15,16 @@ pub struct IslandsStrategy {
     pub max_gap: u64,
 }
 
+impl Default for IslandsStrategy {
+    fn default() -> Self {
+        Self {
+            max_size: (48000, 48000),
+            min_gap: 1,
+            max_gap: 20,
+        }
+    }
+}
+
 impl PartitionStrategy for IslandsStrategy {
     fn partitions(&self, screens: &ScreenMap) -> Result<Vec<Partition>, anyhow::Error> {
         if self.max_gap < self.min_gap {
