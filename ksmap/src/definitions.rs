@@ -1,8 +1,9 @@
-use std::{collections::HashMap, fs, ops::{Deref, DerefMut, Range, RangeInclusive}, path::Path};
+use std::{fs, ops::{Deref, DerefMut, Range, RangeInclusive}, path::Path};
 
 use anyhow::Result;
 use libks::map_bin::Tile;
 use libks_ini::Ini;
+use rustc_hash::FxHashMap;
 use serde::Deserialize;
 
 use crate::{
@@ -118,8 +119,8 @@ pub enum LaserPhase {
 }
 
 pub struct ObjectDefs {
-    pub defs: HashMap<ObjectId, ObjectDef>,
-    pub variants: HashMap<Tile, Vec<ObjectVariant>>,
+    pub defs: FxHashMap<ObjectId, ObjectDef>,
+    pub variants: FxHashMap<Tile, Vec<ObjectVariant>>,
 }
 
 impl ObjectDefs {
@@ -132,7 +133,7 @@ impl ObjectDefs {
 }
 
 impl Deref for ObjectDefs {
-    type Target = HashMap<ObjectId, ObjectDef>;
+    type Target = FxHashMap<ObjectId, ObjectDef>;
 
     fn deref(&self) -> &Self::Target {
         &self.defs
@@ -146,8 +147,8 @@ impl DerefMut for ObjectDefs {
 }
 
 pub fn load_object_defs(path: impl AsRef<Path>) -> Result<ObjectDefs> {
-    let mut defs = HashMap::<ObjectId, ObjectDef>::new();
-    let mut variants = HashMap::<Tile, Vec<ObjectVariant>>::new();
+    let mut defs = FxHashMap::<ObjectId, ObjectDef>::default();
+    let mut variants = FxHashMap::<Tile, Vec<ObjectVariant>>::default();
 
     let raw = fs::read_to_string(path)?;
     let table: toml::Table = raw.parse()?;

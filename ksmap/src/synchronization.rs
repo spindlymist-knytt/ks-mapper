@@ -1,8 +1,7 @@
-use std::collections::HashMap;
-
 use petgraph::unionfind::UnionFind;
 use rand::{prelude::*, rng};
 use libks::{constants::{SCREEN_WIDTH, TILES_PER_LAYER}, map_bin::{LayerData, ScreenData}};
+use rustc_hash::FxHashMap;
 
 use crate::{
     analysis::count_laser_phases, definitions::{LaserPhase, Limit, ObjectDefs, ObjectKind}, id::ObjectId, screen_map::ScreenMap
@@ -21,7 +20,7 @@ pub struct GroupSync {
 pub struct ScreenSync {
     pub group: GroupSync,
     pub anim_t: u32,
-    pub limiters: HashMap<ObjectId, Limiter>,
+    pub limiters: FxHashMap<ObjectId, Limiter>,
 }
 
 pub struct Limiter {
@@ -90,7 +89,7 @@ impl WorldSync {
             }
         }
         
-        let mut groups_by_rep = HashMap::<usize, Vec<usize>>::new();
+        let mut groups_by_rep = FxHashMap::<usize, Vec<usize>>::default();
         for (index_member, index_rep) in uf.into_labeling().into_iter().enumerate() {
             let members = groups_by_rep.entry(index_rep)
                 .or_insert_with(|| Vec::new());
@@ -146,8 +145,8 @@ fn pick_laser_phase(
 impl ScreenSync {
     pub fn new(screen: &ScreenData, object_defs: &ObjectDefs, group: GroupSync) -> Self {
         let anim_t = rng().next_u32();
-        let mut limiters = HashMap::new();
-        let mut counts = HashMap::new();
+        let mut limiters = FxHashMap::default();
+        let mut counts = FxHashMap::default();
 
         for LayerData(layer) in &screen.layers[4..] {
             for tile in layer {

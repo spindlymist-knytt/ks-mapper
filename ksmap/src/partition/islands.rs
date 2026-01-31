@@ -1,11 +1,10 @@
-use std::collections::HashMap;
-
 use petgraph::{
     prelude::*,
     unionfind::UnionFind,
     visit::{IntoNodeReferences, NodeIndexable}
 };
 use libks::ScreenCoord;
+use rustc_hash::FxHashMap;
 
 use crate::{partition::grid, screen_map::ScreenMap};
 use super::{Partition, PartitionStrategy};
@@ -102,7 +101,7 @@ fn graph_into_partitions(graph: UnGraph<ScreenCoord, u64>) -> Vec<Partition> {
         vertex_sets.union(edge.source(), edge.target());
     }
     
-    let mut partitions = HashMap::<NodeIndex, Vec<ScreenCoord>>::new();
+    let mut partitions = FxHashMap::<NodeIndex, Vec<ScreenCoord>>::default();
     for (node, pos) in graph.node_references() {
         let parent = vertex_sets.find(node);
         let partition = partitions.entry(parent)

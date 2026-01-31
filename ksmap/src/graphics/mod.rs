@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, hash_map::Entry},
+    collections::hash_map::Entry,
     fs::OpenOptions,
     io::{self, BufReader},
     path::{Path, PathBuf},
@@ -9,6 +9,7 @@ use std::{
 use anyhow::{Context, Result};
 use image::{DynamicImage, Rgba, RgbaImage};
 use libks::map_bin::AssetId;
+use rustc_hash::FxHashMap;
 
 use crate::{
     definitions::{ObjectDef, ObjectDefs, ObjectKind, OcoSupport},
@@ -22,10 +23,10 @@ type MaybeImage = Option<Rc<RgbaImage>>;
 pub struct Graphics<'a> {
     paths: Paths,
     object_defs: &'a ObjectDefs,
-    cache: HashMap<(PathBuf, MagicColor), MaybeImage>,
-    tilesets: HashMap<AssetId, Rc<RgbaImage>>,
-    gradients: HashMap<AssetId, Rc<RgbaImage>>,
-    objects: HashMap<ObjectId, Rc<RgbaImage>>,
+    cache: FxHashMap<(PathBuf, MagicColor), MaybeImage>,
+    tilesets: FxHashMap<AssetId, Rc<RgbaImage>>,
+    gradients: FxHashMap<AssetId, Rc<RgbaImage>>,
+    objects: FxHashMap<ObjectId, Rc<RgbaImage>>,
 }
 
 pub struct Paths {
@@ -68,10 +69,10 @@ impl<'a> Graphics<'a> {
         Self {
             paths,
             object_defs,
-            cache: HashMap::new(),
-            tilesets: HashMap::new(),
-            gradients: HashMap::new(),
-            objects: HashMap::new(),
+            cache: FxHashMap::default(),
+            tilesets: FxHashMap::default(),
+            gradients: FxHashMap::default(),
+            objects: FxHashMap::default(),
         }
     }
     

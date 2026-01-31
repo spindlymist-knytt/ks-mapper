@@ -1,15 +1,16 @@
-use std::{collections::HashMap, ops::Deref};
+use std::ops::Deref;
 
 use libks::{ScreenCoord, map_bin::ScreenData};
+use rustc_hash::FxHashMap;
 
 pub struct ScreenMap {
     screens: Vec<ScreenData>,
-    indices: HashMap<ScreenCoord, usize>,
+    indices: FxHashMap<ScreenCoord, usize>,
 }
 
 impl ScreenMap {
     pub fn new(screens: Vec<ScreenData>) -> Self {
-        let mut indices = HashMap::new();
+        let mut indices = FxHashMap::default();
 
         for (i, screen) in screens.iter().enumerate() {
             indices.insert(screen.position, i);
