@@ -1,3 +1,5 @@
+use std::ops::RangeInclusive;
+
 use petgraph::{
     prelude::*,
     unionfind::UnionFind,
@@ -7,35 +9,29 @@ use libks::ScreenCoord;
 use rustc_hash::FxHashMap;
 
 use crate::{partition::grid, screen_map::ScreenMap};
-use super::{Partition, PartitionStrategy};
+use super::{Partition, Partitioner};
 
-pub struct IslandsStrategy {
+pub struct IslandsPartitioner {
     pub max_size: (u64, u64),
-    pub min_gap: u64,
-    pub max_gap: u64,
+    pub gap: RangeInclusive<u64>,
 }
 
-impl Default for IslandsStrategy {
+impl Default for IslandsPartitioner {
     fn default() -> Self {
         Self {
             max_size: (48000, 48000),
-            min_gap: 1,
-            max_gap: 20,
+            gap: 1..=20,
         }
     }
 }
 
-impl PartitionStrategy for IslandsStrategy {
-    fn partitions(&self, screens: &ScreenMap) -> Result<Vec<Partition>, anyhow::Error> {
-        if self.max_gap < self.min_gap {
-            anyhow::bail!("Max gap must not be less than min gap");
-        }
-        
+impl Partitioner for IslandsPartitioner {
+    fn partitions(&self, screens: &ScreenMap) -> Vec<Partition> {
         let positions = screens.iter_positions()
             .copied()
             .collect();
         let partition = Partition::new(positions);
-        Ok(partition_recursively(partition, self.max_size, self.min_gap, self.max_gap))
+        partition_recursively(partition, self.max_size, *self.gap.start(), *self.gap.end())
     }
 }
 

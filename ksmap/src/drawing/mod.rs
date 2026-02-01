@@ -81,9 +81,9 @@ pub fn draw_partitions(
         fs::create_dir_all(&output)?;
     }
     
-    for partition in partitions {        
+    for (index_partition, partition) in partitions.iter().enumerate() {
         let bounds = partition.bounds();
-        println!("{bounds}");
+        println!("{bounds} ({}/{})", index_partition + 1, partitions.len());
         let Ok(mut canvas) = make_canvas(&bounds) else { continue };
 
         let mut span_draw = Timespan::begin();

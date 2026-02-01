@@ -7,11 +7,11 @@ use libks::ScreenCoord;
 use crate::screen_map::ScreenMap;
 
 pub use bounds::Bounds;
-pub use grid::GridStrategy;
-pub use islands::IslandsStrategy;
+pub use grid::GridPartitioner;
+pub use islands::IslandsPartitioner;
 
-pub trait PartitionStrategy {
-    fn partitions(&self, screens: &ScreenMap) -> Result<Vec<Partition>, anyhow::Error>;
+pub trait Partitioner {
+    fn partitions(&self, screens: &ScreenMap) -> Vec<Partition>;
 }
 
 #[derive(Debug, Clone)]

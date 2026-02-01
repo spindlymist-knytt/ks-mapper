@@ -1,15 +1,15 @@
 use libks::ScreenCoord;
 
 use crate::screen_map::ScreenMap;
-use super::{Bounds, Partition, PartitionStrategy};
+use super::{Bounds, Partition, Partitioner};
 
-pub struct GridStrategy {
+pub struct GridPartitioner {
     pub max_size: (u64, u64),
     pub rows: Option<u64>,
     pub cols: Option<u64>,
 }
 
-impl Default for GridStrategy {
+impl Default for GridPartitioner {
     fn default() -> Self {
         Self {
             max_size: (48000, 48000),
@@ -19,15 +19,14 @@ impl Default for GridStrategy {
     }
 }
 
-impl PartitionStrategy for GridStrategy {
-    fn partitions(&self, screens: &ScreenMap) -> Result<Vec<Partition>, anyhow::Error> {
+impl Partitioner for GridPartitioner {
+    fn partitions(&self, screens: &ScreenMap) -> Vec<Partition> {
         let bounds = Bounds::from_iter(screens.iter_positions());
         let rows = self.rows.unwrap_or_else(|| calc_grid_rows(&bounds, self.max_size.1));
         let cols = self.cols.unwrap_or_else(|| calc_grid_cols(&bounds, self.max_size.0));
         let positions = screens.iter().map(|screen| &screen.position);
-        let partitions = partitions_from_grid(positions, &bounds, rows, cols);
         
-        Ok(partitions)
+        partitions_from_grid(positions, &bounds, rows, cols)
     }
 }
 
