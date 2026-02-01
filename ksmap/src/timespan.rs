@@ -27,10 +27,10 @@ impl Display for Timespan {
                 let duration = end - self.start;
                 let secs = duration.as_secs_f64();
                 if secs < 0.001 {
-                    write!(f, "{:.1}us", secs / 1_000_000.0)
+                    write!(f, "{:.1}us", secs * 1_000_000.0)
                 }
                 else if secs < 0.1 {
-                    write!(f, "{:.1}ms", secs / 1000.0)
+                    write!(f, "{:.1}ms", secs * 1000.0)
                 }
                 else {
                     write!(f, "{:.1}s", secs)
