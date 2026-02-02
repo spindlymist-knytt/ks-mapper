@@ -20,6 +20,9 @@ pub struct Cli {
     /// Force the partitioner to be used even if the map fits in one image
     #[arg(short = 'f', long)]
     pub force: bool,
+    /// Print the partition list, but don't render the map
+    #[arg(long)]
+    pub dry_run: bool,
     #[command(flatten)]
     pub islands_args: IslandsArgs,
     #[command(flatten)]
