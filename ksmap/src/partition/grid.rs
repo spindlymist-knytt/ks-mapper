@@ -22,6 +22,16 @@ impl Default for GridPartitioner {
 impl Partitioner for GridPartitioner {
     fn partitions(&self, screens: &ScreenMap) -> Vec<Partition> {
         let bounds = Bounds::from_iter(screens.iter_positions());
+        
+        if bounds.width() <= self.max_size.0
+            && bounds.height() <= self.max_size.1
+        {
+            let positions: Vec<_> = screens.iter()
+                .map(|screen| screen.position)
+                .collect();
+            return vec![Partition::new(positions)];
+        }
+        
         let rows = self.rows.unwrap_or_else(|| calc_grid_rows(&bounds, self.max_size.1));
         let cols = self.cols.unwrap_or_else(|| calc_grid_cols(&bounds, self.max_size.0));
         let positions = screens.iter().map(|screen| &screen.position);

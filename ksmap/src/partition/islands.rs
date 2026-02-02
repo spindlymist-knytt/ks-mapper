@@ -31,7 +31,12 @@ impl Partitioner for IslandsPartitioner {
             .copied()
             .collect();
         let partition = Partition::new(positions);
-        partition_recursively(partition, self.max_size, *self.gap.start(), *self.gap.end())
+        if is_partition_too_large(&partition, self.max_size) {
+            partition_recursively(partition, self.max_size, *self.gap.start(), *self.gap.end())
+        }
+        else {
+            vec![partition]
+        }
     }
 }
 
