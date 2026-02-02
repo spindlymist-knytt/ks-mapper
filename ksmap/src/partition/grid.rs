@@ -7,6 +7,7 @@ pub struct GridPartitioner {
     pub max_size: (u64, u64),
     pub rows: Option<u64>,
     pub cols: Option<u64>,
+    pub force: bool,
 }
 
 impl Default for GridPartitioner {
@@ -15,6 +16,7 @@ impl Default for GridPartitioner {
             max_size: (48000, 48000),
             rows: None,
             cols: None,
+            force: false,
         }
     }
 }
@@ -23,7 +25,8 @@ impl Partitioner for GridPartitioner {
     fn partitions(&self, screens: &ScreenMap) -> Vec<Partition> {
         let bounds = Bounds::from_iter(screens.iter_positions());
         
-        if bounds.width() <= self.max_size.0
+        if !self.force
+            && bounds.width() <= self.max_size.0
             && bounds.height() <= self.max_size.1
         {
             let positions: Vec<_> = screens.iter()

@@ -17,6 +17,9 @@ pub struct Cli {
     /// How to divide large maps that don't fit into one image
     #[arg(value_enum, short = 'p', long, default_value = "islands")]
     pub partitioner: PartitionStrategy,
+    /// Force the partitioner to be used even if the map fits in one image
+    #[arg(short = 'f', long)]
+    pub force: bool,
     #[command(flatten)]
     pub islands_args: IslandsArgs,
     #[command(flatten)]
@@ -62,7 +65,7 @@ pub enum PartitionStrategy {
 pub struct IslandsArgs {
     /// The number of empty screens allowed between the screens of an island.
     /// -g sets min and max to the same value
-    #[arg(short = 'g', long, default_value = "20", help_heading = "Islands partitioner")]
+    #[arg(short = 'g', long, default_value = "10", help_heading = "Islands partitioner")]
     pub max_gap: u64,
     /// If an island is too big, it will be subdivided by gradually reducing max gap no lower than this value.
     /// -g sets min and max to the same value

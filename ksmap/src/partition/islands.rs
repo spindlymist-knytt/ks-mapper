@@ -14,6 +14,7 @@ use super::{Partition, Partitioner};
 pub struct IslandsPartitioner {
     pub max_size: (u64, u64),
     pub gap: RangeInclusive<u64>,
+    pub force: bool,
 }
 
 impl Default for IslandsPartitioner {
@@ -21,6 +22,7 @@ impl Default for IslandsPartitioner {
         Self {
             max_size: (48000, 48000),
             gap: 1..=20,
+            force: false,
         }
     }
 }
@@ -31,11 +33,14 @@ impl Partitioner for IslandsPartitioner {
             .copied()
             .collect();
         let partition = Partition::new(positions);
-        if is_partition_too_large(&partition, self.max_size) {
-            partition_recursively(partition, self.max_size, *self.gap.start(), *self.gap.end())
+        
+        if !self.force
+            && !is_partition_too_large(&partition, self.max_size)
+        {
+            vec![partition]
         }
         else {
-            vec![partition]
+            partition_recursively(partition, self.max_size, *self.gap.start(), *self.gap.end())
         }
     }
 }

@@ -105,11 +105,13 @@ fn main() -> Result<()> {
         PartitionStrategy::Islands => Box::new(IslandsPartitioner {
             max_size,
             gap: cli.islands_args.min_gap..=cli.islands_args.max_gap,
+            force: cli.force,
         }),
         PartitionStrategy::Grid => Box::new(GridPartitioner {
             max_size,
             rows: cli.grid_args.rows,
             cols: cli.grid_args.cols,
+            force: cli.force,
         }),
     };
     
