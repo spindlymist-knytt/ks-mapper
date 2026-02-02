@@ -50,11 +50,15 @@ struct DrawContext<'a> {
 
 pub struct DrawOptions {
     pub editor_only: bool,
+    pub use_multithreaded_encoder: bool,
 }
 
 impl Default for DrawOptions {
     fn default() -> Self {
-        Self { editor_only: false }
+        Self {
+            editor_only: false,
+            use_multithreaded_encoder: true,
+        }
     }
 }
 
@@ -117,7 +121,20 @@ pub fn draw_partitions(
             else {
                 &output.as_ref().with_extension("png")
             };
-        export_canvas_multithreaded(canvas, path)?;
+        if options.use_multithreaded_encoder {
+            match export_canvas_multithreaded(&canvas, path) {
+                Ok(_) => {},
+                Err(err) if err.to_string() == "Incomplete image input" => {
+                    println!(" [failed, falling back to single-threaded encoder]");
+                    print!("    Saving canvas to disk");
+                    export_canvas(canvas, path)?;
+                },
+                Err(err) => return Err(err),
+            }
+        }
+        else {
+            export_canvas(canvas, path)?;
+        }
         
         span_export.end();
         println!(" [{span_export}]\n");
@@ -144,7 +161,7 @@ fn make_canvas(bounds: &Bounds) -> Result<RgbaImage> {
     Ok(RgbaImage::new(width, height))
 }
 
-fn _export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
+fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -166,7 +183,7 @@ fn _export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
+fn export_canvas_multithreaded(canvas: &RgbaImage, path: &Path) -> Result<()> {
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -176,7 +193,7 @@ fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
     
     let width = canvas.width();
     let height = canvas.height();
-    let data = canvas.into_vec();
+    let data = canvas.as_raw();
     
     let mut header = mtpng::Header::new();
     header.set_size(width, height)?;
@@ -187,7 +204,7 @@ fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
 
     let mut encoder = mtpng::encoder::Encoder::new(writer, &options);
     encoder.write_header(&header)?;
-    encoder.write_image_rows(&data)?;
+    encoder.write_image_rows(data)?;
     encoder.finish()?;
 
     Ok(())

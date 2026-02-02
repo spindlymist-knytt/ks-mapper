@@ -126,6 +126,7 @@ fn main() -> Result<()> {
 
     let draw_options = DrawOptions {
         editor_only: cli.editor_only,
+        use_multithreaded_encoder: !cli.single_threaded_encoder,
     };
     drawing::draw_partitions(seed, &screen_map, &partitions, &gfx, &object_defs, &ini, output_dir, &draw_options, &world_sync)?;
     

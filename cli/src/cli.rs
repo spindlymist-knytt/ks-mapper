@@ -27,6 +27,9 @@ pub struct Cli {
     /// Always pick a random laser phase (red/green) rather than the one with the most lasers
     #[arg(long)]
     pub randomize_lasers: bool,
+    /// Don't use the multithreaded PNG encoder
+    #[arg(long)]
+    pub single_threaded_encoder: bool,
     /// Path to the KS data directory.
     /// If unspecified, it will be located relative to the level directory
     #[arg(long = "data", help_heading = "Paths")]
