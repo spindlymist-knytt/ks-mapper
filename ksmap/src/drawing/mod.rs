@@ -122,15 +122,7 @@ pub fn draw_partitions(
                 &output.as_ref().with_extension("png")
             };
         if options.use_multithreaded_encoder {
-            match export_canvas_multithreaded(&canvas, path) {
-                Ok(_) => {},
-                Err(err) if err.to_string() == "Incomplete image input" => {
-                    println!(" [failed, falling back to single-threaded encoder]");
-                    print!("    Saving canvas to disk");
-                    export_canvas(canvas, path)?;
-                },
-                Err(err) => return Err(err),
-            }
+            export_canvas_multithreaded(canvas, path)?;
         }
         else {
             export_canvas(canvas, path)?;
@@ -183,7 +175,7 @@ fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn export_canvas_multithreaded(canvas: &RgbaImage, path: &Path) -> Result<()> {
+fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -193,7 +185,7 @@ fn export_canvas_multithreaded(canvas: &RgbaImage, path: &Path) -> Result<()> {
     
     let width = canvas.width();
     let height = canvas.height();
-    let data = canvas.as_raw();
+    let data = canvas.into_raw();
     
     let mut header = mtpng::Header::new();
     header.set_size(width, height)?;
@@ -204,7 +196,7 @@ fn export_canvas_multithreaded(canvas: &RgbaImage, path: &Path) -> Result<()> {
 
     let mut encoder = mtpng::encoder::Encoder::new(writer, &options);
     encoder.write_header(&header)?;
-    encoder.write_image_rows(data)?;
+    encoder.write_image_rows(&data)?;
     encoder.finish()?;
 
     Ok(())

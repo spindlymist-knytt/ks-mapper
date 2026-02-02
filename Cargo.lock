@@ -796,8 +796,7 @@ dependencies = [
 [[package]]
 name = "mtpng"
 version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d05e488693c22438d55b5acc9f74dea027636df0666c2768d6ef769f9f2d947"
+source = "git+https://github.com/spindlymist/mtpng.git#058cca38bccb37263bfbbcf2097e20e5b390eb72"
 dependencies = [
  "crc",
  "itertools 0.10.5",
