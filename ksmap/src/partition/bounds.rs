@@ -24,6 +24,25 @@ impl Bounds {
     pub fn height(&self) -> u64 {
         self.y.end.abs_diff(self.y.start)
     }
+    
+    pub fn contains(&self, other: &Bounds) -> bool {
+        other.x.start >= self.x.start
+            && other.x.end <= self.x.end
+            && other.y.start >= self.y.start
+            && other.y.end <= self.y.end
+    }
+    
+    pub fn union(a: &Bounds, b: &Bounds) -> Bounds {
+        let start_x = i64::min(a.x.start, b.x.start);
+        let start_y = i64::min(a.y.start, b.y.start);
+        let end_x = i64::max(a.x.end, b.x.end);
+        let end_y = i64::max(a.y.end, b.y.end);
+        
+        Bounds {
+            x: start_x..end_x,
+            y: start_y..end_y,
+        }
+    }
 }
 
 impl From<&[ScreenCoord]> for Bounds {

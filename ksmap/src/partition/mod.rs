@@ -20,6 +20,36 @@ pub struct Partition {
     bounds: Bounds,
 }
 
+pub fn merge_redundant_partitions(partitions: &mut Vec<Partition>) {
+    // This algorithm is not great, but it's fine for small numbers of partitions
+    // For each partition, consider each partition that comes after it in the list
+    let mut i = 0;
+    while i < partitions.len() {
+        let current = partitions[i].bounds();
+        let mut j = i + 1;
+        while j < partitions.len() {
+            let other = partitions[j].bounds();
+            // If we fully contain the other partition, remove it from the list
+            if current.contains(&other) {
+                let removed = partitions.swap_remove(j);
+                partitions[i].merge(removed);
+            }
+            // If the other partition fully contains us, replace the current partition with that one
+            // and remove the other one from the list
+            else if other.contains(&current) {
+                let removed = partitions.swap_remove(j);
+                partitions[i].merge(removed);
+                j = i + 1; // Start over
+                continue;
+            }
+            else {
+                j += 1;
+            }
+        }
+        i += 1;
+    }
+}
+
 impl Partition {
     pub fn new(positions: Vec<ScreenCoord>) -> Self {
         let bounds = Bounds::from(positions.as_slice());
@@ -39,6 +69,11 @@ impl Partition {
 
     pub fn len(&self) -> usize {
         self.positions.len()
+    }
+    
+    pub fn merge(&mut self, other: Partition) {
+        self.positions.extend(other.positions.into_iter());
+        self.bounds = Bounds::union(&self.bounds, &other.bounds);
     }
 }
 
