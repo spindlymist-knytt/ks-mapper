@@ -1,4 +1,4 @@
-use std::{fs, io::Write, ops::RangeInclusive, path::Path};
+use std::{fs, ops::RangeInclusive, path::Path};
 
 use anyhow::{anyhow, Result};
 use image::{codecs::png::PngEncoder, imageops, GenericImage, ImageEncoder, RgbaImage, SubImage};
@@ -14,7 +14,6 @@ use crate::{
     screen_map::ScreenMap,
     seed::{MapSeed, RngStep},
     synchronization::{ScreenSync, WorldSync},
-    timespan::Timespan
 };
 
 mod blend_modes;
@@ -34,7 +33,18 @@ pub fn screen_index_to_pixels(i: u8) -> (i64, i64) {
     )
 }
 
-struct DrawContext<'a> {
+#[derive(Clone, Copy)]
+pub struct DrawContext<'a> {
+    pub seed: MapSeed,
+    pub screens: &'a ScreenMap,
+    pub gfx: &'a Graphics<'a>,
+    pub defs: &'a ObjectDefs,
+    pub ini: &'a Ini,
+    pub world_sync: &'a WorldSync,
+    pub options: DrawOptions,
+}
+
+struct ScreenContext<'a> {
     seed: MapSeed,
     screen_pos: ScreenCoord,
     layer: u8,
@@ -45,21 +55,12 @@ struct DrawContext<'a> {
     defs: &'a ObjectDefs,
     ini_section: Option<VirtualSection<'a>>,
     sync: ScreenSync,
-    opts: &'a DrawOptions,
+    opts: DrawOptions,
 }
 
+#[derive(Clone, Copy, Default)]
 pub struct DrawOptions {
     pub editor_only: bool,
-    pub use_multithreaded_encoder: bool,
-}
-
-impl Default for DrawOptions {
-    fn default() -> Self {
-        Self {
-            editor_only: false,
-            use_multithreaded_encoder: true,
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -69,70 +70,22 @@ struct Cursor {
     proxy_id: ObjectId,
 }
 
-pub fn draw_partitions(
-    seed: MapSeed,
-    screens: &ScreenMap,
-    partitions: &[Partition],
-    gfx: &Graphics,
-    defs: &ObjectDefs,
-    ini: &Ini,
-    output: impl AsRef<Path>,
-    options: &DrawOptions,
-    world_sync: &WorldSync,
-) -> Result<()> {
-    let output_is_dir = partitions.len() > 1;
-    if output_is_dir {
-        fs::create_dir_all(&output)?;
+pub fn draw_partition(ctx: DrawContext, partition: &Partition) -> Result<RgbaImage> {        
+    let bounds = partition.bounds();
+    let mut canvas = make_canvas(&bounds)?;
+    for pos in partition {
+        let Some(index_screen) = ctx.screens.index_of(pos) else { continue };
+        let screen = &ctx.screens[index_screen];
+        match draw_screen(ctx.seed, screen, index_screen, ctx.gfx, ctx.defs, ctx.ini, ctx.options, ctx.world_sync) {
+            Ok(screen_image) => {
+                let canvas_x: u32 = ((screen.position.0 as i64 - bounds.x.start) * 600).try_into().unwrap();
+                let canvas_y: u32 = ((screen.position.1 as i64 - bounds.y.start) * 240).try_into().unwrap();
+                canvas.copy_from(&screen_image, canvas_x, canvas_y)?;
+            },
+            Err(err) => return Err(err),
+        }
     }
-    
-    for (index_partition, partition) in partitions.iter().enumerate() {
-        let bounds = partition.bounds();
-        println!("{bounds} ({}/{})", index_partition + 1, partitions.len());
-        let Ok(mut canvas) = make_canvas(&bounds) else { continue };
-
-        let mut span_draw = Timespan::begin();
-        print!("    Drawing screens");
-        let _ = std::io::stdout().flush();
-        for pos in partition {
-            let Some(index_screen) = screens.index_of(pos) else { continue };
-            let screen = &screens[index_screen];
-            match draw_screen(seed, screen, index_screen, gfx, defs, ini, options, world_sync) {
-                Ok(screen_image) => {
-                    let canvas_x: u32 = ((screen.position.0 as i64 - bounds.x.start) * 600).try_into().unwrap();
-                    let canvas_y: u32 = ((screen.position.1 as i64 - bounds.y.start) * 240).try_into().unwrap();
-                    canvas.copy_from(&screen_image, canvas_x, canvas_y)?;
-                },
-                Err(err) => {
-                    eprintln!("    Error on x{}y{}: {err}", screen.position.0, screen.position.1);
-                },
-            }
-        }
-        span_draw.end();
-        println!(" [{span_draw}]");
-
-        let mut span_export = Timespan::begin();
-        print!("    Saving canvas to disk");
-        let _ = std::io::stdout().flush();
-        
-        let path = if output_is_dir {
-                let file_name = format!("{bounds}.png");
-                &output.as_ref().join(file_name)
-            }
-            else {
-                &output.as_ref().with_extension("png")
-            };
-        if options.use_multithreaded_encoder {
-            export_canvas_multithreaded(canvas, path)?;
-        }
-        else {
-            export_canvas(canvas, path)?;
-        }
-        
-        span_export.end();
-        println!(" [{span_export}]\n");
-    }
-
-    Ok(())
+    Ok(canvas)
 }
 
 fn make_canvas(bounds: &Bounds) -> Result<RgbaImage> {
@@ -153,7 +106,7 @@ fn make_canvas(bounds: &Bounds) -> Result<RgbaImage> {
     Ok(RgbaImage::new(width, height))
 }
 
-fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
+pub fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -175,7 +128,7 @@ fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
+pub fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -209,7 +162,7 @@ pub fn draw_screen(
     gfx: &Graphics,
     defs: &ObjectDefs,
     ini: &Ini,
-    options: &DrawOptions,
+    options: DrawOptions,
     world_sync: &WorldSync,
 ) -> Result<RgbaImage> {
     let ini_section = ini.section(&format!("x{}y{}", screen.position.0, screen.position.1));
@@ -224,7 +177,7 @@ pub fn draw_screen(
     // Create context
     let group = world_sync.groups[index_screen];
     let sync = ScreenSync::new(seed, screen, defs, group);
-    let mut ctx = DrawContext {
+    let mut ctx = ScreenContext {
         seed,
         screen_pos: screen.position,
         layer: 0,
@@ -267,7 +220,7 @@ pub fn draw_screen(
     Ok(ctx.image)
 }
 
-fn draw_tile_layer(ctx: &mut DrawContext, layer: &LayerData) {
+fn draw_tile_layer(ctx: &mut ScreenContext, layer: &LayerData) {
     for (i, tile) in layer.0.iter().enumerate() {
         if tile.1 == 0 {
             continue;
@@ -289,7 +242,7 @@ fn draw_tile_layer(ctx: &mut DrawContext, layer: &LayerData) {
     }
 }
 
-fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
+fn draw_object_layer(ctx: &mut ScreenContext, layer: &LayerData) {
     for (i, tile) in layer.0.iter().enumerate() {
         if tile.1 == 0 { continue }
 
@@ -340,7 +293,7 @@ fn draw_object_layer(ctx: &mut DrawContext, layer: &LayerData) {
 
 #[inline]
 fn draw_object(
-    ctx: &mut DrawContext,
+    ctx: &mut ScreenContext,
     at_index: usize,
     object: ObjectId,
 ) {
@@ -349,7 +302,7 @@ fn draw_object(
 
 #[inline]
 fn draw_object_with_offset(
-    ctx: &mut DrawContext,
+    ctx: &mut ScreenContext,
     at_index: usize,
     mut object: ObjectId,
     offset: (i64, i64),
@@ -381,7 +334,7 @@ fn draw_object_with_offset(
 }
 
 fn draw_spritesheet(
-    ctx: &mut DrawContext,
+    ctx: &mut ScreenContext,
     at_index: u8,
     params: &DrawParams,
     anim_t: Option<u32>,
@@ -466,7 +419,7 @@ fn pick_frame<'a>(rng: &mut impl Rng, object_img: &'a RgbaImage, params: &DrawPa
     imageops::crop_imm(object_img, frame_x, frame_y, frame_width, frame_height)
 }
 
-fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &str) {
+fn draw_shift(ctx: &mut ScreenContext, curs: Cursor, vis_prop: &str, type_prop: &str) {
     let shift_visible = !ctx.ini_section
         .as_ref()
         .and_then(|section| section.get(vis_prop))
@@ -492,12 +445,12 @@ fn draw_shift(ctx: &mut DrawContext, curs: Cursor, vis_prop: &str, type_prop: &s
     draw_object(ctx, curs.i, curs.proxy_id.into_variant(shift_type));
 }
 
-fn draw_with_glow(ctx: &mut DrawContext, curs: Cursor) {
+fn draw_with_glow(ctx: &mut ScreenContext, curs: Cursor) {
     draw_object(ctx, curs.i, curs.proxy_id.to_variant(ObjectVariant::Glow));
     draw_object(ctx, curs.i, curs.actual_id);
 }
 
-fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) {
+fn draw_elemental(ctx: &mut ScreenContext, curs: Cursor) {
     let mut rng = ctx.seed.hasher(RngStep::ElementalVariant)
         .write(ctx.screen_pos)
         .write(ctx.layer)
@@ -510,7 +463,7 @@ fn draw_elemental(ctx: &mut DrawContext, curs: Cursor) {
     draw_object(ctx, curs.i, curs.proxy_id.into_variant(*variant));
 }
 
-fn draw_with_random_offset(ctx: &mut DrawContext, curs: Cursor, range: RangeInclusive<i64>) {
+fn draw_with_random_offset(ctx: &mut ScreenContext, curs: Cursor, range: RangeInclusive<i64>) {
     let mut rng = ctx.seed.hasher(RngStep::Offset)
         .write(ctx.screen_pos)
         .write(ctx.layer)

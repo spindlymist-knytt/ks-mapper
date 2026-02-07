@@ -1,10 +1,34 @@
 use std::fmt::Display;
+use std::io::Write;
 use std::time::Instant;
 
 #[derive(Debug, Clone)]
 pub struct Timespan {
     pub start: Instant,
     pub end: Option<Instant>,
+}
+
+pub fn time_it<F, T>(label: &str, f: F) -> T
+where
+    F: FnOnce() -> T
+{
+    print!("{label}");
+    let _ = std::io::stdout().flush();
+    let mut span = Timespan::begin();
+    
+    let result = f();
+    
+    span.end();
+    println!(" [{span}]");
+    
+    result
+}
+
+pub fn time_it_anyhow<F, T>(label: &str, f: F) -> anyhow::Result<T>
+where
+    F: FnOnce() -> anyhow::Result<T>,
+{
+    time_it(label, f)
 }
 
 impl Timespan {
@@ -37,7 +61,7 @@ impl Display for Timespan {
                 }
             }
             None => {
-                write!(f, "<running>")
+                write!(f, "<timing>")
             }
         }
     }

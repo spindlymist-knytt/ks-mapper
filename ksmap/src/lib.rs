@@ -7,4 +7,3 @@ pub mod screen_map;
 pub mod analysis;
 pub mod id;
 pub mod seed;
-pub mod timespan;
