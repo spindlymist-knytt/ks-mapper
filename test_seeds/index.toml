@@ -1,0 +1,111 @@
+["Lit Knob - 3-20 & 14-1 Test"]
+seeds = [
+    "5E7AEC82A1A537DF",
+    "4B8993474E1E972E",
+    "4D65A13236269171",
+]
+
+["Lit Knob - Bank 7 Test"]
+seeds = [
+    "02945FC245E3041D",
+    "C2F0B08B88FA8936",
+    "99C422C240570B33",
+]
+
+["Lit Knob - Bubble Test"]
+seeds = [
+    "A8E2BD7BDE1A75BB",
+    "9205774B9D1B370B",
+    "B6FC86F98CAB65E3",
+]
+
+["Lit Knob - Combination Test"]
+seeds = [
+    "2EA13FA7FB7217A1",
+    "E4935A549B5DF581",
+    "6FD5EBBE71D19515",
+]
+
+["Lit Knob - Custom Collectables Test"]
+seeds = [
+    "2AF4285ADA35E7FC",
+    "AE11C708F4A7EC71",
+    "5C0A675D15D85DC3",
+]
+
+["Lit Knob - Global Sync Test"]
+seeds = [
+    "5E602A28F6B3D6D2",
+    "93DEABE4731262DE",
+    "E345AE37522B00FB",
+]
+
+["Lit Knob - Laser Visibility Test"]
+seeds = [
+    "3791CD0A97872CEE",
+    "88A5D7FCDF504A8B",
+    "3C4647AAF7D0CF13",
+]
+
+["Lit Knob - Layer Test"]
+seeds = [
+    "71FEEDA7969BAF48",
+    "05E72D6E8C18DA8D",
+    "49336028F55D343B",
+]
+
+["Lit Knob - Object Test"]
+seeds = [
+    "E3EF6DD9CE1580B4",
+    "1CE21391B9461E78",
+    "4A49CB206C9D9CA0",
+]
+
+["Lit Knob - Out of Range Test"]
+seeds = [
+    "799C57299D4BE633",
+    "CC4DE8A3708BCF5A",
+    "E79309E532192DE4",
+]
+
+["Lit Knob - Shift Test"]
+seeds = [
+    "0ABE6B30E3126538",
+    "8C72CC0A1F5F0306",
+    "47FC08C73BA167E3",
+]
+
+["Lit Knob - Starting Frame Test"]
+seeds = [
+    "4B9EE1A68DD26E72",
+    "EBA57E954F15900C",
+    "5517A51CC1868A52",
+]
+
+["Lit Knob - Umbrella and Keys Test"]
+seeds = [
+    "4168898A8FBF3308",
+    "831C1E128B1ACC38",
+    "94F9030B624D6570",
+]
+
+["Lit Knob - Wrong CO Resolution Test"]
+seeds = [
+    "B40884CE38101910",
+    "92E07A95A2274C00",
+    "3CBD90445406F147",
+]
+
+["Robin - Horizontal Flip Test"]
+seeds = [
+    "653EA0542893E271",
+    "D4FBCEE8AC34D77C",
+    "16311AABAAEC7C96",
+]
+
+["Robin - Unsupported OCO Test"]
+seeds = [
+    "E6CCBDE65E7B48C6",
+    "0A6E2A9D5033CECC",
+    "4D0471E29A1B7BF2",
+]

@@ -2,8 +2,10 @@ use std::{fmt::Display, hash::{Hash, Hasher}};
 
 use rand::prelude::*;
 use rustc_hash::FxHasher;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(try_from = "String", into = "String")]
 pub struct MapSeed {
     pub seed: u64,
 }
@@ -38,6 +40,12 @@ impl MapSeed {
         let mut hasher = FxHasher::with_seed(self.seed as usize);
         hasher.write_u8(step as u8);
         SeedHasher(hasher)
+    }
+}
+
+impl Into<String> for MapSeed {
+    fn into(self) -> String {
+        self.to_string()
     }
 }
 
