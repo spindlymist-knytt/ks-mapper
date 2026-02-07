@@ -17,7 +17,7 @@ use ksmap::graphics::Graphics;
 use ksmap::screen_map::ScreenMap;
 
 use crate::cli::{Cli, GridArgs, IslandsArgs, PartitionStrategy};
-use crate::timing::{Timespan, time_it, time_it_anyhow};
+use crate::timing::Timespan;
 
 fn main() -> Result<()> {
     let mut total_time = Timespan::begin();
@@ -43,13 +43,14 @@ fn main() -> Result<()> {
                 .to_owned()
         };
 
-    let screen_map = time_it_anyhow("Loading map", || {
+    let screen_map = time_it!("Loading map", {
         let screens = map_bin::parse_map_file(level_dir.join("Map.bin"))?;
         let screen_map = ScreenMap::new(screens);
-        Ok(screen_map)
-    })?;
+        screen_map
+    });
     
     if cli.dry_run {
+        println!();
         make_partitions(&screen_map,
             cli.max_width,
             cli.max_height,
@@ -58,17 +59,18 @@ fn main() -> Result<()> {
             cli.grid_args,
             cli.force);
         total_time.end();
+        println!();
         println!("Finished in {total_time}");
         return Ok(());
     }
     
     let ini = world_ini::load_ini_from_dir(&level_dir)?;
     
-    let object_defs = time_it_anyhow("Loading definitions", || {
+    let object_defs = time_it!("Loading definitions", {
         let mut defs = definitions::load_object_defs(cli.object_definitions)?;
         definitions::insert_custom_obj_defs(&mut defs, &ini);
-        Ok(defs)
-    })?;
+        defs
+    });
     
     let data_dir = cli.data_dir.unwrap_or_else(|| level_dir.join("../../Data"));
     let mut gfx = Graphics::new(
@@ -78,21 +80,21 @@ fn main() -> Result<()> {
         &object_defs,
     );
     
-    time_it_anyhow("Loading assets", || {
+    time_it!("Loading assets", {
         let assets_used = analysis::list_assets(&screen_map, &object_defs);
         gfx.load_tilesets(&assets_used.tilesets)?;
         gfx.load_gradients(&assets_used.gradients)?;
         gfx.load_objects(&assets_used.objects)?;
-        Ok(())
-    })?;
+    });
     
-    let world_sync = time_it("Synchronizing map", || {
+    let world_sync = time_it!("Synchronizing map", {
         let sync_options = SyncOptions {
             maximize_visible_lasers: !cli.randomize_lasers,
         };
         WorldSync::new(seed, &screen_map, &object_defs, &sync_options)
     });
     
+    println!();
     let partitions = make_partitions(&screen_map,
         cli.max_width,
         cli.max_height,
@@ -124,13 +126,14 @@ fn main() -> Result<()> {
         fs::create_dir_all(&output_dir)?;
     }
     
+    println!();
     for (i, partition) in partitions.iter().enumerate() {
         let bounds = partition.bounds();
         println!("{bounds} ({}/{})", i + 1, partitions.len());
         
-        let canvas = time_it("    Drawing", || {
-            drawing::draw_partition(draw_context, &partition)
-        })?;
+        let canvas = time_it!("    Drawing", {
+            drawing::draw_partition(draw_context, &partition)?
+        });
         
         let path: &Path = if output_is_dir {
                 let file_name = format!("{bounds}.png");
@@ -143,15 +146,16 @@ fn main() -> Result<()> {
                 &output_dir.with_added_extension("png")
             };
             
-        time_it_anyhow("    Exporting", || {
+        time_it!("    Exporting", {
             if cli.single_threaded_encoder {
-                drawing::export_canvas(canvas, path)
+                drawing::export_canvas(canvas, path)?
             }
             else {
-                drawing::export_canvas_multithreaded(canvas, path)
+                drawing::export_canvas_multithreaded(canvas, path)?
             }
-        })?;
+        });
     }
+    println!();
     
     total_time.end();
     println!("Finished in {total_time}");
@@ -187,7 +191,7 @@ fn make_partitions(
         }),
     };
     
-    let partitions = time_it("Partitioning:", || {
+    let partitions = time_it!("Partitioning:", {
         strategy.partitions(screen_map)
     });
     
@@ -195,7 +199,6 @@ fn make_partitions(
         let bounds = partition.bounds();
         println!("   {:2}: {:24} {}x{}", i + 1, bounds.to_string(), bounds.width() * 600, bounds.height() * 240);
     }
-    println!();
     
     partitions
 }
