@@ -113,7 +113,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         && let Some(partition) = state.partitions.get(i)
         && let Some(first_screen_pos) = partition.positions().first()
     {
-        state.map_state.center = *first_screen_pos;
+        state.map_state.top_left = *first_screen_pos;
     }
     
     ui.window("Drawing").build(|| {

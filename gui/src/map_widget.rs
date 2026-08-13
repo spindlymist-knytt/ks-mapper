@@ -4,16 +4,17 @@ use libks::ScreenCoord;
 use rustc_hash::FxHashMap;
 
 pub struct MapState {
-    pub center: ScreenCoord,
-    pub drag_origin: Option<ScreenCoord>,
+    pub top_left: ScreenCoord,
+    pub is_dragging: bool,
     pub cell_size: f32,
     pub line_thickness: f32,
+    pub bias: (f32, f32),
 }
 
 impl MapState {
-    pub fn new(center: ScreenCoord) -> Self {
+    pub fn new(top_left: ScreenCoord) -> Self {
         Self {
-            center,
+            top_left,
             ..Default::default()
         }
     }
@@ -22,13 +23,49 @@ impl MapState {
 impl Default for MapState {
     fn default() -> Self {
         Self {
-            center: (1000, 1000),
-            drag_origin: None,
+            top_left: (1000, 1000),
+            is_dragging: false,
             cell_size: 10.0,
             line_thickness: 1.0,
+            bias: (0.0, 0.0),
         }
     }
 }
+
+const MAP_COLORS: &'static [[f32; 4]] = &[
+    [0.114, 0.169, 0.325, 1.0],
+    [0.494, 0.145, 0.325, 1.0],
+    [0.000, 0.529, 0.318, 1.0],
+    [0.671, 0.322, 0.212, 1.0],
+    [0.373, 0.341, 0.310, 1.0],
+    [0.761, 0.765, 0.780, 1.0],
+    [1.000, 0.945, 0.910, 1.0],
+    [1.000, 0.000, 0.302, 1.0],
+    [1.000, 0.639, 0.000, 1.0],
+    [1.000, 0.925, 0.153, 1.0],
+    [0.000, 0.894, 0.212, 1.0],
+    [0.161, 0.678, 1.000, 1.0],
+    [0.514, 0.463, 0.612, 1.0],
+    [1.000, 0.467, 0.659, 1.0],
+    [1.000, 0.800, 0.667, 1.0],
+    [0.000, 0.000, 0.000, 1.0],
+    [0.161, 0.094, 0.078, 1.0],
+    [0.067, 0.114, 0.208, 1.0],
+    [0.259, 0.129, 0.212, 1.0],
+    [0.071, 0.325, 0.349, 1.0],
+    [0.455, 0.184, 0.161, 1.0],
+    [0.286, 0.200, 0.231, 1.0],
+    [0.635, 0.533, 0.475, 1.0],
+    [0.953, 0.937, 0.490, 1.0],
+    [0.745, 0.071, 0.314, 1.0],
+    [1.000, 0.424, 0.141, 1.0],
+    [0.659, 0.906, 0.180, 1.0],
+    [0.000, 0.710, 0.263, 1.0],
+    [0.024, 0.353, 0.710, 1.0],
+    [0.459, 0.275, 0.396, 1.0],
+    [1.000, 0.431, 0.349, 1.0],
+    [1.000, 0.616, 0.506, 1.0],
+];
 
 pub fn build_map(
     ui: &Ui,
@@ -37,129 +74,100 @@ pub fn build_map(
     selected_partition: Option<&Partition>,
     partition_members: &FxHashMap<ScreenCoord, usize>
 ) -> Option<ScreenCoord> {
-    const COLORS: &'static [[f32; 4]] = &[
-        [0.114, 0.169, 0.325, 1.0],
-        [0.494, 0.145, 0.325, 1.0],
-        [0.000, 0.529, 0.318, 1.0],
-        [0.671, 0.322, 0.212, 1.0],
-        [0.373, 0.341, 0.310, 1.0],
-        [0.761, 0.765, 0.780, 1.0],
-        [1.000, 0.945, 0.910, 1.0],
-        [1.000, 0.000, 0.302, 1.0],
-        [1.000, 0.639, 0.000, 1.0],
-        [1.000, 0.925, 0.153, 1.0],
-        [0.000, 0.894, 0.212, 1.0],
-        [0.161, 0.678, 1.000, 1.0],
-        [0.514, 0.463, 0.612, 1.0],
-        [1.000, 0.467, 0.659, 1.0],
-        [1.000, 0.800, 0.667, 1.0],
-        [0.000, 0.000, 0.000, 1.0],
-        [0.161, 0.094, 0.078, 1.0],
-        [0.067, 0.114, 0.208, 1.0],
-        [0.259, 0.129, 0.212, 1.0],
-        [0.071, 0.325, 0.349, 1.0],
-        [0.455, 0.184, 0.161, 1.0],
-        [0.286, 0.200, 0.231, 1.0],
-        [0.635, 0.533, 0.475, 1.0],
-        [0.953, 0.937, 0.490, 1.0],
-        [0.745, 0.071, 0.314, 1.0],
-        [1.000, 0.424, 0.141, 1.0],
-        [0.659, 0.906, 0.180, 1.0],
-        [0.000, 0.710, 0.263, 1.0],
-        [0.024, 0.353, 0.710, 1.0],
-        [0.459, 0.275, 0.396, 1.0],
-        [1.000, 0.431, 0.349, 1.0],
-        [1.000, 0.616, 0.506, 1.0],
-    ];
-    
+    // Zoom
     let wheel_delta = ui.get_mouse_wheel();
     if ui.is_window_hovered() && wheel_delta != 0.0 {
         map_state.cell_size = f32::max(1.0, map_state.cell_size + wheel_delta);
         map_state.line_thickness = if map_state.cell_size == 1.0 { 0.0 } else { 1.0 };
     }
     
-    let cell_width = map_state.cell_size;
-    let cell_height = map_state.cell_size;
-    let line_thickness = map_state.line_thickness;
-    let cell_width_outer = cell_width + line_thickness;
-    let cell_height_outer = cell_height + line_thickness;
-
-    let [width_avail, height_avail] = ui.get_content_region_avail();
-    let cols = (width_avail / (cell_width_outer)).ceil() as i32;
-    let rows = (height_avail / (cell_height_outer)).ceil() as i32;
-    
     // Pan
-    if ui.is_mouse_released(MouseButton::Right) {
-        map_state.drag_origin = None;
+    if ui.is_mouse_clicked(MouseButton::Right) && ui.is_window_hovered() {
+        map_state.is_dragging = true;
     }
-    else if ui.is_mouse_clicked(MouseButton::Right)
-        && ui.is_window_hovered() 
-    {
-        map_state.drag_origin = Some(map_state.center);
-    }
-    if let Some((origin_x, origin_y)) = &map_state.drag_origin {
-        let [dx, dy] = ui.mouse_drag_delta(MouseButton::Right);
-        let new_x = origin_x - (dx / (cell_width_outer)) as i32;
-        let new_y = origin_y - (dy / (cell_height_outer)) as i32;
-        map_state.center = (new_x, new_y);
-    }
+    let pan =
+        if map_state.is_dragging {
+            ui.mouse_drag_delta(MouseButton::Right).into()
+        }
+        else {
+            (0.0, 0.0)
+        };
     
-    let (x_center, y_center) = map_state.center;
-    let x_min = x_center - cols / 2;
-    let y_min = y_center - rows / 2;
-    let x_max = x_min + cols;
-    let y_max = y_min + rows;
+    let geom = calc_map_geometry(
+        map_state,
+        pan,
+        ui.get_content_region_avail().into(),
+    );
+    
+    // When panning stops, we "commit" the current geometry
+    if map_state.is_dragging && ui.is_mouse_released(MouseButton::Right) {
+        map_state.is_dragging = false;
+        map_state.top_left = (geom.x_min, geom.y_min);
+        map_state.bias = (geom.origin_x, geom.origin_y);
+    }
     
     let draw_list = ui.get_window_draw_list();
-    let [origin_x, origin_y] = ui.get_cursor_screen_pos();
+    let [width_avail, height_avail] = ui.content_region_avail();
+    let [map_x_screen, map_y_screen] = ui.get_cursor_screen_pos();
+    let cols = (geom.x_max - geom.x_min + 1) as usize;
+    let rows = (geom.y_max - geom.y_min + 1) as usize;
+    let n_grid_cells = rows * cols;
     
-    if line_thickness > 0.0 {
-        for x_grid in 1..=cols {
-            let x_screen = (origin_x - line_thickness) + (x_grid as f32) * (cell_width_outer);
-            draw_list.add_line_v(x_screen, origin_y, origin_y + height_avail, [0.1, 0.1, 0.1], line_thickness);
+    // Draw grid lines
+    if map_state.line_thickness > 0.0 {
+        let mut x = map_x_screen + geom.origin_x;
+        for _ in 0..cols {
+            x += geom.cell_outer_width;
+            draw_list.add_line_v(x, map_y_screen, map_y_screen + height_avail, [0.1, 0.1, 0.1], map_state.line_thickness);
         }
-        for y_grid in 1..=rows {
-            let y_screen = (origin_y - line_thickness) + (y_grid as f32) * (cell_height_outer);
-            draw_list.add_line_h(origin_x, origin_x + width_avail, y_screen, [0.1, 0.1, 0.1], line_thickness);
+        let mut y = map_y_screen + geom.origin_y;
+        for _ in 0..rows {
+            y += geom.cell_outer_height;
+            draw_list.add_line_h(map_x_screen, map_x_screen + width_avail, y, [0.1, 0.1, 0.1], map_state.line_thickness);
         }
     }
     
+    // Helper functions
+    let relative_to_screen_coords = |rel_pos: [f32; 2]| {
+        [rel_pos[0] + map_x_screen, rel_pos[1] + map_y_screen]
+    };
+    let screen_to_relative_coords = |screen_pos: [f32; 2]| {
+        [screen_pos[0] - map_x_screen, screen_pos[1] - map_y_screen]
+    };
+    let draw_rect_relative = |top_left_rel: [f32; 2], bottom_right_rel: [f32; 2], color: [f32; 4], filled: bool| {
+        let top_left_screen = relative_to_screen_coords(top_left_rel);
+        let bottom_right_screen = relative_to_screen_coords(bottom_right_rel);
+        draw_list.add_rect(top_left_screen, bottom_right_screen, color)
+            .filled(filled)
+            .build();
+    };
     let draw_screen_rect = |(x, y)| {
-        let dx = x - x_min;
-        let dy = y - y_min;
-        
-        let top_left = [
-            origin_x + (dx as f32) * (cell_width_outer),
-            origin_y + (dy as f32) * (cell_height_outer),
-        ];
+        let top_left: [f32; 2] = calc_cell_pos((x, y), &geom).into();
         let bottom_right = [
-            top_left[0] + cell_width,
-            top_left[1] + cell_height
+            top_left[0] + map_state.cell_size,
+            top_left[1] + map_state.cell_size
         ];
         
         let partition_index = partition_members.get(&(x, y)).unwrap();
-        let color = COLORS[*partition_index % COLORS.len()];
+        let color = MAP_COLORS[*partition_index % MAP_COLORS.len()];
         
-        draw_list.add_rect(top_left, bottom_right, color)
-            .filled(true)
-            .build();
-        draw_list.add_rect(top_left, bottom_right, [1.0, 1.0, 1.0, 0.1])
-            .filled(false)
-            .build();
+        draw_rect_relative(top_left, bottom_right, color, true);
+        draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 0.1], false);
     };
     
-    let n_grid_cells = (rows * cols) as usize;
+    // Now, we either iterate over screens (and check if they're on the map), or iterate over map cells
+    // (and check if they contain a screen), whichever takes fewer iterations.
     if screens.len() <= n_grid_cells {
         for screen in screens.iter() {
             let (x, y) = screen.position;
-            if x >= x_min && x <= x_max && y >= y_min && y <= y_max {
+            if x >= geom.x_min && x <= geom.x_max && y >= geom.y_min && y <= geom.y_max {
                 draw_screen_rect((x, y));
             }
         }
     }
     else {
-        for y in y_min..y_max {
-            for x in x_min..x_max {
+        for y in geom.y_min..geom.y_max {
+            for x in geom.x_min..geom.x_max {
                 if screens.index_of(&(x, y)).is_some() {
                     draw_screen_rect((x, y));
                 }
@@ -167,49 +175,91 @@ pub fn build_map(
         }
     }
     
-    if let Some(partition) = selected_partition {
-        let bounds = partition.bounds();
-        // if bounds.x.is_empty() || bounds.y.is_empty() { return; }
-        let top_left_dx = bounds.x.start as i32 - x_min;
-        let top_left_dy = bounds.y.start as i32 - y_min;
-        let bottom_right_dx = bounds.x.end as i32 - x_min;
-        let bottom_right_dy = bounds.y.end as i32 - y_min;
-        let top_left = [
-            origin_x + top_left_dx as f32 * (cell_width_outer) - line_thickness,
-            origin_y + top_left_dy as f32 * (cell_height_outer) - line_thickness,
-        ];
-        let bottom_right = [
-            origin_x + bottom_right_dx as f32 * (cell_width_outer),
-            origin_y + bottom_right_dy as f32 * (cell_height_outer),
-        ];
-        draw_list.add_rect(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0])
-            .filled(false)
-            .build();
+    // Draw partition outline
+    if let Some(bounds) = selected_partition.map(|partition| partition.bounds())
+        && !bounds.x.is_empty()
+        && !bounds.y.is_empty()
+    {
+        let top_left = calc_cell_pos((bounds.x.start as i32, bounds.y.start as i32), &geom);
+        let bottom_right = calc_cell_pos((bounds.x.end as i32, bounds.y.end as i32), &geom);
+        draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
     }
     
+    // Hover indicator
     if !ui.is_window_hovered() {
         return None;
     }
+    else {
+        let mouse_pos = screen_to_relative_coords(ui.mouse_pos());
+        let hovered_screen_pos = get_hovered_screen_pos(mouse_pos, &geom);
+        
+        let top_left: [f32; 2] = calc_cell_pos(hovered_screen_pos, &geom);
+        let bottom_right = [
+            top_left[0] + geom.cell_outer_width,
+            top_left[1] + geom.cell_outer_height,
+        ];
+        draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
+        
+        Some(hovered_screen_pos)
+    }
+}
+
+struct MapGeometry {
+    x_min: i32,
+    y_min: i32,
+    x_max: i32,
+    y_max: i32,
+    origin_x: f32,
+    origin_y: f32,
+    cell_outer_width: f32,
+    cell_outer_height: f32,
+}
+
+fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)) -> MapGeometry {
+    let total_bias = (map_state.bias.0 + pan.0, map_state.bias.1 + pan.1);
     
-    let [mouse_x, mouse_y] = ui.mouse_pos();
-    let dx = mouse_x - origin_x;
-    let dy = mouse_y - origin_y;
-    let grid_x = (dx / (cell_width_outer)) as i32;
-    let grid_y = (dy / (cell_height_outer)) as i32;
-    let screen_x = x_min + grid_x;
-    let screen_y = y_min + grid_y;
+    let cell_outer_width = map_state.cell_size + map_state.line_thickness;
+    let cell_outer_height = map_state.cell_size + map_state.line_thickness;
     
-    let hover_top_left = [
-        origin_x + grid_x as f32 * (cell_width_outer),
-        origin_y + grid_y as f32 * (cell_height_outer),
-    ];
-    let hover_bottom_right = [
-        hover_top_left[0] + cell_width,
-        hover_top_left[1] + cell_height
-    ];
-    draw_list.add_rect(hover_top_left, hover_bottom_right, [1.0, 1.0, 1.0, 1.0])
-        .filled(false)
-        .build();
+    let blah_x = f32::ceil(total_bias.0 / cell_outer_width) as i32;
+    let blah_y = f32::ceil(total_bias.1 / cell_outer_height) as i32;
     
-    Some((screen_x, screen_y))
+    let x_min = map_state.top_left.0 - blah_x;
+    let y_min = map_state.top_left.1 - blah_y;
+    
+    let origin_x = total_bias.0 + (x_min - map_state.top_left.0) as f32 * cell_outer_width;
+    let origin_y = total_bias.1 + (y_min - map_state.top_left.1) as f32 * cell_outer_height;
+    
+    let x_max = x_min + ((map_size.0 - origin_x) / cell_outer_width).floor() as i32;
+    let y_max = y_min + ((map_size.1 - origin_y) / cell_outer_height).floor() as i32;
+    
+    MapGeometry {
+        x_min,
+        y_min,
+        x_max,
+        y_max,
+        cell_outer_width,
+        cell_outer_height,
+        origin_x,
+        origin_y
+    }
+}
+
+fn calc_cell_pos(screen_pos: ScreenCoord, geom: &MapGeometry) -> [f32; 2] {
+    let dx = screen_pos.0 - geom.x_min;
+    let dy = screen_pos.1 - geom.y_min;
+    
+    let x = geom.origin_x + dx as f32 * geom.cell_outer_width;
+    let y = geom.origin_y + dy as f32 * geom.cell_outer_height;
+    
+    [x, y]
+}
+
+fn get_hovered_screen_pos(hover_pos: [f32; 2], geom: &MapGeometry) -> ScreenCoord {
+    let offset_from_origin_x = hover_pos[0] - geom.origin_x;
+    let offset_from_origin_y = hover_pos[1] - geom.origin_y;
+    let screen_x = geom.x_min + (offset_from_origin_x / geom.cell_outer_width).floor() as i32;
+    let screen_y = geom.y_min + (offset_from_origin_y / geom.cell_outer_height).floor() as i32;
+    
+    (screen_x, screen_y)
 }
