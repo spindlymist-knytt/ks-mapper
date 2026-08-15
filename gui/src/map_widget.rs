@@ -135,7 +135,11 @@ pub fn build_map(
             .build();
     };
     let draw_screen_rect = |(x, y)| {
-        let top_left: [f32; 2] = calc_cell_pos((x, y), &geom).into();
+        let cell_pos = calc_cell_pos((x, y), &geom);
+        let top_left = [
+            cell_pos[0] + line_thickness,
+            cell_pos[1] + line_thickness,
+        ];
         let bottom_right = [
             top_left[0] + cell_size,
             top_left[1] + cell_size
@@ -176,7 +180,9 @@ pub fn build_map(
         && !bounds.y.is_empty()
     {
         let top_left = calc_cell_pos((bounds.x.start as i32, bounds.y.start as i32), &geom);
-        let bottom_right = calc_cell_pos((bounds.x.end as i32, bounds.y.end as i32), &geom);
+        let mut bottom_right = calc_cell_pos((bounds.x.end as i32, bounds.y.end as i32), &geom);
+        bottom_right[0] += line_thickness;
+        bottom_right[1] += line_thickness;
         draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
     }
     
@@ -185,10 +191,14 @@ pub fn build_map(
         let mouse_pos = screen_to_relative_coords(ui.mouse_pos());
         let hovered_screen_pos = get_hovered_screen_pos(mouse_pos, &geom);
         
-        let top_left: [f32; 2] = calc_cell_pos(hovered_screen_pos, &geom);
+        let cell_pos = calc_cell_pos(hovered_screen_pos, &geom);
+        let top_left = [
+            cell_pos[0] + line_thickness,
+            cell_pos[1] + line_thickness,
+        ];
         let bottom_right = [
-            top_left[0] + geom.cell_outer_width,
-            top_left[1] + geom.cell_outer_height,
+            top_left[0] + cell_size,
+            top_left[1] + cell_size,
         ];
         draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
         
@@ -278,8 +288,8 @@ fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)
     let origin_x = total_bias.0 + (x_min - map_state.top_left.0) as f32 * cell_outer_width;
     let origin_y = total_bias.1 + (y_min - map_state.top_left.1) as f32 * cell_outer_height;
     
-    let x_max = x_min + ((map_size.0 - origin_x) / cell_outer_width).floor() as i32;
-    let y_max = y_min + ((map_size.1 - origin_y) / cell_outer_height).floor() as i32;
+    let x_max = x_min + ((map_size.0 - origin_x) / cell_outer_width).ceil() as i32;
+    let y_max = y_min + ((map_size.1 - origin_y) / cell_outer_height).ceil() as i32;
     
     MapGeometry {
         x_min,
