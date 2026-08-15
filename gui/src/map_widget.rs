@@ -6,8 +6,7 @@ use rustc_hash::FxHashMap;
 pub struct MapState {
     pub top_left: ScreenCoord,
     pub is_dragging: bool,
-    pub cell_size: f32,
-    pub line_thickness: f32,
+    pub zoom_level: i32,
     pub bias: (f32, f32),
 }
 
@@ -25,8 +24,7 @@ impl Default for MapState {
         Self {
             top_left: (1000, 1000),
             is_dragging: false,
-            cell_size: 10.0,
-            line_thickness: 1.0,
+            zoom_level: 5,
             bias: (0.0, 0.0),
         }
     }
@@ -74,13 +72,6 @@ pub fn build_map(
     selected_partition: Option<&Partition>,
     partition_members: &FxHashMap<ScreenCoord, usize>
 ) -> Option<ScreenCoord> {
-    // Zoom
-    let wheel_delta = ui.get_mouse_wheel();
-    if ui.is_window_hovered() && wheel_delta != 0.0 {
-        map_state.cell_size = f32::max(1.0, map_state.cell_size + wheel_delta);
-        map_state.line_thickness = if map_state.cell_size == 1.0 { 0.0 } else { 1.0 };
-    }
-    
     // Pan
     if ui.is_mouse_clicked(MouseButton::Right) && ui.is_window_hovered() {
         map_state.is_dragging = true;
@@ -112,18 +103,20 @@ pub fn build_map(
     let cols = (geom.x_max - geom.x_min + 1) as usize;
     let rows = (geom.y_max - geom.y_min + 1) as usize;
     let n_grid_cells = rows * cols;
+    let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level);
+    let cell_size = get_cell_size_for_zoom_level(map_state.zoom_level);
     
     // Draw grid lines
-    if map_state.line_thickness > 0.0 {
+    if get_line_thickness_for_zoom_level(map_state.zoom_level) > 0.0 {
         let mut x = map_x_screen + geom.origin_x;
         for _ in 0..cols {
             x += geom.cell_outer_width;
-            draw_list.add_line_v(x, map_y_screen, map_y_screen + height_avail, [0.1, 0.1, 0.1], map_state.line_thickness);
+            draw_list.add_line_v(x, map_y_screen, map_y_screen + height_avail, [0.1, 0.1, 0.1], line_thickness);
         }
         let mut y = map_y_screen + geom.origin_y;
         for _ in 0..rows {
             y += geom.cell_outer_height;
-            draw_list.add_line_h(map_x_screen, map_x_screen + width_avail, y, [0.1, 0.1, 0.1], map_state.line_thickness);
+            draw_list.add_line_h(map_x_screen, map_x_screen + width_avail, y, [0.1, 0.1, 0.1], line_thickness);
         }
     }
     
@@ -144,15 +137,17 @@ pub fn build_map(
     let draw_screen_rect = |(x, y)| {
         let top_left: [f32; 2] = calc_cell_pos((x, y), &geom).into();
         let bottom_right = [
-            top_left[0] + map_state.cell_size,
-            top_left[1] + map_state.cell_size
+            top_left[0] + cell_size,
+            top_left[1] + cell_size
         ];
         
         let partition_index = partition_members.get(&(x, y)).unwrap();
         let color = MAP_COLORS[*partition_index % MAP_COLORS.len()];
         
         draw_rect_relative(top_left, bottom_right, color, true);
-        draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 0.1], false);
+        if cell_size >= 5.0 {
+            draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 0.1], false);
+        }
     };
     
     // Now, we either iterate over screens (and check if they're on the map), or iterate over map cells
@@ -186,10 +181,7 @@ pub fn build_map(
     }
     
     // Hover indicator
-    if !ui.is_window_hovered() {
-        return None;
-    }
-    else {
+    if ui.is_window_hovered() {
         let mouse_pos = screen_to_relative_coords(ui.mouse_pos());
         let hovered_screen_pos = get_hovered_screen_pos(mouse_pos, &geom);
         
@@ -200,7 +192,61 @@ pub fn build_map(
         ];
         draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
         
+        // Zoom
+        let wheel_delta = ui.get_mouse_wheel();
+        if wheel_delta != 0.0 && !map_state.is_dragging {
+            let new_zoom_level = (map_state.zoom_level + wheel_delta as i32).clamp(0, 15);
+            let new_cell_size = get_cell_size_for_zoom_level(new_zoom_level);
+            let new_line_thickness = get_line_thickness_for_zoom_level(new_zoom_level);
+            
+            // The general idea here is to keep the point the mouse is hovering over in the same position as we zoom
+            // We start by converting the pixel position to a proportion that is agnostic to the zoom level
+            let mouse_pos_within_cell = [
+                mouse_pos[0] - top_left[0],
+                mouse_pos[1] - top_left[1]
+            ];
+            let mouse_pos_within_cell_proportion = [
+                mouse_pos_within_cell[0] / geom.cell_outer_width,
+                mouse_pos_within_cell[1] / geom.cell_outer_height,
+            ];
+            
+            // Next, we use that proportion to calculate the pixel offset at the new zoom level
+            let new_cell_outer_width = new_cell_size + new_line_thickness;
+            let new_cell_outer_height = new_cell_size + new_line_thickness;
+            let new_mouse_pos_within_cell = [
+                f32::round(mouse_pos_within_cell_proportion[0] * new_cell_outer_width),
+                f32::round(mouse_pos_within_cell_proportion[1] * new_cell_outer_height),
+            ];
+            
+            // Working backwards, we can calculate where the top left of the hovered screen is at the new zoom level
+            let new_hovered_cell_top_left = [
+                mouse_pos[0] - new_mouse_pos_within_cell[0],
+                mouse_pos[1] - new_mouse_pos_within_cell[1],
+            ];
+            
+            // Since we know the map coordinates of the hovered screen and the pixel coordinates of its top left corner,
+            // we can do some math to figure out the what screen appears in the top left of the map and where its
+            // top left corner is.
+            let blah_x = f32::ceil(new_hovered_cell_top_left[0] / new_cell_outer_width) as i32;
+            let blah_y = f32::ceil(new_hovered_cell_top_left[1] / new_cell_outer_height) as i32;
+            let new_top_left_screen = (
+                hovered_screen_pos.0 - blah_x,
+                hovered_screen_pos.1 - blah_y,
+            );
+            let new_bias = (
+                new_hovered_cell_top_left[0] - blah_x as f32 * new_cell_outer_width,
+                new_hovered_cell_top_left[1] - blah_y as f32 * new_cell_outer_height,
+            );
+            
+            map_state.zoom_level = new_zoom_level;
+            map_state.top_left = new_top_left_screen;
+            map_state.bias = new_bias;
+        }
+        
         Some(hovered_screen_pos)
+    }
+    else {
+        None
     }
 }
 
@@ -218,8 +264,10 @@ struct MapGeometry {
 fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)) -> MapGeometry {
     let total_bias = (map_state.bias.0 + pan.0, map_state.bias.1 + pan.1);
     
-    let cell_outer_width = map_state.cell_size + map_state.line_thickness;
-    let cell_outer_height = map_state.cell_size + map_state.line_thickness;
+    let cell_size = get_cell_size_for_zoom_level(map_state.zoom_level);
+    let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level);
+    let cell_outer_width = cell_size + line_thickness;
+    let cell_outer_height = cell_size + line_thickness;
     
     let blah_x = f32::ceil(total_bias.0 / cell_outer_width) as i32;
     let blah_y = f32::ceil(total_bias.1 / cell_outer_height) as i32;
@@ -262,4 +310,12 @@ fn get_hovered_screen_pos(hover_pos: [f32; 2], geom: &MapGeometry) -> ScreenCoor
     let screen_y = geom.y_min + (offset_from_origin_y / geom.cell_outer_height).floor() as i32;
     
     (screen_x, screen_y)
+}
+
+fn get_cell_size_for_zoom_level(zoom: i32) -> f32 {
+    return 1.6f32.powi(zoom).round();
+}
+
+fn get_line_thickness_for_zoom_level(zoom: i32) -> f32 {
+    if zoom < 4 { 0.0 } else { 1.0 }
 }
