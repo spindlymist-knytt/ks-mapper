@@ -2,7 +2,7 @@ use std::{path::PathBuf, rc::Rc};
 
 use image::RgbaImage;
 use imgui_app::{Extras, Fonts, ImguiCursorExt, ImguiExt};
-use imgui_app::dear_imgui_rs::{DockBuilder, InputText, InputTextCallbackHandler, InputTextFlags, MouseButton, SelectableFlags, SplitDirection, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnWidth, TableFlags, Ui, WindowFlags};
+use imgui_app::dear_imgui_rs::{DockBuilder, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, SplitDirection, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnWidth, TableFlags, Ui, WindowFlags};
 use ksmap::drawing::DrawContext;
 use ksmap::{
     analysis::list_assets,
@@ -84,6 +84,10 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         
         DockBuilder::finish(dockspace_id);
         state.setup_windows = false;
+    }
+    
+    if ui.is_key_pressed(Key::F2) {
+        state.map_state.aspect_ratio = if state.map_state.aspect_ratio == 1.0 { 2.5 } else { 1.0 };
     }
     
     let hover_pos = {

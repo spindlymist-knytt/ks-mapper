@@ -8,6 +8,7 @@ pub struct MapState {
     pub is_dragging: bool,
     pub zoom_level: i32,
     pub bias: (f32, f32),
+    pub aspect_ratio: f32,
 }
 
 impl MapState {
@@ -26,6 +27,7 @@ impl Default for MapState {
             is_dragging: false,
             zoom_level: 5,
             bias: (0.0, 0.0),
+            aspect_ratio: 1.0,
         }
     }
 }
@@ -139,7 +141,7 @@ pub fn build_map(
     let rows = (geom.y_max - geom.y_min + 1) as usize;
     let n_grid_cells = rows * cols;
     let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level);
-    let cell_size = get_cell_size_for_zoom_level(map_state.zoom_level);
+    let (cell_width, cell_height) = get_cell_size_for_zoom_level(map_state.zoom_level, map_state.aspect_ratio);
     
     // Draw grid lines
     if get_line_thickness_for_zoom_level(map_state.zoom_level) > 0.0 {
@@ -176,8 +178,8 @@ pub fn build_map(
             cell_pos[1] + line_thickness,
         ];
         let bottom_right = [
-            top_left[0] + cell_size,
-            top_left[1] + cell_size
+            top_left[0] + cell_width,
+            top_left[1] + cell_height
         ];
         
         let partition_index = partition_members.get(&(x, y)).unwrap();
@@ -186,7 +188,7 @@ pub fn build_map(
         let color = MAP_COLORS[color_index];
         draw_rect_relative(top_left, bottom_right, color, true);
         
-        if cell_size >= 5.0 {
+        if cell_height >= 5.0 {
             let highlight_color = HIGHLIGHT_COLORS[color_index];
             draw_rect_relative(top_left, bottom_right, highlight_color, false);
         }
@@ -235,8 +237,8 @@ pub fn build_map(
             cell_pos[1] + line_thickness,
         ];
         let bottom_right = [
-            top_left[0] + cell_size,
-            top_left[1] + cell_size,
+            top_left[0] + cell_width,
+            top_left[1] + cell_height,
         ];
         draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
         
@@ -244,7 +246,7 @@ pub fn build_map(
         let wheel_delta = ui.get_mouse_wheel();
         if wheel_delta != 0.0 && !map_state.is_dragging {
             let new_zoom_level = (map_state.zoom_level + wheel_delta as i32).clamp(0, 15);
-            let new_cell_size = get_cell_size_for_zoom_level(new_zoom_level);
+            let (new_cell_width, new_cell_height) = get_cell_size_for_zoom_level(new_zoom_level, map_state.aspect_ratio);
             let new_line_thickness = get_line_thickness_for_zoom_level(new_zoom_level);
             
             // The general idea here is to keep the point the mouse is hovering over in the same position as we zoom
@@ -259,8 +261,8 @@ pub fn build_map(
             ];
             
             // Next, we use that proportion to calculate the pixel offset at the new zoom level
-            let new_cell_outer_width = new_cell_size + new_line_thickness;
-            let new_cell_outer_height = new_cell_size + new_line_thickness;
+            let new_cell_outer_width = new_cell_width + new_line_thickness;
+            let new_cell_outer_height = new_cell_height + new_line_thickness;
             let new_mouse_pos_within_cell = [
                 f32::round(mouse_pos_within_cell_proportion[0] * new_cell_outer_width),
                 f32::round(mouse_pos_within_cell_proportion[1] * new_cell_outer_height),
@@ -312,10 +314,10 @@ struct MapGeometry {
 fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)) -> MapGeometry {
     let total_bias = (map_state.bias.0 + pan.0, map_state.bias.1 + pan.1);
     
-    let cell_size = get_cell_size_for_zoom_level(map_state.zoom_level);
+    let (cell_width, cell_height) = get_cell_size_for_zoom_level(map_state.zoom_level, map_state.aspect_ratio);
     let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level);
-    let cell_outer_width = cell_size + line_thickness;
-    let cell_outer_height = cell_size + line_thickness;
+    let cell_outer_width = cell_width + line_thickness;
+    let cell_outer_height = cell_height + line_thickness;
     
     let blah_x = f32::ceil(total_bias.0 / cell_outer_width) as i32;
     let blah_y = f32::ceil(total_bias.1 / cell_outer_height) as i32;
@@ -360,8 +362,10 @@ fn get_hovered_screen_pos(hover_pos: [f32; 2], geom: &MapGeometry) -> ScreenCoor
     (screen_x, screen_y)
 }
 
-fn get_cell_size_for_zoom_level(zoom: i32) -> f32 {
-    return 1.6f32.powi(zoom).round();
+fn get_cell_size_for_zoom_level(zoom: i32, aspect_ratio: f32) -> (f32, f32) {
+    let height = 1.6f32.powi(zoom).round();
+    let width = (height * aspect_ratio).round().max(1.0);
+    (width, height)
 }
 
 fn get_line_thickness_for_zoom_level(zoom: i32) -> f32 {
