@@ -147,13 +147,13 @@ pub fn build_map(
     if get_line_thickness_for_zoom_level(map_state.zoom_level) > 0.0 {
         let mut x = map_x_screen + geom.origin_x;
         for _ in 0..cols {
-            x += geom.cell_outer_width;
             draw_list.add_line_v(x, map_y_screen, map_y_screen + height_avail, [0.1, 0.1, 0.1], line_thickness);
+            x += geom.cell_outer_width;
         }
         let mut y = map_y_screen + geom.origin_y;
         for _ in 0..rows {
-            y += geom.cell_outer_height;
             draw_list.add_line_h(map_x_screen, map_x_screen + width_avail, y, [0.1, 0.1, 0.1], line_thickness);
+            y += geom.cell_outer_height;
         }
     }
     
@@ -205,8 +205,8 @@ pub fn build_map(
         }
     }
     else {
-        for y in geom.y_min..geom.y_max {
-            for x in geom.x_min..geom.x_max {
+        for y in geom.y_min..=geom.y_max {
+            for x in geom.x_min..=geom.x_max {
                 if screens.index_of(&(x, y)).is_some() {
                     draw_screen_rect((x, y));
                 }
@@ -328,8 +328,8 @@ fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)
     let origin_x = total_bias.0 + (x_min - map_state.top_left.0) as f32 * cell_outer_width;
     let origin_y = total_bias.1 + (y_min - map_state.top_left.1) as f32 * cell_outer_height;
     
-    let x_max = x_min + ((map_size.0 - origin_x) / cell_outer_width).ceil() as i32;
-    let y_max = y_min + ((map_size.1 - origin_y) / cell_outer_height).ceil() as i32;
+    let x_max = x_min + ((map_size.0 - origin_x) / cell_outer_width).floor() as i32;
+    let y_max = y_min + ((map_size.1 - origin_y) / cell_outer_height).floor() as i32;
     
     MapGeometry {
         x_min,
