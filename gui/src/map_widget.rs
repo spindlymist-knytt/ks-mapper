@@ -65,6 +65,41 @@ const MAP_COLORS: &'static [[f32; 4]] = &[
     [1.000, 0.616, 0.506, 1.0],
 ];
 
+const HIGHLIGHT_COLORS: &'static [[f32; 4]] = &[
+    [0.214, 0.276, 0.45, 1.0],
+    [0.619, 0.259, 0.445, 1.0],
+    [0.0818, 0.654, 0.426, 1.0],
+    [0.796, 0.458, 0.351, 1.0],
+    [0.498, 0.487, 0.476, 1.0],
+    [0.905, 0.905, 0.905, 1.0],
+    [1.0, 1.0, 1.0, 1.0],
+    [1.0, 0.125, 0.389, 1.0],
+    [1.0, 0.684, 0.125, 1.0],
+    [1.0, 0.936, 0.278, 1.0],
+    [0.125, 1.0, 0.332, 1.0],
+    [0.286, 0.726, 1.0, 1.0],
+    [0.68, 0.65, 0.737, 1.0],
+    [1.0, 0.592, 0.739, 1.0],
+    [1.0, 0.875, 0.792, 1.0],
+    [0.125, 0.125, 0.125, 1.0],
+    [0.286, 0.196, 0.174, 1.0],
+    [0.149, 0.21, 0.333, 1.0],
+    [0.384, 0.239, 0.332, 1.0],
+    [0.156, 0.447, 0.474, 1.0],
+    [0.58, 0.301, 0.278, 1.0],
+    [0.411, 0.339, 0.365, 1.0],
+    [0.76, 0.698, 0.664, 1.0],
+    [1.0, 0.988, 0.639, 1.0],
+    [0.87, 0.192, 0.436, 1.0],
+    [1.0, 0.508, 0.266, 1.0],
+    [0.77, 1.0, 0.324, 1.0],
+    [0.104, 0.835, 0.375, 1.0],
+    [0.133, 0.469, 0.835, 1.0],
+    [0.584, 0.423, 0.529, 1.0],
+    [1.0, 0.54, 0.474, 1.0],
+    [1.0, 0.713, 0.631, 1.0],
+];
+
 pub fn build_map(
     ui: &Ui,
     map_state: &mut MapState,
@@ -146,11 +181,14 @@ pub fn build_map(
         ];
         
         let partition_index = partition_members.get(&(x, y)).unwrap();
-        let color = MAP_COLORS[*partition_index % MAP_COLORS.len()];
+        let color_index = *partition_index % MAP_COLORS.len();
         
+        let color = MAP_COLORS[color_index];
         draw_rect_relative(top_left, bottom_right, color, true);
+        
         if cell_size >= 5.0 {
-            draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 0.1], false);
+            let highlight_color = HIGHLIGHT_COLORS[color_index];
+            draw_rect_relative(top_left, bottom_right, highlight_color, false);
         }
     };
     
