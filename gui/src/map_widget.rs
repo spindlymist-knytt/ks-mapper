@@ -9,6 +9,7 @@ pub struct MapState {
     pub zoom_level: i32,
     pub bias: (f32, f32),
     pub aspect_ratio: f32,
+    pub prev_geom: Option<MapGeometry>,
 }
 
 impl MapState {
@@ -28,6 +29,7 @@ impl Default for MapState {
             zoom_level: 5,
             bias: (0.0, 0.0),
             aspect_ratio: 1.0,
+            prev_geom: None,
         }
     }
 }
@@ -107,8 +109,32 @@ pub fn build_map(
     map_state: &mut MapState,
     screens: &ScreenMap,
     selected_partition: Option<&Partition>,
-    partition_members: &FxHashMap<ScreenCoord, usize>
+    partition_members: &FxHashMap<ScreenCoord, usize>,
+    mut requested_center: Option<ScreenCoord>,
 ) -> Option<ScreenCoord> {
+    let draw_list = ui.get_window_draw_list();
+    let map_size = ui.content_region_avail();
+    let [map_x_screen, map_y_screen] = ui.get_cursor_screen_pos();
+    
+    let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level);
+    let (cell_width, cell_height) = get_cell_size_for_zoom_level(map_state.zoom_level, map_state.aspect_ratio);
+    
+    // Recenter if map was resized
+    if requested_center.is_none()
+        && let Some(prev_geom) = &map_state.prev_geom
+        && map_size != prev_geom.size
+    {
+        requested_center = Some(map_get_center_screen(prev_geom));
+    }
+    
+    // Move the top left of the map to get the desired center
+    if let Some(center) = requested_center {
+        map_state.top_left = (
+            center.0 - (map_size[0] / 2.0 / (cell_width + line_thickness)) as i32,
+            center.1 - (map_size[1] / 2.0 / (cell_height + line_thickness)) as i32,
+        );
+    }
+    
     // Pan
     if ui.is_mouse_clicked(MouseButton::Right) && ui.is_window_hovered() {
         map_state.is_dragging = true;
@@ -126,6 +152,7 @@ pub fn build_map(
         pan,
         ui.get_content_region_avail().into(),
     );
+    map_state.prev_geom = Some(geom.clone());
     
     // When panning stops, we "commit" the current geometry
     if map_state.is_dragging && ui.is_mouse_released(MouseButton::Right) {
@@ -134,25 +161,20 @@ pub fn build_map(
         map_state.bias = (geom.origin_x, geom.origin_y);
     }
     
-    let draw_list = ui.get_window_draw_list();
-    let [width_avail, height_avail] = ui.content_region_avail();
-    let [map_x_screen, map_y_screen] = ui.get_cursor_screen_pos();
     let cols = (geom.x_max - geom.x_min + 1) as usize;
     let rows = (geom.y_max - geom.y_min + 1) as usize;
     let n_grid_cells = rows * cols;
-    let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level);
-    let (cell_width, cell_height) = get_cell_size_for_zoom_level(map_state.zoom_level, map_state.aspect_ratio);
     
     // Draw grid lines
     if get_line_thickness_for_zoom_level(map_state.zoom_level) > 0.0 {
         let mut x = map_x_screen + geom.origin_x;
         for _ in 0..cols {
-            draw_list.add_line_v(x, map_y_screen, map_y_screen + height_avail, [0.1, 0.1, 0.1], line_thickness);
+            draw_list.add_line_v(x, map_y_screen, map_y_screen + map_size[1], [0.1, 0.1, 0.1], line_thickness);
             x += geom.cell_outer_width;
         }
         let mut y = map_y_screen + geom.origin_y;
         for _ in 0..rows {
-            draw_list.add_line_h(map_x_screen, map_x_screen + width_avail, y, [0.1, 0.1, 0.1], line_thickness);
+            draw_list.add_line_h(map_x_screen, map_x_screen + map_size[0], y, [0.1, 0.1, 0.1], line_thickness);
             y += geom.cell_outer_height;
         }
     }
@@ -300,7 +322,9 @@ pub fn build_map(
     }
 }
 
-struct MapGeometry {
+#[derive(Clone)]
+pub struct MapGeometry {
+    size: [f32; 2],
     x_min: i32,
     y_min: i32,
     x_max: i32,
@@ -332,6 +356,7 @@ fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)
     let y_max = y_min + ((map_size.1 - origin_y) / cell_outer_height).floor() as i32;
     
     MapGeometry {
+        size: map_size.into(),
         x_min,
         y_min,
         x_max,
@@ -370,4 +395,10 @@ fn get_cell_size_for_zoom_level(zoom: i32, aspect_ratio: f32) -> (f32, f32) {
 
 fn get_line_thickness_for_zoom_level(zoom: i32) -> f32 {
     if zoom < 4 { 0.0 } else { 1.0 }
+}
+
+pub fn map_get_center_screen(geom: &MapGeometry) -> ScreenCoord {
+    let x = geom.x_min + (geom.size[0] / 2.0 / geom.cell_outer_width) as i32;
+    let y = geom.y_min + (geom.size[1] / 2.0 / geom.cell_outer_height) as i32;
+    (x, y)
 }

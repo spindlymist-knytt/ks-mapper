@@ -18,7 +18,7 @@ use libks_ini::edit::Ini;
 use ksmap::{definitions, screen_map::ScreenMap};
 use rustc_hash::FxHashMap;
 
-use crate::{map_widget::{build_map, MapState}, ui_extensions::UiExt};
+use crate::{map_widget::{build_map, MapState, map_get_center_screen}, ui_extensions::UiExt};
 
 pub struct State {
     #[allow(dead_code)]
@@ -86,25 +86,19 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         state.setup_windows = false;
     }
     
-    if ui.is_key_pressed(Key::F2) {
-        state.map_state.aspect_ratio = if state.map_state.aspect_ratio == 1.0 { 2.5 } else { 1.0 };
+    let mut requested_center: Option<ScreenCoord> = None;
+    if state.map_state.prev_geom.is_none()
+        && let Some(screen) = state.screen_map.first()
+    {
+        requested_center = Some(screen.position);
     }
     
-    let hover_pos = {
-        let _map_padding = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0])); 
-        ui.window("Map")
-            .flags(WindowFlags::NO_MOVE)
-            .build(|| {
-                build_map(
-                    ui,
-                    &mut state.map_state,
-                    &state.screen_map,
-                    state.partitions.get(state.selected),
-                    &state.partition_members
-                )
-            })
-            .unwrap_or(None)
-    };
+    if ui.is_key_pressed(Key::F2) {
+        state.map_state.aspect_ratio = if state.map_state.aspect_ratio == 1.0 { 2.5 } else { 1.0 };
+        if let Some(geom) = &state.map_state.prev_geom {
+            requested_center = Some(map_get_center_screen(geom));
+        }
+    }
     
     let should_go_to_level_list = ui.window("Export").build(|| {
         build_window_export(ui, &mut ex, state)
@@ -117,7 +111,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         && let Some(partition) = state.partitions.get(i)
         && let Some(first_screen_pos) = partition.positions().first()
     {
-        state.map_state.top_left = *first_screen_pos;
+        requested_center = Some(*first_screen_pos);
     }
     
     ui.window("Drawing").build(|| {
@@ -127,6 +121,23 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
             &mut state.sync_options,
             &mut state.seed);
     });
+    
+    let hover_pos = {
+        let _map_padding = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0])); 
+        ui.window("Map")
+            .flags(WindowFlags::NO_MOVE)
+            .build(|| {
+                build_map(
+                    ui,
+                    &mut state.map_state,
+                    &state.screen_map,
+                    state.partitions.get(state.selected),
+                    &state.partition_members,
+                    requested_center,
+                )
+            })
+            .unwrap_or(None)
+    };
     
     ui.window("Preview").build(|| {
         build_window_preview(ui, &mut ex, state, hover_pos);
