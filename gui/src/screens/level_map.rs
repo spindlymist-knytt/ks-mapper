@@ -87,10 +87,18 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     }
     
     let mut requested_center: Option<ScreenCoord> = None;
-    if state.map_state.prev_geom.is_none()
-        && let Some(screen) = state.screen_map.first()
-    {
-        requested_center = Some(screen.position);
+    if state.map_state.prev_geom.is_none() {
+        if let Some(partition) = state.partitions.first() {
+            let bounds = partition.bounds();
+            let partition_center = (
+                (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i32,
+                (bounds.y.start + (bounds.y.end - bounds.y.start) / 2) as i32,
+            );
+            requested_center = Some(partition_center);
+        }
+        else {
+            requested_center = Some((1000, 1000));
+        }
     }
     
     if ui.is_key_pressed(Key::F2) {
@@ -109,9 +117,13 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     }).unwrap_or_default();
     if let Some(i) = go_to_partition_index
         && let Some(partition) = state.partitions.get(i)
-        && let Some(first_screen_pos) = partition.positions().first()
     {
-        requested_center = Some(*first_screen_pos);
+        let bounds = partition.bounds();
+        let partition_center = (
+            (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i32,
+            (bounds.y.start + (bounds.y.end - bounds.y.start) / 2) as i32,
+        );
+        requested_center = Some(partition_center);
     }
     
     ui.window("Drawing").build(|| {
