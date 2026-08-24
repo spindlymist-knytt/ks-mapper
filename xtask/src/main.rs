@@ -1,6 +1,6 @@
 mod paths;
 
-use std::{collections::BTreeMap, env, fs, path::{Path, PathBuf}, rc::Rc};
+use std::{collections::BTreeMap, env, fs, path::{Path, PathBuf}, sync::Arc};
 
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand, Args};
@@ -169,14 +169,14 @@ fn render_seeds(level_dir: &Path, seeds: &[MapSeed], output_dir: &Path, level_na
         let mut defs = definitions::load_object_defs(DEFINITIONS_PATH.as_path())
             .expect("Object definitions should be valid");
         definitions::insert_custom_obj_defs(&mut defs, &ini);
-        Rc::new(defs)
+        Arc::new(defs)
     };
     
     let mut gfx = Graphics::new(
         DATA_DIR.as_path(),
         &level_dir,
         TEMPLATES_DIR.as_path(),
-        Rc::clone(&object_defs),
+        Arc::clone(&object_defs),
     );
     let assets_used = analysis::list_assets(&screens, &object_defs);
     

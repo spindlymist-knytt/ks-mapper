@@ -1,5 +1,5 @@
-use std::{path::PathBuf, rc::Rc};
-
+use std::thread::JoinHandle;
+use std::{path::{Path, PathBuf}, sync::{Arc, mpsc, RwLock}};
 use image::RgbaImage;
 use imgui_app::{Extras, Fonts, ImguiCursorExt, ImguiExt};
 use imgui_app::dear_imgui_rs::{DockBuilder, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, SplitDirection, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnWidth, TableFlags, Ui, WindowFlags};
@@ -23,23 +23,28 @@ use crate::{map_widget::{build_map, MapState, map_get_center_screen}, ui_extensi
 pub struct State {
     #[allow(dead_code)]
     level_dir: PathBuf,
+    setup_windows: bool,
+    render_thread: Option<JoinHandle<()>>,
+    render_rx: Option<mpsc::Receiver<String>>,
+    render_state_lock: Arc<RwLock<RenderState>>,
+    last_message: Option<String>,
+    map_state: MapState,
+    partition_state: PartitionState,
+    drawing_state: DrawingState,
+    preview_state: PreviewState,
+}
+
+struct RenderState {
     ini: Ini,
-    object_defs: Rc<ObjectDefs>,
+    object_defs: Arc<ObjectDefs>,
     gfx: Graphics,
     screen_map: ScreenMap,
     seed: MapSeed,
     partitions: Vec<Partition>,
-    partition_members: FxHashMap<ScreenCoord, usize>,
     world_sync: Option<WorldSync>,
     draw_options: DrawOptions,
     sync_options: SyncOptions,
-    selected: usize,
-    setup_windows: bool,
-    preview: Option<(ScreenCoord, u64)>,
     use_multithreaded_encoder: bool,
-    map_state: MapState,
-    partition_state: PartitionState,
-    drawing_state: DrawingState,
 }
 
 pub enum Task {
@@ -47,9 +52,40 @@ pub enum Task {
 }
 
 pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
-    let dockspace_id = ui.dockspace_over_main_viewport();
+    let State {
+        level_dir,
+        setup_windows,
+        render_thread,
+        render_rx,
+        render_state_lock,
+        last_message,
+        map_state,
+        partition_state,
+        drawing_state,
+        preview_state,
+    } = state;
     
-    if state.setup_windows {
+    if render_thread.is_some() {
+        let rx = render_rx.as_mut().unwrap();
+        while let Ok(message) = rx.try_recv() {
+            last_message.replace(message);
+        }
+        if let Some(message) = &last_message {
+            ui.text(format!("Rendering: {message}"));
+            if *message == "done" {
+                render_thread.take();
+                last_message.take();
+                render_rx.take();
+            }
+        }
+        else {
+            ui.text("Rendering");
+        }
+        return None;
+    }
+    
+    let dockspace_id = ui.dockspace_over_main_viewport();
+    if *setup_windows {
         let proportion_left = {
             let width_left = unsafe {
                 600.0
@@ -83,12 +119,21 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         DockBuilder::dock_window("Preview", dock_bottom_left);
         
         DockBuilder::finish(dockspace_id);
-        state.setup_windows = false;
+        *setup_windows = false;
     }
     
+    let Ok(mut render_state) = render_state_lock.write() else {
+        return Some(Task::ShowLevelList);
+    };
+    // let render_state: &mut RenderState = &mut render_state_guard;
+    
+    let should_go_to_level_list = ui.window("Export").build(|| {
+        build_window_export(ui, &mut ex, &mut render_state, level_dir, render_thread, render_rx, render_state_lock)
+    }).unwrap_or_default();
+    
     let mut requested_center: Option<ScreenCoord> = None;
-    if state.map_state.prev_geom.is_none() {
-        if let Some(partition) = state.partitions.first() {
+    if map_state.prev_geom.is_none() {
+        if let Some(partition) = render_state.partitions.first() {
             let bounds = partition.bounds();
             let partition_center = (
                 (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i32,
@@ -102,21 +147,17 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     }
     
     if ui.is_key_pressed(Key::F2) {
-        state.map_state.aspect_ratio = if state.map_state.aspect_ratio == 1.0 { 2.5 } else { 1.0 };
-        if let Some(geom) = &state.map_state.prev_geom {
+        map_state.aspect_ratio = if map_state.aspect_ratio == 1.0 { 2.5 } else { 1.0 };
+        if let Some(geom) = &map_state.prev_geom {
             requested_center = Some(map_get_center_screen(geom));
         }
     }
     
-    let should_go_to_level_list = ui.window("Export").build(|| {
-        build_window_export(ui, &mut ex, state)
-    }).unwrap_or_default();
-    
     let go_to_partition_index = ui.window("Partitions").build(|| {
-        build_window_partitions(ui, &mut ex, state)
+        build_window_partitions(ui, &mut ex, partition_state, &mut render_state)
     }).unwrap_or_default();
     if let Some(i) = go_to_partition_index
-        && let Some(partition) = state.partitions.get(i)
+        && let Some(partition) = render_state.partitions.get(i)
     {
         let bounds = partition.bounds();
         let partition_center = (
@@ -127,11 +168,12 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     }
     
     ui.window("Drawing").build(|| {
+        let RenderState { draw_options, sync_options, seed, .. } = &mut *render_state;
         build_window_drawing(ui, &mut ex,
-            &mut state.drawing_state,
-            &mut state.draw_options,
-            &mut state.sync_options,
-            &mut state.seed);
+            drawing_state,
+            draw_options,
+            sync_options,
+            seed);
     });
     
     let hover_pos = {
@@ -141,10 +183,10 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
             .build(|| {
                 build_map(
                     ui,
-                    &mut state.map_state,
-                    &state.screen_map,
-                    state.partitions.get(state.selected),
-                    &state.partition_members,
+                    map_state,
+                    &render_state.screen_map,
+                    render_state.partitions.get(partition_state.selected),
+                    &partition_state.partition_members,
                     requested_center,
                 )
             })
@@ -152,7 +194,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     };
     
     ui.window("Preview").build(|| {
-        build_window_preview(ui, &mut ex, state, hover_pos);
+        build_window_preview(ui, &mut ex, preview_state, &mut render_state, hover_pos);
     });
     
     if should_go_to_level_list {
@@ -164,6 +206,8 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
 }
 
 struct PartitionState {
+    partition_members: FxHashMap<ScreenCoord, usize>,
+    selected: usize,
     algorithm: PartitionAlgorithm,
     max_width: i32,
     max_height: i32,
@@ -176,9 +220,11 @@ struct PartitionState {
     force: bool,
 }
 
-impl Default for PartitionState {
-    fn default() -> Self {
+impl PartitionState {
+    fn new(partition_members: FxHashMap<ScreenCoord, usize>) -> Self {
         Self {
+            partition_members,
+            selected: 0,
             algorithm: PartitionAlgorithm::default(),
             max_width: 120,
             max_height: 300,
@@ -200,14 +246,12 @@ enum PartitionAlgorithm {
     Grid,
 }
 
-fn build_window_partitions(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<usize> {
-    let partition_state = &mut state.partition_state;
-    
+fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut PartitionState, render_state: &mut RenderState) -> Option<usize> {
     let button_width = ui.window_width() * 0.65;
     let button_height = ui.text_line_height() * 2.0;
     if ui.button_with_size("Rebuild partitions", [button_width, button_height]) {
         let max_size = (partition_state.max_width as u64, partition_state.max_height as u64);
-        state.partitions = match partition_state.algorithm {
+        render_state.partitions = match partition_state.algorithm {
             PartitionAlgorithm::Islands => {
                 let gap = partition_state.min_gap as u64 ..= partition_state.max_gap as u64;
                 let partitioner = IslandsPartitioner {
@@ -215,7 +259,7 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, state: &mut State) -> Optio
                     gap,
                     force: partition_state.force,
                 };
-                partitioner.partitions(&state.screen_map)
+                partitioner.partitions(&render_state.screen_map)
             }
             PartitionAlgorithm::Grid => {
                 let partitioner = GridPartitioner {
@@ -224,14 +268,14 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, state: &mut State) -> Optio
                     cols: if partition_state.auto_cols { None } else { Some(partition_state.cols as u64) },
                     force: partition_state.force,
                 };
-                partitioner.partitions(&state.screen_map)
+                partitioner.partitions(&render_state.screen_map)
             }
         };
         
-        state.partition_members.clear();
-        for (i, positions) in state.partitions.iter().enumerate() {
+        partition_state.partition_members.clear();
+        for (i, positions) in render_state.partitions.iter().enumerate() {
             for pos in positions {
-                state.partition_members.insert(*pos, i);
+                partition_state.partition_members.insert(*pos, i);
             }
         }
     }
@@ -276,7 +320,7 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, state: &mut State) -> Optio
     };
     
     ui.new_line();
-    build_partition_table(ui, ex.fonts, &state.partitions, &mut state.selected)
+    build_partition_table(ui, ex.fonts, &render_state.partitions, &mut partition_state.selected)
 }
 
 fn build_partition_options_islands(ui: &Ui, state: &mut PartitionState) {
@@ -400,22 +444,27 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selec
     go_to_partition_index
 }
 
-fn build_window_preview(ui: &Ui, ex: &mut Extras, state: &mut State, hover_pos: Option<ScreenCoord>) { 
+#[derive(Default)]
+struct PreviewState {
+    preview: Option<(ScreenCoord, u64)>,
+}
+
+fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewState, render_state: &mut RenderState, hover_pos: Option<ScreenCoord>) { 
     let Some(pos) = hover_pos else {
         ui.text("Mouse over the map to preview a screen");
         return;
     };
     
-    let pos_changed = state.preview.as_ref().is_none_or(|preview| {
+    let pos_changed = preview_state.preview.as_ref().is_none_or(|preview| {
         preview.0 != pos
     });
     
     if pos_changed {
-        if let Some(preview) = state.preview.take() {
+        if let Some(preview) = preview_state.preview.take() {
             ex.textures.delete_texture(preview.1);
         }
         
-        state.preview = match draw_single_screen(state, pos) {
+        preview_state.preview = match draw_single_screen(render_state, pos) {
             Some(image) => {
                 let id = ex.textures.create_texture_from_bytes(image.width(), image.height(), &image);
                 Some((pos, id))
@@ -424,33 +473,33 @@ fn build_window_preview(ui: &Ui, ex: &mut Extras, state: &mut State, hover_pos: 
         };
     }
     
-    if let Some(preview) = &state.preview
+    if let Some(preview) = &preview_state.preview
         && let Some(texture) = ex.textures.get_texture(preview.1)
     {
         ui.image(texture, texture.size());
     }
 }
 
-fn draw_single_screen(state: &mut State, screen_pos: ScreenCoord) -> Option<RgbaImage> {
-    let world_sync = state.world_sync.get_or_insert_with(|| {
+fn draw_single_screen(render_state: &mut RenderState, screen_pos: ScreenCoord) -> Option<RgbaImage> {
+    let world_sync = render_state.world_sync.get_or_insert_with(|| {
         WorldSync::new(
-            state.seed,
-            &state.screen_map,
-            &state.object_defs,
-            &state.sync_options
+            render_state.seed,
+            &render_state.screen_map,
+            &render_state.object_defs,
+            &render_state.sync_options
         )
     });
-    let screen_index = state.screen_map.index_of(&screen_pos)?;
-    let screen = &state.screen_map[screen_index];
+    let screen_index = render_state.screen_map.index_of(&screen_pos)?;
+    let screen = &render_state.screen_map[screen_index];
     
     ksmap::drawing::draw_screen(
-        state.seed,
+        render_state.seed,
         screen,
         screen_index,
-        &state.gfx,
-        &state.object_defs,
-        &state.ini,
-        state.draw_options,
+        &render_state.gfx,
+        &render_state.object_defs,
+        &render_state.ini,
+        render_state.draw_options,
         world_sync
     ).ok()
 }
@@ -576,55 +625,28 @@ impl InputTextCallbackHandler for MapSeedEditCallback {
     }
 }
 
-fn build_window_export(ui: &Ui, _ex: &mut Extras, state: &mut State) -> bool {
+fn build_window_export(
+    ui: &Ui,
+    _ex: &mut Extras,
+    render_state: &mut RenderState,
+    _level_dir: &Path,
+    render_thread: &mut Option<JoinHandle<()>>,
+    render_rx: &mut Option<mpsc::Receiver<String>>,
+    render_state_lock: &Arc<RwLock<RenderState>>,
+) -> bool {
     let button_width = ui.window_width() * 0.65;
     let button_height = ui.text_line_height() * 2.0;
     if ui.button_with_size("Export", [button_width, button_height]) {
-        let world_sync = state.world_sync.get_or_insert_with(|| {
-            WorldSync::new(
-                state.seed,
-                &state.screen_map,
-                &state.object_defs,
-                &state.sync_options
-            )
+        let (tx, rx) = mpsc::channel::<String>();
+        let render_state_for_thread = Arc::clone(render_state_lock);
+        let handle = std::thread::spawn(|| {
+            do_the_render(render_state_for_thread, tx)
         });
-        let draw_context = DrawContext {
-            seed: state.seed,
-            screens: &state.screen_map,
-            gfx: &state.gfx,
-            defs: &state.object_defs,
-            ini: &state.ini,
-            world_sync: &world_sync,
-            options: state.draw_options.clone(),
-        };
-        
-        let output_dir =
-            if state.partitions.len() > 1 {
-                let dir = PathBuf::from(state.level_dir.file_name().unwrap());
-                std::fs::create_dir_all(&dir).unwrap();
-                dir
-            }
-            else {
-                PathBuf::from(".")
-            };
-        
-        for partition in &state.partitions {
-            let bounds = partition.bounds();
-            let canvas = drawing::draw_partition(draw_context, partition).unwrap();
-            
-            let file_name = format!("{bounds}.png");
-            let path = output_dir.join(file_name);
-            
-            if state.use_multithreaded_encoder {
-                drawing::export_canvas_multithreaded(canvas, path.as_ref()).unwrap();
-            }
-            else {
-                drawing::export_canvas(canvas, path.as_ref()).unwrap();
-            }
-        }
+        render_rx.replace(rx);
+        render_thread.replace(handle);
     }
     
-    ui.checkbox("Multithreaded encoding", &mut state.use_multithreaded_encoder);
+    ui.checkbox("Multithreaded encoding", &mut render_state.use_multithreaded_encoder);
     
     ui.new_line();
     if ui.small_button("Open another level") {
@@ -633,6 +655,59 @@ fn build_window_export(ui: &Ui, _ex: &mut Extras, state: &mut State) -> bool {
     else {
         false
     }
+}
+
+fn do_the_render(render_state_lock: Arc<RwLock<RenderState>>, tx: mpsc::Sender<String>) {
+    let Ok(mut render_state) = render_state_lock.write() else { return };
+    
+    if render_state.world_sync.is_none() {
+        render_state.world_sync = Some(WorldSync::new(
+            render_state.seed,
+            &render_state.screen_map,
+            &render_state.object_defs,
+            &render_state.sync_options
+        ));
+    }
+    
+    let world_sync: &WorldSync = render_state.world_sync.as_ref().unwrap();
+    let draw_context = DrawContext {
+        seed: render_state.seed,
+        screens: &render_state.screen_map,
+        gfx: &render_state.gfx,
+        defs: &render_state.object_defs,
+        ini: &render_state.ini,
+        world_sync: &world_sync,
+        options: render_state.draw_options.clone(),
+    };
+    
+    let output_dir =
+        if render_state.partitions.len() > 1 {
+            let dir = PathBuf::from("Output");
+            std::fs::create_dir_all(&dir).unwrap();
+            dir
+        }
+        else {
+            PathBuf::from(".")
+        };
+    
+    for partition in &render_state.partitions {
+        let bounds = partition.bounds();
+        let canvas = drawing::draw_partition(draw_context, partition).unwrap();
+        
+        let _ = tx.send(bounds.to_string());
+        
+        let file_name = format!("{bounds}.png");
+        let path = output_dir.join(file_name);
+        
+        if render_state.use_multithreaded_encoder {
+            drawing::export_canvas_multithreaded(canvas, path.as_ref()).unwrap();
+        }
+        else {
+            drawing::export_canvas(canvas, path.as_ref()).unwrap();
+        }
+    }
+    
+    let _ = tx.send(String::from("done"));
 }
 
 #[derive(Clone, Copy)]
@@ -713,7 +788,7 @@ impl State {
         let object_defs = {
             let mut defs = definitions::load_object_defs(object_defs_path).unwrap();
             definitions::insert_custom_obj_defs(&mut defs, &ini);
-            Rc::new(defs)
+            Arc::new(defs)
         };
         
         let data_dir = level_dir.join("../../Data");
@@ -723,7 +798,7 @@ impl State {
             current_dir.set_file_name("ksmap_data/templates");
             current_dir
         };
-        let mut gfx = Graphics::new(data_dir, level_dir.clone(), templates_dir, Rc::clone(&object_defs));
+        let mut gfx = Graphics::new(data_dir, level_dir.clone(), templates_dir, Arc::clone(&object_defs));
         
         let assets = list_assets(screen_map.as_slice(), &object_defs);
         let mut warnings = Vec::new();
@@ -749,25 +824,30 @@ impl State {
             .map(|screen| screen.position)
             .unwrap_or((1000, 1000));
         
-        State {
-            level_dir,
+        let render_state_lock = Arc::new(RwLock::new(RenderState {
             ini,
             object_defs,
             gfx,
             screen_map,
             seed,
             partitions,
-            partition_members,
             world_sync: None,
             draw_options: DrawOptions::default(),
             sync_options: SyncOptions::default(),
-            selected: 0,
-            setup_windows: true,
-            preview: None,
             use_multithreaded_encoder: true,
+        }));
+        
+        State {
+            level_dir,
+            render_state_lock,
+            render_rx: None,
+            last_message: None,
+            setup_windows: true,
             map_state: MapState::new(first_screen_pos),
-            partition_state: PartitionState::default(),
+            partition_state: PartitionState::new(partition_members),
             drawing_state: DrawingState::default(),
+            preview_state: PreviewState::default(),
+            render_thread: None,
         }
     }
 }

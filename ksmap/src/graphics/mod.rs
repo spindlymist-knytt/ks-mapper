@@ -6,7 +6,7 @@ use std::{
     fs::File,
     io::{self, BufReader},
     path::{Path, PathBuf},
-    rc::Rc,
+    sync::Arc,
 };
 
 use anyhow::Result;
@@ -21,14 +21,14 @@ use crate::{
 use spritesheet::Spritesheet;
 
 pub struct Graphics {
-    object_defs: Rc<ObjectDefs>,
+    object_defs: Arc<ObjectDefs>,
     inner: GraphicsInner,
 }
 
 struct GraphicsInner {
     paths: Paths,
     cache: FxHashMap<(PathBuf, MagicColor), Option<ImageInfo>>,
-    tilesets: FxHashMap<AssetId, Rc<RgbaImage>>,
+    tilesets: FxHashMap<AssetId, Arc<RgbaImage>>,
     gradients: FxHashMap<AssetId, Gradient>,
     objects: FxHashMap<ObjectId, Spritesheet>,
 }
@@ -44,21 +44,21 @@ struct Paths {
 }
 
 struct ImageInfo {
-    image: Rc<RgbaImage>,
+    image: Arc<RgbaImage>,
     has_alpha_channel: bool,
 }
 
 impl Clone for ImageInfo {
     fn clone(&self) -> Self {
         Self {
-            image: Rc::clone(&self.image),
+            image: Arc::clone(&self.image),
             has_alpha_channel: self.has_alpha_channel,
         }
     }
 }
 
 pub struct Gradient {
-    pub image: Rc<RgbaImage>,
+    pub image: Arc<RgbaImage>,
     pub has_transparency: bool,
 }
 
@@ -99,14 +99,14 @@ pub enum LoadImageWarning {
     },
 }
 
-type MaybeImageRc = Option<Rc<RgbaImage>>;
+type MaybeImageRc = Option<Arc<RgbaImage>>;
 
 impl Graphics {
     pub fn new(
         data_dir: impl AsRef<Path>,
         level_dir: impl AsRef<Path>,
         templates_dir: impl Into<PathBuf>,
-        object_defs: Rc<ObjectDefs>,
+        object_defs: Arc<ObjectDefs>,
     ) -> Self {
         let paths = Paths::new(
             data_dir,
@@ -129,7 +129,7 @@ impl Graphics {
     
     pub fn tileset(&self, id: AssetId) -> Option<&RgbaImage> {
         self.inner.tilesets.get(&id)
-            .map(Rc::as_ref)
+            .map(Arc::as_ref)
     }
 
     pub fn gradient(&self, id: AssetId) -> Option<&Gradient> {
@@ -244,7 +244,7 @@ impl GraphicsInner {
         }
         
         let info = ImageInfo {
-            image: Rc::new(image),
+            image: Arc::new(image),
             has_alpha_channel: has_alpha,
         };
         cached_image.insert(Some(info.clone()));
@@ -274,7 +274,7 @@ impl GraphicsInner {
         Ok(None)
     }
 
-    fn preprocess_tileset(&mut self, info: ImageInfo) -> Rc<RgbaImage> {
+    fn preprocess_tileset(&mut self, info: ImageInfo) -> Arc<RgbaImage> {
         let image = info.image;
 
         // If a tileset is undersized such that it has partially incomplete tiles, and it has no alpha channel, the
@@ -303,7 +303,7 @@ impl GraphicsInner {
             let width_new = width_original + width_padding;
             let height_new = height_original + height_padding;
             let processed = resize_image_canvas(image.as_ref(), width_new, height_new, Rgba([0, 0, 0, 255]));
-            Rc::new(processed)
+            Arc::new(processed)
         }
         else {
             image
@@ -340,7 +340,7 @@ impl GraphicsInner {
         if image.height() < 240 {
             let alpha = if info.has_alpha_channel { 0 } else { 255 };
             let processed = resize_image_canvas(image.as_ref(), image.width(), 240, Rgba([0, 0, 0, alpha]));
-            image = Rc::new(processed);
+            image = Arc::new(processed);
         }
         
         let has_transparency = image.pixels().any(|pixel| pixel.alpha() < 255);
@@ -447,7 +447,7 @@ impl GraphicsInner {
             }
         }
         
-        Ok(Some(Rc::new(transformed_image)))
+        Ok(Some(Arc::new(transformed_image)))
     }
 }
 

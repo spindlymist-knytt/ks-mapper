@@ -1,4 +1,4 @@
-use std::{ops::Range, rc::Rc};
+use std::{ops::Range, sync::Arc};
 
 use image::{RgbaImage, SubImage, imageops};
 use rand::{Rng, RngExt};
@@ -6,7 +6,7 @@ use rand::{Rng, RngExt};
 use crate::definitions::AnimParams;
 
 pub struct Spritesheet {
-    pub image: Rc<RgbaImage>,
+    pub image: Arc<RgbaImage>,
     pub n_frames: u32,
     pub frames_per_row: u32,
     pub frame_width: u32,
@@ -17,7 +17,7 @@ pub struct Spritesheet {
 }
 
 impl Spritesheet {
-    pub fn new(image: Rc<RgbaImage>, params: &AnimParams) -> Self {
+    pub fn new(image: Arc<RgbaImage>, params: &AnimParams) -> Self {
         let frame_width = params.frame_size.0.min(image.width());
         let frame_height = params.frame_size.1.min(image.height());
         
