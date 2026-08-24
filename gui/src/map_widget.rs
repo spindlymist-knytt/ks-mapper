@@ -12,15 +12,6 @@ pub struct MapState {
     pub prev_geom: Option<MapGeometry>,
 }
 
-impl MapState {
-    pub fn new(top_left: ScreenCoord) -> Self {
-        Self {
-            top_left,
-            ..Default::default()
-        }
-    }
-}
-
 impl Default for MapState {
     fn default() -> Self {
         Self {

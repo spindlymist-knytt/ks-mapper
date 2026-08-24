@@ -148,14 +148,22 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         requested_center = Some(partition_center);
     }
     
-    ui.window("Drawing").build(|| {
+    let invalidate_world_sync = ui.window("Drawing").build(|| {
         let RenderState { draw_options, sync_options, seed, .. } = &mut *render_state;
         build_window_drawing(ui, &mut ex,
             drawing_state,
             draw_options,
             sync_options,
-            seed);
-    });
+            seed)
+    }).unwrap_or(false);
+    if invalidate_world_sync {
+        render_state.world_sync = WorldSync::new(
+            render_state.seed,
+            &render_state.screen_map,
+            &render_state.object_defs,
+            &render_state.sync_options
+        );
+    }
     
     let hover_pos = {
         let _map_padding = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0])); 
@@ -462,14 +470,6 @@ fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewSta
 }
 
 fn draw_single_screen(render_state: &mut RenderState, screen_pos: ScreenCoord) -> Option<RgbaImage> {
-    let world_sync = render_state.world_sync.get_or_insert_with(|| {
-        WorldSync::new(
-            render_state.seed,
-            &render_state.screen_map,
-            &render_state.object_defs,
-            &render_state.sync_options
-        )
-    });
     let screen_index = render_state.screen_map.index_of(&screen_pos)?;
     let screen = &render_state.screen_map[screen_index];
     
@@ -481,7 +481,7 @@ fn draw_single_screen(render_state: &mut RenderState, screen_pos: ScreenCoord) -
         &render_state.object_defs,
         &render_state.ini,
         render_state.draw_options,
-        world_sync
+        &render_state.world_sync
     ).ok()
 }
 
@@ -507,8 +507,10 @@ fn build_window_drawing(
     state: &mut DrawingState,
     draw_options: &mut DrawOptions,
     sync_options: &mut SyncOptions,
-    seed: &mut MapSeed
-) {
+    seed: &mut MapSeed,
+) -> bool {
+    let mut invalidate_world_sync = false;
+    
     let mut seed_buffer = seed.to_string();
     if InputText::new(ui, "Seed", &mut seed_buffer)
         .flags(InputTextFlags::CHARS_HEXADECIMAL | InputTextFlags::CALLBACK_EDIT)
@@ -517,12 +519,14 @@ fn build_window_drawing(
     {
         if let Ok(new_seed) = MapSeed::try_from(seed_buffer) {
             *seed = new_seed;
+            invalidate_world_sync = true;
         }
     }
     
     ui.same_line();
     if ui.small_button("Random") {
         *seed = MapSeed::random();
+        invalidate_world_sync = true;
     }
     
     let mut lasers_index = match (draw_options.ignore_laser_phase, sync_options.maximize_visible_lasers) {
@@ -539,10 +543,12 @@ fn build_window_drawing(
             0 => {
                 draw_options.ignore_laser_phase = false;
                 sync_options.maximize_visible_lasers = true;
+                invalidate_world_sync = true;
             }
             1 => {
                 draw_options.ignore_laser_phase = false;
                 sync_options.maximize_visible_lasers = false;
+                invalidate_world_sync = true;
             }
             2 => {
                 draw_options.ignore_laser_phase = true;
@@ -593,6 +599,8 @@ fn build_window_drawing(
     
     ui.checkbox("Show invisible objects", &mut draw_options.show_invisible);
     ui.checkbox("Show proximity-sensitive objects", &mut draw_options.show_proximity);
+    
+    invalidate_world_sync
 }
 
 struct MapSeedEditCallback(usize);
@@ -660,7 +668,7 @@ struct RenderState {
     screen_map: ScreenMap,
     seed: MapSeed,
     partitions: Vec<Partition>,
-    world_sync: Option<WorldSync>,
+    world_sync: WorldSync,
     draw_options: DrawOptions,
     sync_options: SyncOptions,
     use_multithreaded_encoder: bool,
@@ -700,33 +708,20 @@ struct RenderProgress {
 
 #[derive(PartialEq, Eq)]
 enum RenderMessage {
-    Syncing,
     PartitionUpdate(usize, RenderTaskStatus),
     Done,
     Aborted,
 }
 
 fn do_the_render(render_state_lock: Arc<RwLock<RenderState>>, tx: mpsc::Sender<RenderMessage>, cancel: Arc<AtomicBool>) {
-    let Ok(mut render_state) = render_state_lock.write() else { return };
-    
-    if render_state.world_sync.is_none() {
-        let _ = tx.send(RenderMessage::Syncing);
-        render_state.world_sync = Some(WorldSync::new(
-            render_state.seed,
-            &render_state.screen_map,
-            &render_state.object_defs,
-            &render_state.sync_options
-        ));
-    }
-    
-    let world_sync: &WorldSync = render_state.world_sync.as_ref().unwrap();
+    let Ok(render_state) = render_state_lock.read() else { return };    
     let draw_context = DrawContext {
         seed: render_state.seed,
         screens: &render_state.screen_map,
         gfx: &render_state.gfx,
         defs: &render_state.object_defs,
         ini: &render_state.ini,
-        world_sync: &world_sync,
+        world_sync: &render_state.world_sync,
         options: render_state.draw_options.clone(),
     };
     
@@ -746,13 +741,16 @@ fn do_the_render(render_state_lock: Arc<RwLock<RenderState>>, tx: mpsc::Sender<R
             return;
         }
         
-        let bounds = partition.bounds();
         let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Rendering));
-        
+        let bounds = partition.bounds();
         let canvas = drawing::draw_partition(draw_context, partition).unwrap();
 
-        let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Exporting));
+        if cancel.load(atomic::Ordering::Relaxed) {
+            let _ = tx.send(RenderMessage::Aborted);
+            return;
+        }
         
+        let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Exporting));
         let file_name = format!("{bounds}.png");
         let path = output_dir.join(file_name);
         
@@ -773,7 +771,6 @@ fn build_window_progress(ui: &Ui, _ex: &mut Extras, state: &mut State) {
     let rx = state.render_rx.as_mut().unwrap();
     while let Ok(message) = rx.try_recv() {
         match message {
-            RenderMessage::Syncing => {},
             RenderMessage::PartitionUpdate(i, progress) => {
                 state.render_progress.tasks[i].status = progress;
                 if progress == RenderTaskStatus::Done {
@@ -789,8 +786,10 @@ fn build_window_progress(ui: &Ui, _ex: &mut Extras, state: &mut State) {
     }
 
     let item_spacing_x = unsafe { ui.style().item_spacing()[0] };
-    let avail_width = ui.content_region_avail_width();
-    let progress_bar_width = avail_width * (10.0 / 12.0) - item_spacing_x;
+    let progress_bar_width = {
+        let avail_width = ui.content_region_avail_width();
+        avail_width * (10.0 / 12.0) - item_spacing_x
+    };
     let percent_done = state.render_progress.screens_done as f32 / state.render_progress.screens_total as f32;
     ui.progress_bar(percent_done)
         .size([progress_bar_width, 0.0])
@@ -800,22 +799,30 @@ fn build_window_progress(ui: &Ui, _ex: &mut Extras, state: &mut State) {
     if ui.button_with_size("Cancel", [-1.0, 0.0]) {
         state.render_cancel.store(true, atomic::Ordering::Relaxed);
     }
-
-    for task in &state.render_progress.tasks {
-        if task.status == RenderTaskStatus::Done { continue; }
-        let label_width = ui.calc_text_width(&task.label);
-        ui.set_cursor_pos_x(f32::round((avail_width - item_spacing_x) * 0.5) - label_width);
-        ui.text(&task.label);
-        let color = match task.status {
-            RenderTaskStatus::NotStarted => [0.5, 0.5, 0.5, 1.0],
-            RenderTaskStatus::Rendering => ui.style_color(StyleColor::PlotHistogram),
-            RenderTaskStatus::Exporting => ui.style_color(StyleColor::PlotHistogram),
-            RenderTaskStatus::Done => [0.5, 1.0, 0.5, 1.0],
-        };
-        let _color_token = ui.push_style_color(StyleColor::Text, color);
-        ui.same_line();
-        ui.text(task.status.to_string());
-    }
+    
+    ui.child_window("Render Progress")
+        .size([-1.0, -1.0])
+    .build(ui, || {
+        let avail_width = ui.content_region_avail_width();
+        for task in &state.render_progress.tasks {
+            if task.status == RenderTaskStatus::Done { continue }
+            
+            let label_width = ui.calc_text_width(&task.label);
+            let label_x = f32::round((avail_width - item_spacing_x) * 0.5) - label_width;
+            ui.set_cursor_pos_x(label_x);
+            ui.text(&task.label);
+            
+            let color = match task.status {
+                RenderTaskStatus::NotStarted => [0.5, 0.5, 0.5, 1.0],
+                RenderTaskStatus::Rendering => ui.style_color(StyleColor::PlotHistogram),
+                RenderTaskStatus::Exporting => ui.style_color(StyleColor::PlotHistogram),
+                RenderTaskStatus::Done => [0.5, 1.0, 0.5, 1.0],
+            };
+            let _color_token = ui.push_style_color(StyleColor::Text, color);
+            ui.same_line();
+            ui.text(task.status.to_string());
+        }
+    });
 }
 
 #[derive(Clone, Copy)]
@@ -928,9 +935,13 @@ impl State {
         }
         
         let seed = MapSeed::random();
-        let first_screen_pos = screen_map.first()
-            .map(|screen| screen.position)
-            .unwrap_or((1000, 1000));
+        let sync_options = SyncOptions::default();
+        let world_sync = WorldSync::new(
+            seed,
+            &screen_map,
+            &object_defs,
+            &sync_options
+        );
         
         let render_state_lock = Arc::new(RwLock::new(RenderState {
             ini,
@@ -939,7 +950,7 @@ impl State {
             screen_map,
             seed,
             partitions,
-            world_sync: None,
+            world_sync,
             draw_options: DrawOptions::default(),
             sync_options: SyncOptions::default(),
             use_multithreaded_encoder: true,
@@ -952,7 +963,7 @@ impl State {
             render_progress: RenderProgress::default(),
             render_cancel: Arc::new(AtomicBool::new(false)),
             setup_windows: true,
-            map_state: MapState::new(first_screen_pos),
+            map_state: MapState::default(),
             partition_state: PartitionState::new(partition_members),
             drawing_state: DrawingState::default(),
             preview_state: PreviewState::default(),
