@@ -1,8 +1,8 @@
 use std::thread::JoinHandle;
-use std::{path::{Path, PathBuf}, sync::{Arc, mpsc, RwLock}};
+use std::{path::{Path, PathBuf}, sync::{Arc, atomic::{self, AtomicBool}, mpsc, RwLock}};
 use image::RgbaImage;
 use imgui_app::{Extras, Fonts, ImguiCursorExt, ImguiExt};
-use imgui_app::dear_imgui_rs::{DockBuilder, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, SplitDirection, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnWidth, TableFlags, Ui, WindowFlags};
+use imgui_app::dear_imgui_rs::{Condition, DockBuilder, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, SplitDirection, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnWidth, TableFlags, Ui, WindowFlags};
 use ksmap::drawing::DrawContext;
 use ksmap::{
     analysis::list_assets,
@@ -25,26 +25,14 @@ pub struct State {
     level_dir: PathBuf,
     setup_windows: bool,
     render_thread: Option<JoinHandle<()>>,
-    render_rx: Option<mpsc::Receiver<String>>,
+    render_rx: Option<mpsc::Receiver<RenderMessage>>,
     render_state_lock: Arc<RwLock<RenderState>>,
-    last_message: Option<String>,
+    render_progress: RenderProgress,
+    render_cancel: Arc<AtomicBool>,
     map_state: MapState,
     partition_state: PartitionState,
     drawing_state: DrawingState,
     preview_state: PreviewState,
-}
-
-struct RenderState {
-    ini: Ini,
-    object_defs: Arc<ObjectDefs>,
-    gfx: Graphics,
-    screen_map: ScreenMap,
-    seed: MapSeed,
-    partitions: Vec<Partition>,
-    world_sync: Option<WorldSync>,
-    draw_options: DrawOptions,
-    sync_options: SyncOptions,
-    use_multithreaded_encoder: bool,
 }
 
 pub enum Task {
@@ -52,37 +40,31 @@ pub enum Task {
 }
 
 pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
+    if state.render_thread.is_some() {
+        let (width, height) = ex.window.size();
+        ui.window("Main")
+            .position([0.0, 0.0], Condition::Always)
+            .size([width as f32, height as f32], Condition::Always)
+            .flags(WindowFlags::NO_TITLE_BAR | WindowFlags::NO_MOVE | WindowFlags::NO_RESIZE)
+        .build(|| {
+            build_window_progress(ui, &mut ex, state);
+        });
+        return None;
+    }
+    
     let State {
         level_dir,
         setup_windows,
         render_thread,
         render_rx,
         render_state_lock,
-        last_message,
+        render_progress,
+        render_cancel,
         map_state,
         partition_state,
         drawing_state,
         preview_state,
     } = state;
-    
-    if render_thread.is_some() {
-        let rx = render_rx.as_mut().unwrap();
-        while let Ok(message) = rx.try_recv() {
-            last_message.replace(message);
-        }
-        if let Some(message) = &last_message {
-            ui.text(format!("Rendering: {message}"));
-            if *message == "done" {
-                render_thread.take();
-                last_message.take();
-                render_rx.take();
-            }
-        }
-        else {
-            ui.text("Rendering");
-        }
-        return None;
-    }
     
     let dockspace_id = ui.dockspace_over_main_viewport();
     if *setup_windows {
@@ -125,10 +107,9 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     let Ok(mut render_state) = render_state_lock.write() else {
         return Some(Task::ShowLevelList);
     };
-    // let render_state: &mut RenderState = &mut render_state_guard;
     
     let should_go_to_level_list = ui.window("Export").build(|| {
-        build_window_export(ui, &mut ex, &mut render_state, level_dir, render_thread, render_rx, render_state_lock)
+        build_window_export(ui, &mut ex, &mut render_state, level_dir, render_thread, render_rx, render_state_lock, render_progress, render_cancel)
     }).unwrap_or_default();
     
     let mut requested_center: Option<ScreenCoord> = None;
@@ -631,19 +612,34 @@ fn build_window_export(
     render_state: &mut RenderState,
     _level_dir: &Path,
     render_thread: &mut Option<JoinHandle<()>>,
-    render_rx: &mut Option<mpsc::Receiver<String>>,
+    render_rx: &mut Option<mpsc::Receiver<RenderMessage>>,
     render_state_lock: &Arc<RwLock<RenderState>>,
+    render_progress: &mut RenderProgress,
+    render_cancel: &mut Arc<AtomicBool>,
 ) -> bool {
     let button_width = ui.window_width() * 0.65;
     let button_height = ui.text_line_height() * 2.0;
     if ui.button_with_size("Export", [button_width, button_height]) {
-        let (tx, rx) = mpsc::channel::<String>();
+        let (tx, rx) = mpsc::channel();
         let render_state_for_thread = Arc::clone(render_state_lock);
+        let render_cancel_for_thread = Arc::clone(render_cancel);
         let handle = std::thread::spawn(|| {
-            do_the_render(render_state_for_thread, tx)
+            do_the_render(render_state_for_thread, tx, render_cancel_for_thread)
         });
         render_rx.replace(rx);
         render_thread.replace(handle);
+        render_cancel.store(false, atomic::Ordering::Relaxed);
+        render_progress.tasks.clear();
+        render_progress.screens_done = 0;
+        render_progress.screens_total = 0;
+        for partition in &render_state.partitions {
+            render_progress.tasks.push(RenderTask {
+                status: RenderTaskStatus::NotStarted,
+                label: partition.bounds().to_string(),
+                n_screens: partition.len(),
+            });
+            render_progress.screens_total += partition.len();
+        }
     }
     
     ui.checkbox("Multithreaded encoding", &mut render_state.use_multithreaded_encoder);
@@ -657,10 +653,64 @@ fn build_window_export(
     }
 }
 
-fn do_the_render(render_state_lock: Arc<RwLock<RenderState>>, tx: mpsc::Sender<String>) {
+struct RenderState {
+    ini: Ini,
+    object_defs: Arc<ObjectDefs>,
+    gfx: Graphics,
+    screen_map: ScreenMap,
+    seed: MapSeed,
+    partitions: Vec<Partition>,
+    world_sync: Option<WorldSync>,
+    draw_options: DrawOptions,
+    sync_options: SyncOptions,
+    use_multithreaded_encoder: bool,
+}
+
+struct RenderTask {
+    status: RenderTaskStatus,
+    label: String,
+    n_screens: usize,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RenderTaskStatus {
+    NotStarted,
+    Rendering,
+    Exporting,
+    Done
+}
+
+impl std::fmt::Display for RenderTaskStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RenderTaskStatus::NotStarted => write!(f, "Not Started"),
+            RenderTaskStatus::Rendering => write!(f, "Rendering"),
+            RenderTaskStatus::Exporting => write!(f, "Exporting"),
+            RenderTaskStatus::Done => write!(f, "Done"),
+        }
+    }
+}
+
+#[derive(Default)]
+struct RenderProgress {
+    tasks: Vec<RenderTask>,
+    screens_done: usize,
+    screens_total: usize,
+}
+
+#[derive(PartialEq, Eq)]
+enum RenderMessage {
+    Syncing,
+    PartitionUpdate(usize, RenderTaskStatus),
+    Done,
+    Aborted,
+}
+
+fn do_the_render(render_state_lock: Arc<RwLock<RenderState>>, tx: mpsc::Sender<RenderMessage>, cancel: Arc<AtomicBool>) {
     let Ok(mut render_state) = render_state_lock.write() else { return };
     
     if render_state.world_sync.is_none() {
+        let _ = tx.send(RenderMessage::Syncing);
         render_state.world_sync = Some(WorldSync::new(
             render_state.seed,
             &render_state.screen_map,
@@ -690,11 +740,18 @@ fn do_the_render(render_state_lock: Arc<RwLock<RenderState>>, tx: mpsc::Sender<S
             PathBuf::from(".")
         };
     
-    for partition in &render_state.partitions {
-        let bounds = partition.bounds();
-        let canvas = drawing::draw_partition(draw_context, partition).unwrap();
+    for (i, partition) in render_state.partitions.iter().enumerate() {
+        if cancel.load(atomic::Ordering::Relaxed) {
+            let _ = tx.send(RenderMessage::Aborted);
+            return;
+        }
         
-        let _ = tx.send(bounds.to_string());
+        let bounds = partition.bounds();
+        let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Rendering));
+        
+        let canvas = drawing::draw_partition(draw_context, partition).unwrap();
+
+        let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Exporting));
         
         let file_name = format!("{bounds}.png");
         let path = output_dir.join(file_name);
@@ -705,9 +762,60 @@ fn do_the_render(render_state_lock: Arc<RwLock<RenderState>>, tx: mpsc::Sender<S
         else {
             drawing::export_canvas(canvas, path.as_ref()).unwrap();
         }
+        
+        let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Done));
     }
+
+    let _ = tx.send(RenderMessage::Done);
+}
+
+fn build_window_progress(ui: &Ui, _ex: &mut Extras, state: &mut State) {
+    let rx = state.render_rx.as_mut().unwrap();
+    while let Ok(message) = rx.try_recv() {
+        match message {
+            RenderMessage::Syncing => {},
+            RenderMessage::PartitionUpdate(i, progress) => {
+                state.render_progress.tasks[i].status = progress;
+                if progress == RenderTaskStatus::Done {
+                    state.render_progress.screens_done += state.render_progress.tasks[i].n_screens;
+                }
+            }
+            RenderMessage::Done | RenderMessage::Aborted => {
+                state.render_thread.take();
+                state.render_rx.take();
+                break;
+            }
+        }
+    }
+
+    let item_spacing_x = unsafe { ui.style().item_spacing()[0] };
+    let avail_width = ui.content_region_avail_width();
+    let progress_bar_width = avail_width * (10.0 / 12.0) - item_spacing_x;
+    let percent_done = state.render_progress.screens_done as f32 / state.render_progress.screens_total as f32;
+    ui.progress_bar(percent_done)
+        .size([progress_bar_width, 0.0])
+        .build();
     
-    let _ = tx.send(String::from("done"));
+    ui.same_line();
+    if ui.button_with_size("Cancel", [-1.0, 0.0]) {
+        state.render_cancel.store(true, atomic::Ordering::Relaxed);
+    }
+
+    for task in &state.render_progress.tasks {
+        if task.status == RenderTaskStatus::Done { continue; }
+        let label_width = ui.calc_text_width(&task.label);
+        ui.set_cursor_pos_x(f32::round((avail_width - item_spacing_x) * 0.5) - label_width);
+        ui.text(&task.label);
+        let color = match task.status {
+            RenderTaskStatus::NotStarted => [0.5, 0.5, 0.5, 1.0],
+            RenderTaskStatus::Rendering => ui.style_color(StyleColor::PlotHistogram),
+            RenderTaskStatus::Exporting => ui.style_color(StyleColor::PlotHistogram),
+            RenderTaskStatus::Done => [0.5, 1.0, 0.5, 1.0],
+        };
+        let _color_token = ui.push_style_color(StyleColor::Text, color);
+        ui.same_line();
+        ui.text(task.status.to_string());
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -841,7 +949,8 @@ impl State {
             level_dir,
             render_state_lock,
             render_rx: None,
-            last_message: None,
+            render_progress: RenderProgress::default(),
+            render_cancel: Arc::new(AtomicBool::new(false)),
             setup_windows: true,
             map_state: MapState::new(first_screen_pos),
             partition_state: PartitionState::new(partition_members),
