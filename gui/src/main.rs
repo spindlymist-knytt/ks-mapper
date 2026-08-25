@@ -5,6 +5,7 @@ mod screens {
     pub mod startup_error;
     pub mod level_list;
     pub mod level_map;
+    pub mod loading;
 }
 mod map_widget;
 
@@ -25,6 +26,7 @@ struct App {
 enum Screen {
     StartupError(startup_error::State),
     LevelList(level_list::State),
+    Loading(loading::State),
     LevelMap(level_map::State),
 }
 
@@ -56,8 +58,22 @@ fn main() -> Result<()> {
             Screen::StartupError(state) => startup_error::build_ui(ui, ex, state),
             Screen::LevelList(state) => match level_list::build_ui(ui, ex, state) {
                 Some(level_dir) => {
-                    let state = level_map::State::new(level_dir);
+                    let state = loading::State::new(level_dir);
+                    app.screen = Screen::Loading(state);
+                }
+                None => {}
+            }
+            Screen::Loading(state) => match loading::build_ui(ui, ex, state) {
+                Some(loading::Task::ShowLevelMap {
+                    level_dir,
+                    render_state
+                }) => {
+                    let state = level_map::State::new(level_dir, render_state);
                     app.screen = Screen::LevelMap(state);
+                }
+                Some(loading::Task::ShowLevelList) => {
+                    let state = level_list::State::new(&app.ks_dir);
+                    app.screen = Screen::LevelList(state);
                 }
                 None => {}
             }
@@ -81,8 +97,8 @@ fn init_app() -> App {
     let screen = match arg {
         Some(Ok(PathArg::WorldPath(world_dir))) => {
             ks_dir = world_dir.join("../..");
-            let state = level_map::State::new(world_dir);
-            Screen::LevelMap(state)
+            let state = loading::State::new(world_dir);
+            Screen::Loading(state)
         }
         Some(Ok(PathArg::KsPath(path))) => {
             let state = level_list::State::new(&path);

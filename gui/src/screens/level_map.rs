@@ -26,7 +26,7 @@ pub struct State {
     setup_windows: bool,
     render_thread: Option<JoinHandle<()>>,
     render_rx: Option<mpsc::Receiver<RenderMessage>>,
-    render_state_lock: Arc<RwLock<RenderState>>,
+    render_state_lock: RenderStateLock,
     render_progress: RenderProgress,
     render_cancel: Arc<AtomicBool>,
     map_state: MapState,
@@ -621,7 +621,7 @@ fn build_window_export(
     _level_dir: &Path,
     render_thread: &mut Option<JoinHandle<()>>,
     render_rx: &mut Option<mpsc::Receiver<RenderMessage>>,
-    render_state_lock: &Arc<RwLock<RenderState>>,
+    render_state_lock: &RenderStateLock,
     render_progress: &mut RenderProgress,
     render_cancel: &mut Arc<AtomicBool>,
 ) -> bool {
@@ -661,18 +661,19 @@ fn build_window_export(
     }
 }
 
-struct RenderState {
-    ini: Ini,
-    object_defs: Arc<ObjectDefs>,
-    gfx: Graphics,
-    screen_map: ScreenMap,
-    seed: MapSeed,
-    partitions: Vec<Partition>,
-    world_sync: WorldSync,
-    draw_options: DrawOptions,
-    sync_options: SyncOptions,
-    use_multithreaded_encoder: bool,
+pub struct RenderState {
+    pub ini: Ini,
+    pub object_defs: Arc<ObjectDefs>,
+    pub gfx: Graphics,
+    pub screen_map: ScreenMap,
+    pub seed: MapSeed,
+    pub partitions: Vec<Partition>,
+    pub world_sync: WorldSync,
+    pub draw_options: DrawOptions,
+    pub sync_options: SyncOptions,
+    pub use_multithreaded_encoder: bool,
 }
+pub type RenderStateLock = Arc<RwLock<RenderState>>;
 
 struct RenderTask {
     status: RenderTaskStatus,
@@ -713,7 +714,7 @@ enum RenderMessage {
     Aborted,
 }
 
-fn do_the_render(render_state_lock: Arc<RwLock<RenderState>>, tx: mpsc::Sender<RenderMessage>, cancel: Arc<AtomicBool>) {
+fn do_the_render(render_state_lock: RenderStateLock, tx: mpsc::Sender<RenderMessage>, cancel: Arc<AtomicBool>) {
     let Ok(render_state) = render_state_lock.read() else { return };    
     let draw_context = DrawContext {
         seed: render_state.seed,
@@ -889,76 +890,17 @@ fn bytes_to_string(bytes: usize, precision: usize) -> String {
 }
 
 impl State {
-    pub fn new(level_dir: PathBuf) -> Self {    
-        let screens = map_bin::parse_map_file(level_dir.join("Map.bin")).unwrap();
-        let screen_map = ScreenMap::new(screens);
-        let ini = world_ini::load_ini_from_dir(&level_dir).unwrap();
-        
-        let object_defs_path = {
-            let mut current_dir = std::env::current_exe()
-                .unwrap_or_else(|_| PathBuf::new());
-            current_dir.set_file_name("ksmap_data/object_definitions.toml");
-            current_dir
-        };
-        let object_defs = {
-            let mut defs = definitions::load_object_defs(object_defs_path).unwrap();
-            definitions::insert_custom_obj_defs(&mut defs, &ini);
-            Arc::new(defs)
-        };
-        
-        let data_dir = level_dir.join("../../Data");
-        let templates_dir = {
-            let mut current_dir = std::env::current_exe()
-                .unwrap_or_else(|_| PathBuf::new());
-            current_dir.set_file_name("ksmap_data/templates");
-            current_dir
-        };
-        let mut gfx = Graphics::new(data_dir, level_dir.clone(), templates_dir, Arc::clone(&object_defs));
-        
-        let assets = list_assets(screen_map.as_slice(), &object_defs);
-        let mut warnings = Vec::new();
-        gfx.load_tilesets(&assets.tilesets, &mut warnings).unwrap();
-        gfx.load_gradients(&assets.gradients, &mut warnings).unwrap();
-        gfx.load_objects(&assets.objects, &mut warnings).unwrap();
-        
-        let partitioner = IslandsPartitioner {
-            max_size: (120, 300),
-            gap: 1..=10,
-            force: false,
-        };
-        let partitions = partitioner.partitions(&screen_map);
+    pub fn new(level_dir: PathBuf, render_state: RenderState) -> Self {    
         let mut partition_members = FxHashMap::default();
-        for (i, positions) in partitions.iter().enumerate() {
+        for (i, positions) in render_state.partitions.iter().enumerate() {
             for pos in positions {
                 partition_members.insert(*pos, i);
             }
         }
         
-        let seed = MapSeed::random();
-        let sync_options = SyncOptions::default();
-        let world_sync = WorldSync::new(
-            seed,
-            &screen_map,
-            &object_defs,
-            &sync_options
-        );
-        
-        let render_state_lock = Arc::new(RwLock::new(RenderState {
-            ini,
-            object_defs,
-            gfx,
-            screen_map,
-            seed,
-            partitions,
-            world_sync,
-            draw_options: DrawOptions::default(),
-            sync_options: SyncOptions::default(),
-            use_multithreaded_encoder: true,
-        }));
-        
         State {
             level_dir,
-            render_state_lock,
+            render_state_lock: Arc::new(RwLock::new(render_state)),
             render_rx: None,
             render_progress: RenderProgress::default(),
             render_cancel: Arc::new(AtomicBool::new(false)),
