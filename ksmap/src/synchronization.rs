@@ -35,6 +35,7 @@ pub struct Limiter {
     chosen: Vec<usize>,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SyncOptions {
     pub maximize_visible_lasers: bool,
 }

@@ -61,7 +61,7 @@ struct ScreenContext<'a> {
     opts: DrawOptions,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct DrawOptions {
     pub show_invisible: bool,
     pub show_proximity: bool,

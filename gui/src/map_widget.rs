@@ -10,6 +10,7 @@ pub struct MapState {
     pub bias: (f32, f32),
     pub aspect_ratio: f32,
     pub prev_geom: Option<MapGeometry>,
+    pub selected_screen: Option<ScreenCoord>,
 }
 
 impl Default for MapState {
@@ -21,6 +22,7 @@ impl Default for MapState {
             bias: (0.0, 0.0),
             aspect_ratio: 1.0,
             prev_geom: None,
+            selected_screen: None,
         }
     }
 }
@@ -206,6 +208,18 @@ pub fn build_map(
             draw_rect_relative(top_left, bottom_right, highlight_color, false);
         }
     };
+    let draw_indicator = |(x, y), color| {
+        let cell_pos = calc_cell_pos((x, y), &geom);
+        let top_left = [
+            cell_pos[0] + line_thickness,
+            cell_pos[1] + line_thickness,
+        ];
+        let bottom_right = [
+            top_left[0] + cell_width,
+            top_left[1] + cell_height,
+        ];
+        draw_rect_relative(top_left, bottom_right, color, false);
+    };
     
     // Now, we either iterate over screens (and check if they're on the map), or iterate over map cells
     // (and check if they contain a screen), whichever takes fewer iterations.
@@ -239,21 +253,36 @@ pub fn build_map(
         draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
     }
     
-    // Hover indicator
+    // Hover and selection indicator
     if ui.is_window_hovered() {
         let mouse_pos = screen_to_relative_coords(ui.mouse_pos());
         let hovered_screen_pos = get_hovered_screen_pos(mouse_pos, &geom);
         
-        let cell_pos = calc_cell_pos(hovered_screen_pos, &geom);
-        let top_left = [
-            cell_pos[0] + line_thickness,
-            cell_pos[1] + line_thickness,
+        if ui.is_mouse_clicked(MouseButton::Left) {
+            if screens.index_of(&hovered_screen_pos).is_some()
+                && map_state.selected_screen != Some(hovered_screen_pos)
+            {
+                map_state.selected_screen = Some(hovered_screen_pos);
+            }
+            else {
+                map_state.selected_screen = None;
+            }
+        }
+        
+        if let Some(selected_pos) = &map_state.selected_screen {
+            draw_indicator(*selected_pos, [1.0, 1.0, 0.0, 1.0]);
+        }
+        
+        let hovered_cell_pos = calc_cell_pos(hovered_screen_pos, &geom);
+        let hovered_top_left = [
+            hovered_cell_pos[0] + line_thickness,
+            hovered_cell_pos[1] + line_thickness,
         ];
-        let bottom_right = [
-            top_left[0] + cell_width,
-            top_left[1] + cell_height,
+        let hovered_bottom_right = [
+            hovered_top_left[0] + cell_width,
+            hovered_top_left[1] + cell_height,
         ];
-        draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
+        draw_rect_relative(hovered_top_left, hovered_bottom_right, [1.0, 1.0, 1.0, 1.0], false);
         
         // Zoom
         let wheel_delta = ui.get_mouse_wheel();
@@ -265,8 +294,8 @@ pub fn build_map(
             // The general idea here is to keep the point the mouse is hovering over in the same position as we zoom
             // We start by converting the pixel position to a proportion that is agnostic to the zoom level
             let mouse_pos_within_cell = [
-                mouse_pos[0] - top_left[0],
-                mouse_pos[1] - top_left[1]
+                mouse_pos[0] - hovered_top_left[0],
+                mouse_pos[1] - hovered_top_left[1]
             ];
             let mouse_pos_within_cell_proportion = [
                 mouse_pos_within_cell[0] / geom.cell_outer_width,
@@ -307,6 +336,10 @@ pub fn build_map(
         }
         
         Some(hovered_screen_pos)
+    }
+    else if let Some(selected_pos) = &map_state.selected_screen {
+        draw_indicator(*selected_pos, [1.0, 1.0, 0.0, 1.0]);
+        None
     }
     else {
         None

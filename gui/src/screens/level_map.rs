@@ -5,7 +5,6 @@ use imgui_app::{Extras, Fonts, ImguiCursorExt, ImguiExt};
 use imgui_app::dear_imgui_rs::{Condition, DockBuilder, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, SplitDirection, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnWidth, TableFlags, Ui, WindowFlags};
 use ksmap::drawing::DrawContext;
 use ksmap::{
-    analysis::list_assets,
     definitions::ObjectDefs,
     drawing::{self, alpha_to_trans, DrawOptions, TintStrategy},
     graphics::Graphics,
@@ -13,9 +12,9 @@ use ksmap::{
     seed::MapSeed,
     synchronization::{SyncOptions, WorldSync},
 };
-use libks::{ScreenCoord, map_bin, world_ini};
+use libks::ScreenCoord;
 use libks_ini::edit::Ini;
-use ksmap::{definitions, screen_map::ScreenMap};
+use ksmap::screen_map::ScreenMap;
 use rustc_hash::FxHashMap;
 
 use crate::{map_widget::{build_map, MapState, map_get_center_screen}, ui_extensions::UiExt};
@@ -148,15 +147,18 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         requested_center = Some(partition_center);
     }
     
-    let invalidate_world_sync = ui.window("Drawing").build(|| {
+    let invalidations = ui.window("Drawing").build(|| {
         let RenderState { draw_options, sync_options, seed, .. } = &mut *render_state;
         build_window_drawing(ui, &mut ex,
             drawing_state,
             draw_options,
             sync_options,
             seed)
-    }).unwrap_or(false);
-    if invalidate_world_sync {
+    }).unwrap_or_default();
+    if invalidations.preview {
+        preview_state.preview = None;
+    }
+    if invalidations.world_sync {
         render_state.world_sync = WorldSync::new(
             render_state.seed,
             &render_state.screen_map,
@@ -183,7 +185,14 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     };
     
     ui.window("Preview").build(|| {
-        build_window_preview(ui, &mut ex, preview_state, &mut render_state, hover_pos);
+        let preview_screen =
+            if map_state.selected_screen.is_some() {
+                map_state.selected_screen.clone()
+            }
+            else {
+                hover_pos
+            };
+        build_window_preview(ui, &mut ex, preview_state, &mut render_state, preview_screen);
     });
     
     if should_go_to_level_list {
@@ -438,8 +447,8 @@ struct PreviewState {
     preview: Option<(ScreenCoord, u64)>,
 }
 
-fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewState, render_state: &mut RenderState, hover_pos: Option<ScreenCoord>) { 
-    let Some(pos) = hover_pos else {
+fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewState, render_state: &mut RenderState, screen_pos: Option<ScreenCoord>) { 
+    let Some(pos) = screen_pos else {
         ui.text("Mouse over the map to preview a screen");
         return;
     };
@@ -501,6 +510,12 @@ impl Default for DrawingState {
     }
 }
 
+#[derive(Default)]
+struct Invalidations {
+    world_sync: bool,
+    preview: bool,
+}
+
 fn build_window_drawing(
     ui: &Ui,
     _ex: &mut Extras,
@@ -508,8 +523,10 @@ fn build_window_drawing(
     draw_options: &mut DrawOptions,
     sync_options: &mut SyncOptions,
     seed: &mut MapSeed,
-) -> bool {
-    let mut invalidate_world_sync = false;
+) -> Invalidations {
+    let original_seed = seed.clone();
+    let original_draw_options = draw_options.clone();
+    let original_sync_options = sync_options.clone();
     
     let mut seed_buffer = seed.to_string();
     if InputText::new(ui, "Seed", &mut seed_buffer)
@@ -519,14 +536,12 @@ fn build_window_drawing(
     {
         if let Ok(new_seed) = MapSeed::try_from(seed_buffer) {
             *seed = new_seed;
-            invalidate_world_sync = true;
         }
     }
     
     ui.same_line();
     if ui.small_button("Random") {
         *seed = MapSeed::random();
-        invalidate_world_sync = true;
     }
     
     let mut lasers_index = match (draw_options.ignore_laser_phase, sync_options.maximize_visible_lasers) {
@@ -543,12 +558,10 @@ fn build_window_drawing(
             0 => {
                 draw_options.ignore_laser_phase = false;
                 sync_options.maximize_visible_lasers = true;
-                invalidate_world_sync = true;
             }
             1 => {
                 draw_options.ignore_laser_phase = false;
                 sync_options.maximize_visible_lasers = false;
-                invalidate_world_sync = true;
             }
             2 => {
                 draw_options.ignore_laser_phase = true;
@@ -600,7 +613,20 @@ fn build_window_drawing(
     ui.checkbox("Show invisible objects", &mut draw_options.show_invisible);
     ui.checkbox("Show proximity-sensitive objects", &mut draw_options.show_proximity);
     
-    invalidate_world_sync
+    let mut invalidations = Invalidations::default();
+    if *draw_options != original_draw_options {
+        invalidations.preview = true;
+    }
+    if *sync_options != original_sync_options {
+        invalidations.preview = true;
+        invalidations.world_sync = true;
+    }
+    if *seed != original_seed {
+        invalidations.preview = true;
+        invalidations.world_sync = true;
+    }
+    
+    invalidations
 }
 
 struct MapSeedEditCallback(usize);
