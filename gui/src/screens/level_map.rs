@@ -1,5 +1,5 @@
 use std::thread::JoinHandle;
-use std::{path::{Path, PathBuf}, sync::{Arc, atomic::{self, AtomicBool}, mpsc, RwLock}};
+use std::{path::PathBuf, sync::{Arc, atomic::{self, AtomicBool}, mpsc, RwLock}};
 use image::RgbaImage;
 use imgui_app::{Extras, Fonts, ImguiCursorExt, ImguiExt};
 use imgui_app::dear_imgui_rs::{Condition, DockBuilder, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, SplitDirection, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnWidth, TableFlags, Ui, WindowFlags};
@@ -245,9 +245,10 @@ enum PartitionAlgorithm {
 }
 
 fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut PartitionState, render_state: &mut RenderState) -> Option<usize> {
-    let button_width = ui.window_width() * 0.65;
+    let group = ui.widget_group_begin();
+    
     let button_height = ui.text_line_height() * 2.0;
-    if ui.button_with_size("Rebuild partitions", [button_width, button_height]) {
+    if ui.button_with_size("Rebuild partitions", [-1.0, button_height]) {
         let max_size = (partition_state.max_width as u64, partition_state.max_height as u64);
         render_state.partitions = match partition_state.algorithm {
             PartitionAlgorithm::Islands => {
@@ -278,25 +279,26 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut Parti
         }
     }
     
-    {
-        let mut index = partition_state.algorithm as usize;
-        ui.combo_simple_string("Algorithm", &mut index, &["Islands", "Grid"]);
-        partition_state.algorithm = match index {
-            0 => PartitionAlgorithm::Islands,
-            1 => PartitionAlgorithm::Grid,
-            _ => PartitionAlgorithm::Islands
-        };
-    }
+    let mut algo_index = partition_state.algorithm as usize;
+    ui.widget_group_label("Algorithm");
+    ui.combo_simple_string("##Algorithm", &mut algo_index, &["Islands", "Grid"]);
+    partition_state.algorithm = match algo_index {
+        0 => PartitionAlgorithm::Islands,
+        1 => PartitionAlgorithm::Grid,
+        _ => PartitionAlgorithm::Islands
+    };
     
     let max_width_px = partition_state.max_width * 600;
-    ui.drag_int_config("Max width")
+    ui.widget_group_label("Max width");
+    ui.drag_int_config("##MaxWidth")
         .range(1, i32::MAX)
         .speed(0.1)
         .display_format(format!("%d screens / {max_width_px}px"))
         .build(ui, &mut partition_state.max_width);
     
     let max_height_px = partition_state.max_height * 240;
-    ui.drag_int_config("Max height")
+    ui.widget_group_label("Max height");
+    ui.drag_int_config("##MaxHeight")
         .range(1, i32::MAX)
         .speed(0.1)
         .display_format(format!("%d screens / {max_height_px}px"))
@@ -306,8 +308,10 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut Parti
         let max_bytes = max_width_px as usize * max_height_px as usize * 4;
         let unit = best_unit_for_bytes(max_bytes);
         let mut max_size = convert_bytes_to_unit(max_bytes, unit);
+        
+        ui.widget_group_label("Max memory");
         let _disabled = ui.begin_disabled();
-        ui.drag_float_config("Max memory")
+        ui.drag_float_config("##MaxMemory")
             .display_format(format!("%.1f{unit}"))
             .build(ui, &mut max_size);
     }
@@ -317,44 +321,56 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut Parti
         PartitionAlgorithm::Grid => build_partition_options_grid(ui, partition_state),
     };
     
+    drop(group);
+    
     ui.new_line();
     build_partition_table(ui, ex.fonts, &render_state.partitions, &mut partition_state.selected)
 }
 
 fn build_partition_options_islands(ui: &Ui, state: &mut PartitionState) {
-    ui.drag_int_config("Min gap")
+    ui.widget_group_label("Min gap");
+    ui.drag_int_config("##MinGap")
         .range(1, i32::MAX)
         .speed(0.05)
         .build(ui, &mut state.min_gap);
+
     state.max_gap = state.max_gap.max(state.min_gap);
-    ui.drag_int_config("Max gap")
+    ui.widget_group_label("Max gap");
+    ui.drag_int_config("##MaxGap")
         .range(state.min_gap, i32::MAX)
         .speed(0.05)
         .build(ui, &mut state.max_gap);
+
     ui.checkbox("Force gap size", &mut state.force);
 }
 
 fn build_partition_options_grid(ui: &Ui, state: &mut PartitionState) {
+    let inner_spacing_x = unsafe { ui.style().item_inner_spacing()[0] };
+    let checkbox_width = ui.calc_checkbox_width("Auto");
+    
+    ui.widget_group_label("Rows");
     {
         let _disabled = ui.begin_disabled_with_cond(state.auto_rows);
-        ui.drag_int_config("Rows")
+        ui.set_next_item_width(-checkbox_width - inner_spacing_x);
+        ui.drag_int_config("##Rows")
             .range(1, i32::MAX)
             .speed(0.05)
             .build(ui, &mut state.rows);
     }
-    ui.same_line();
-    ui.move_cursor_right(ui.calc_text_width("Columns") - ui.calc_text_width("Rows"));
-    ui.checkbox_small("Auto##Auto rows", &mut state.auto_rows);
+    ui.same_line_with_spacing(0.0, inner_spacing_x);
+    ui.checkbox("Auto##AutoRows", &mut state.auto_rows);
     
+    ui.widget_group_label("Cols");
     {
         let _disabled = ui.begin_disabled_with_cond(state.auto_cols);
-        ui.drag_int_config("Columns")
+        ui.set_next_item_width(-checkbox_width - inner_spacing_x);
+        ui.drag_int_config("##Columns")
             .range(state.min_gap, i32::MAX)
             .speed(0.05)
             .build(ui, &mut state.cols);
     }
-    ui.same_line();
-    ui.checkbox_small("Auto##Auto cols", &mut state.auto_cols);
+    ui.same_line_with_spacing(0.0, inner_spacing_x);
+    ui.checkbox("Auto##AutoCols", &mut state.auto_cols);
     
     ui.checkbox("Force rows and columns", &mut state.force);
 }
@@ -528,8 +544,15 @@ fn build_window_drawing(
     let original_draw_options = draw_options.clone();
     let original_sync_options = sync_options.clone();
     
+    let _group = ui.widget_group_begin();
+    
     let mut seed_buffer = seed.to_string();
-    if InputText::new(ui, "Seed", &mut seed_buffer)
+    let label_width = ui.calc_text_width("Seed");
+    let button_width = ui.calc_button_width("Random");
+    let inner_spacing_x = unsafe { ui.style().item_inner_spacing()[0] };
+    ui.widget_group_label("Seed");
+    ui.set_next_item_width(-button_width - inner_spacing_x);
+    if InputText::new(ui, "##Seed", &mut seed_buffer)
         .flags(InputTextFlags::CHARS_HEXADECIMAL | InputTextFlags::CALLBACK_EDIT)
         .callback(MapSeedEditCallback(16))
         .build()
@@ -539,8 +562,8 @@ fn build_window_drawing(
         }
     }
     
-    ui.same_line();
-    if ui.small_button("Random") {
+    ui.same_line_with_spacing(0.0, inner_spacing_x);
+    if ui.button("Random") {
         *seed = MapSeed::random();
     }
     
@@ -549,7 +572,8 @@ fn build_window_drawing(
         (false, false) => 1,
         (true, _) => 2
     };
-    if ui.combo_simple_string("Lasers", &mut lasers_index, &[
+    ui.widget_group_label("Lasers");
+    if ui.combo_simple_string("##Lasers", &mut lasers_index, &[
         "Maximize",
         "Randomize",
         "All"
@@ -574,7 +598,8 @@ fn build_window_drawing(
         TintStrategy::Ignore => 0,
         TintStrategy::Explicit => 1
     };
-    if ui.combo_simple_string("Tints", &mut tint_index, &[
+    ui.widget_group_label("Tints");
+    if ui.combo_simple_string("##Tints", &mut tint_index, &[
         "Ignore",
         "Explicit"
     ]) {
@@ -585,7 +610,8 @@ fn build_window_drawing(
         }
     }
     
-    if ui.drag_int_config("Min alpha")
+    ui.widget_group_label("Min alpha");
+    if ui.drag_int_config("##MinAlpha")
         .range(0, 255)
         .speed(0.1)
         .build(ui, &mut state.min_alpha)
@@ -593,7 +619,8 @@ fn build_window_drawing(
         draw_options.trans_max_override = alpha_to_trans(state.min_alpha as u8);
     }
     
-    if ui.drag_int_config("Min alpha threshold")
+    ui.widget_group_label("Min alpha threshold");
+    if ui.drag_int_config("##AlphaThreshold")
         .range(0, i32::MAX)
         .speed(0.1)
         .build(ui, &mut state.min_alpha_threshold)
@@ -602,7 +629,8 @@ fn build_window_drawing(
     }
     
     let alpha_sim_secs = state.alpha_sim_frames as f32 / 50.0;
-    if ui.drag_int_config("Alpha sim frames")
+    ui.widget_group_label("Alpha sim frames");
+    if ui.drag_int_config("##AlphaFrames")
         .range(0, i32::MAX)
         .display_format(format!("%d / {alpha_sim_secs:.1}s"))
         .build(ui, &mut state.alpha_sim_frames)
@@ -678,9 +706,10 @@ fn build_window_export(
     render_progress: &mut RenderProgress,
     render_cancel: &mut Arc<AtomicBool>,
 ) -> bool {
-    let button_width = ui.window_width() * 0.65;
+    let _group = ui.widget_group_begin();
+    
     let button_height = ui.text_line_height() * 2.0;
-    if ui.button_with_size("Export", [button_width, button_height]) {
+    if ui.button_with_size("Export", [-1.0, button_height]) {
         let (tx, rx) = mpsc::channel();
         let render_state_for_thread = Arc::clone(render_state_lock);
         let render_cancel_for_thread = Arc::clone(render_cancel);
@@ -705,12 +734,11 @@ fn build_window_export(
     }
     
     {
-        let frame_padding_x = unsafe { ui.style().frame_padding()[0] };
-        let spacing_x = unsafe { ui.style().item_inner_spacing()[0] };
-        let _token = ui.push_style_var(StyleVar::ItemSpacing([spacing_x, spacing_x]));
-        let browse_button_width = ui.calc_text_width("Browse") + frame_padding_x * 2.0;
-        let input_width = button_width - spacing_x - browse_button_width;
-        ui.set_next_item_width(input_width);
+        ui.widget_group_label("Output dir");
+        
+        let inner_spacing_x = unsafe { ui.style().item_inner_spacing()[0] };
+        let button_width = ui.calc_button_width("Browse");
+        ui.set_next_item_width(-button_width - inner_spacing_x);
         
         let mut path_buffer = export_state.output_dir.display().to_string();
         if ui.input_text("##OutputDir", &mut path_buffer)
@@ -720,7 +748,7 @@ fn build_window_export(
             export_state.output_dir.push(path_buffer);
         }
         
-        ui.same_line();
+        ui.same_line_with_spacing(0.0, inner_spacing_x);
         if ui.button("Browse") {
             if let Some(path) = rfd::FileDialog::new()
                 .set_directory(&export_state.output_dir)
@@ -729,13 +757,13 @@ fn build_window_export(
                 export_state.output_dir = path;
             }
         }
-        
-        ui.same_line();
-        ui.text("Output directory");
     }
     
-    ui.input_text("Subdirectory name", &mut export_state.subdir_spec).build();
-    ui.input_text("Partition name", &mut export_state.partition_spec).build();
+    ui.widget_group_label("Subdirectory name");
+    ui.input_text("##SubdirectoryName", &mut export_state.subdir_spec).build();
+    
+    ui.widget_group_label("Partition name");
+    ui.input_text("##PartitionName", &mut export_state.partition_spec).build();
     
     ui.checkbox("Don't create subdirectory", &mut export_state.no_subdir);
     ui.checkbox("Don't create subdirectory for single partition", &mut export_state.no_subdir_for_single);
