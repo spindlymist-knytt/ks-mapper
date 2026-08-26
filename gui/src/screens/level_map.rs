@@ -17,17 +17,17 @@ use libks_ini::edit::Ini;
 use ksmap::screen_map::ScreenMap;
 use rustc_hash::FxHashMap;
 
+use crate::name_pattern::{self, NamePattern};
 use crate::{map_widget::{build_map, MapState, map_get_center_screen}, ui_extensions::UiExt};
 
 pub struct State {
-    #[allow(dead_code)]
-    level_dir: PathBuf,
     setup_windows: bool,
     render_thread: Option<JoinHandle<()>>,
     render_rx: Option<mpsc::Receiver<RenderMessage>>,
     render_state_lock: RenderStateLock,
     render_progress: RenderProgress,
     render_cancel: Arc<AtomicBool>,
+    export_state: ExportState,
     map_state: MapState,
     partition_state: PartitionState,
     drawing_state: DrawingState,
@@ -52,13 +52,13 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     }
     
     let State {
-        level_dir,
         setup_windows,
         render_thread,
         render_rx,
         render_state_lock,
         render_progress,
         render_cancel,
+        export_state,
         map_state,
         partition_state,
         drawing_state,
@@ -108,7 +108,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     };
     
     let should_go_to_level_list = ui.window("Export").build(|| {
-        build_window_export(ui, &mut ex, &mut render_state, level_dir, render_thread, render_rx, render_state_lock, render_progress, render_cancel)
+        build_window_export(ui, &mut ex, export_state, &mut render_state, render_thread, render_rx, render_state_lock, render_progress, render_cancel)
     }).unwrap_or_default();
     
     let mut requested_center: Option<ScreenCoord> = None;
@@ -629,6 +629,33 @@ fn build_window_drawing(
     invalidations
 }
 
+#[derive(Default, Clone)]
+struct ExportState {
+    level_dir: PathBuf,
+    output_dir: PathBuf,
+    subdir_spec: String,
+    partition_spec: String,
+    no_subdir: bool,
+    no_subdir_for_single: bool,
+    use_subdir_name_for_single: bool,
+    use_multithreaded_encoder: bool,
+}
+
+impl ExportState {
+    pub fn new(level_dir: PathBuf) -> Self {
+        Self {
+            level_dir,
+            output_dir: std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
+            subdir_spec: String::from("$author - $name"),
+            partition_spec: String::from("$bounds"),
+            no_subdir: false,
+            no_subdir_for_single: true,
+            use_subdir_name_for_single: true,
+            use_multithreaded_encoder: true,
+        }
+    }
+}
+
 struct MapSeedEditCallback(usize);
 
 impl InputTextCallbackHandler for MapSeedEditCallback {
@@ -643,8 +670,8 @@ impl InputTextCallbackHandler for MapSeedEditCallback {
 fn build_window_export(
     ui: &Ui,
     _ex: &mut Extras,
+    export_state: &mut ExportState,
     render_state: &mut RenderState,
-    _level_dir: &Path,
     render_thread: &mut Option<JoinHandle<()>>,
     render_rx: &mut Option<mpsc::Receiver<RenderMessage>>,
     render_state_lock: &RenderStateLock,
@@ -657,8 +684,9 @@ fn build_window_export(
         let (tx, rx) = mpsc::channel();
         let render_state_for_thread = Arc::clone(render_state_lock);
         let render_cancel_for_thread = Arc::clone(render_cancel);
+        let export_state_for_thread = export_state.clone();
         let handle = std::thread::spawn(|| {
-            do_the_render(render_state_for_thread, tx, render_cancel_for_thread)
+            do_the_render(render_state_for_thread, export_state_for_thread, tx, render_cancel_for_thread)
         });
         render_rx.replace(rx);
         render_thread.replace(handle);
@@ -676,7 +704,43 @@ fn build_window_export(
         }
     }
     
-    ui.checkbox("Multithreaded encoding", &mut render_state.use_multithreaded_encoder);
+    {
+        let frame_padding_x = unsafe { ui.style().frame_padding()[0] };
+        let spacing_x = unsafe { ui.style().item_inner_spacing()[0] };
+        let _token = ui.push_style_var(StyleVar::ItemSpacing([spacing_x, spacing_x]));
+        let browse_button_width = ui.calc_text_width("Browse") + frame_padding_x * 2.0;
+        let input_width = button_width - spacing_x - browse_button_width;
+        ui.set_next_item_width(input_width);
+        
+        let mut path_buffer = export_state.output_dir.display().to_string();
+        if ui.input_text("##OutputDir", &mut path_buffer)
+            .build()
+        {
+            export_state.output_dir.clear();
+            export_state.output_dir.push(path_buffer);
+        }
+        
+        ui.same_line();
+        if ui.button("Browse") {
+            if let Some(path) = rfd::FileDialog::new()
+                .set_directory(&export_state.output_dir)
+                .pick_folder()
+            {
+                export_state.output_dir = path;
+            }
+        }
+        
+        ui.same_line();
+        ui.text("Output directory");
+    }
+    
+    ui.input_text("Subdirectory name", &mut export_state.subdir_spec).build();
+    ui.input_text("Partition name", &mut export_state.partition_spec).build();
+    
+    ui.checkbox("Don't create subdirectory", &mut export_state.no_subdir);
+    ui.checkbox("Don't create subdirectory for single partition", &mut export_state.no_subdir_for_single);
+    ui.checkbox("Use subdirectory name for single partition", &mut export_state.use_subdir_name_for_single);
+    ui.checkbox("Multithreaded encoding", &mut export_state.use_multithreaded_encoder);
     
     ui.new_line();
     if ui.small_button("Open another level") {
@@ -697,7 +761,6 @@ pub struct RenderState {
     pub world_sync: WorldSync,
     pub draw_options: DrawOptions,
     pub sync_options: SyncOptions,
-    pub use_multithreaded_encoder: bool,
 }
 pub type RenderStateLock = Arc<RwLock<RenderState>>;
 
@@ -740,7 +803,7 @@ enum RenderMessage {
     Aborted,
 }
 
-fn do_the_render(render_state_lock: RenderStateLock, tx: mpsc::Sender<RenderMessage>, cancel: Arc<AtomicBool>) {
+fn do_the_render(render_state_lock: RenderStateLock, export_state: ExportState, tx: mpsc::Sender<RenderMessage>, cancel: Arc<AtomicBool>) {
     let Ok(render_state) = render_state_lock.read() else { return };    
     let draw_context = DrawContext {
         seed: render_state.seed,
@@ -752,15 +815,30 @@ fn do_the_render(render_state_lock: RenderStateLock, tx: mpsc::Sender<RenderMess
         options: render_state.draw_options.clone(),
     };
     
+    let world_section = render_state.ini.section("World");
+    let author = world_section.as_ref().and_then(|section| section.get("Author")).unwrap_or("Unknown");
+    let level_name = world_section.as_ref().and_then(|section| section.get("Name")).unwrap_or("Unknown");
+    let level_dir = export_state.level_dir.file_name().map(|name| name.to_string_lossy()).unwrap_or_default();
+    let level_info = name_pattern::LevelInfo {
+        dir_name: &level_dir,
+        author,
+        name: level_name,
+    };
+    
+    let partition_name_pattern = NamePattern::parse(&export_state.partition_spec);
+    let subdir_name_pattern = NamePattern::parse(&export_state.subdir_spec);
+    let subdir_name = subdir_name_pattern.make_string(&level_info, None);
+    
+    let is_single_partition = render_state.partitions.len() < 2;
     let output_dir =
-        if render_state.partitions.len() > 1 {
-            let dir = PathBuf::from("Output");
-            std::fs::create_dir_all(&dir).unwrap();
-            dir
+        if export_state.no_subdir || (is_single_partition && export_state.no_subdir_for_single) {
+            export_state.output_dir.clone()
         }
         else {
-            PathBuf::from(".")
+            export_state.output_dir.join(&subdir_name)
         };
+    
+    std::fs::create_dir_all(&output_dir).unwrap();
     
     for (i, partition) in render_state.partitions.iter().enumerate() {
         if cancel.load(atomic::Ordering::Relaxed) {
@@ -769,7 +847,6 @@ fn do_the_render(render_state_lock: RenderStateLock, tx: mpsc::Sender<RenderMess
         }
         
         let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Rendering));
-        let bounds = partition.bounds();
         let canvas = drawing::draw_partition(draw_context, partition).unwrap();
 
         if cancel.load(atomic::Ordering::Relaxed) {
@@ -778,14 +855,24 @@ fn do_the_render(render_state_lock: RenderStateLock, tx: mpsc::Sender<RenderMess
         }
         
         let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Exporting));
-        let file_name = format!("{bounds}.png");
-        let path = output_dir.join(file_name);
+        let file_name =
+            if is_single_partition && export_state.use_subdir_name_for_single {
+                subdir_name.clone()
+            }
+            else {
+                let partition_info = name_pattern::PartitionInfo {
+                    index: i,
+                    bounds: partition.bounds(),
+                };
+                partition_name_pattern.make_string(&level_info, Some(partition_info))
+            };
+        let output_path = output_dir.join(file_name).with_extension("png");
         
-        if render_state.use_multithreaded_encoder {
-            drawing::export_canvas_multithreaded(canvas, path.as_ref()).unwrap();
+        if export_state.use_multithreaded_encoder {
+            drawing::export_canvas_multithreaded(canvas, &output_path).unwrap();
         }
         else {
-            drawing::export_canvas(canvas, path.as_ref()).unwrap();
+            drawing::export_canvas(canvas, &output_path).unwrap();
         }
         
         let _ = tx.send(RenderMessage::PartitionUpdate(i, RenderTaskStatus::Done));
@@ -925,7 +1012,6 @@ impl State {
         }
         
         State {
-            level_dir,
             render_state_lock: Arc::new(RwLock::new(render_state)),
             render_rx: None,
             render_progress: RenderProgress::default(),
@@ -935,6 +1021,7 @@ impl State {
             partition_state: PartitionState::new(partition_members),
             drawing_state: DrawingState::default(),
             preview_state: PreviewState::default(),
+            export_state: ExportState::new(level_dir),
             render_thread: None,
         }
     }

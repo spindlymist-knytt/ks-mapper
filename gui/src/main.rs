@@ -8,6 +8,7 @@ mod screens {
     pub mod loading;
 }
 mod map_widget;
+mod name_pattern;
 
 use std::{fs, path::{Path, PathBuf}};
 

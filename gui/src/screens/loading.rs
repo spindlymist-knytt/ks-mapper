@@ -204,7 +204,6 @@ fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyho
         world_sync,
         draw_options: DrawOptions::default(),
         sync_options: SyncOptions::default(),
-        use_multithreaded_encoder: true,
     };
     
     let _ = tx.send(LoadMessage::Done);

@@ -12,3 +12,4 @@ imgui_app = { git = "https://github.com/spindlymist/imgui_app" }
 libks = { git = "https://github.com/spindlymist/libks.git" }
 libks_ini = { git = "https://github.com/spindlymist/libks.git" }
 rustc-hash = "2.1.2"
+rfd = "0.17.2"
