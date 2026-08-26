@@ -1,8 +1,8 @@
 use std::thread::JoinHandle;
 use std::{path::PathBuf, sync::{Arc, atomic::{self, AtomicBool}, mpsc, RwLock}};
 use image::RgbaImage;
-use imgui_app::{Extras, Fonts, ImguiCursorExt, ImguiExt};
-use imgui_app::dear_imgui_rs::{Condition, DockBuilder, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, SplitDirection, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnWidth, TableFlags, Ui, WindowFlags};
+use imgui_app::{Extras, Fonts, ImguiExt};
+use imgui_app::dear_imgui_rs::{Condition, DockLayout, DockLayoutApply, DockSplit, InputText, InputTextCallbackHandler, InputTextFlags, MouseButton, SelectableFlags, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnUserData, TableColumnWidth, TableFlags, TextureId, Ui, WindowFlags, WindowKey};
 use ksmap::drawing::DrawContext;
 use ksmap::{
     definitions::ObjectDefs,
@@ -21,7 +21,7 @@ use crate::name_pattern::{self, NamePattern};
 use crate::{map_widget::{build_map, MapState, map_get_center_screen}, ui_extensions::UiExt};
 
 pub struct State {
-    setup_windows: bool,
+    layout: Option<DockLayout>,
     render_thread: Option<JoinHandle<()>>,
     render_rx: Option<mpsc::Receiver<RenderMessage>>,
     render_state_lock: RenderStateLock,
@@ -36,6 +36,7 @@ pub struct State {
 
 pub enum Task {
     ShowLevelList,
+    Exit,
 }
 
 pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
@@ -52,7 +53,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     }
     
     let State {
-        setup_windows,
+        layout,
         render_thread,
         render_rx,
         render_state_lock,
@@ -65,8 +66,13 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         preview_state,
     } = state;
     
-    let dockspace_id = ui.dockspace_over_main_viewport();
-    if *setup_windows {
+    let layout = layout.get_or_insert_with(|| {
+        let key_map = WindowKey::new("Map", "Map").unwrap();
+        let key_export = WindowKey::new("Export", "Export").unwrap();
+        let key_partitions = WindowKey::new("Partitions", "Partitions").unwrap();
+        let key_drawing = WindowKey::new("Drawing", "Drawing").unwrap();
+        let key_preview = WindowKey::new("Preview", "Preview").unwrap();
+        
         let proportion_left = {
             let width_left = unsafe {
                 600.0
@@ -76,9 +82,6 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
             let width_avail = ui.main_viewport().size()[0];
             (width_left / width_avail).min(0.5)
         };
-        
-        let (dock_left, dock_main) = DockBuilder::split_node(dockspace_id, SplitDirection::Left, proportion_left);
-        DockBuilder::dock_window("Map", dock_main);
         
         let proportion_top = {
             let height_bottom = unsafe {
@@ -93,25 +96,70 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
             1.0 - f32::min(0.5, height_bottom / height_avail)
         };
         
-        let (dock_top_left, dock_bottom_left) = DockBuilder::split_node(dock_left, SplitDirection::Up, proportion_top);
-        DockBuilder::dock_window("Export", dock_top_left);
-        DockBuilder::dock_window("Partitions", dock_top_left);
-        DockBuilder::dock_window("Drawing", dock_top_left);
-        DockBuilder::dock_window("Preview", dock_bottom_left);
-        
-        DockBuilder::finish(dockspace_id);
-        *setup_windows = false;
-    }
+        DockLayout::split(
+            DockSplit::Left,
+            proportion_left,
+            DockLayout::split(
+                DockSplit::Up,
+                proportion_top,
+                DockLayout::tabs(&[key_export, key_partitions, key_drawing]),
+                DockLayout::tabs(&[key_preview])
+            ),
+            DockLayout::tabs(&[key_map])
+        )
+    });
+    ui.dockspace()
+        .layout(layout, DockLayoutApply::IfMissing)
+        .main_viewport()
+        .build()
+        .expect("Invalid dockspace layout");
     
     let Ok(mut render_state) = render_state_lock.write() else {
         return Some(Task::ShowLevelList);
     };
     
-    let should_go_to_level_list = ui.window("Export").build(|| {
-        build_window_export(ui, &mut ex, export_state, &mut render_state, render_thread, render_rx, render_state_lock, render_progress, render_cancel)
-    }).unwrap_or_default();
-    
     let mut requested_center: Option<ScreenCoord> = None;
+    
+    if let Some(_menu_bar) = ui.begin_main_menu_bar() {
+        if let Some(_file_menu) = ui.begin_menu("File") {
+            if ui.menu_item_with_shortcut("Return to level list", "F2") {
+                return Some(Task::ShowLevelList);
+            }
+            ui.separator();
+            if ui.menu_item("Exit") {
+                return Some(Task::Exit);
+            }
+        }
+        ui.menu("View", || {
+            let mut true_aspect_ratio = map_state.aspect_ratio == 2.5;
+            ui.menu_item_toggle("Use true aspect ratio for map", None::<&str>, &mut true_aspect_ratio, true);
+            if ui.is_item_edited() {
+                map_state.aspect_ratio = if true_aspect_ratio { 2.5 } else { 1.0 };
+                if let Some(geom) = &map_state.prev_geom {
+                    requested_center = Some(map_get_center_screen(geom));
+                }
+            }
+            ui.menu("Preview scale", || {
+                if ui.menu_item_toggle("1x", None::<&str>, &mut (preview_state.scale == 1.0), true) {
+                    preview_state.scale = 1.0;
+                }
+                if ui.menu_item_toggle("2x", None::<&str>, &mut (preview_state.scale == 2.0), true) {
+                    preview_state.scale = 2.0;
+                }
+                if ui.menu_item_toggle("3x", None::<&str>, &mut (preview_state.scale == 3.0), true) {
+                    preview_state.scale = 3.0;
+                }
+                if ui.menu_item_toggle("4x", None::<&str>, &mut (preview_state.scale == 4.0), true) {
+                    preview_state.scale = 4.0;
+                }
+            });
+        });
+    }
+    
+    ui.window("Export").build(|| {
+        build_window_export(ui, &mut ex, export_state, &mut render_state, render_thread, render_rx, render_state_lock, render_progress, render_cancel)
+    });
+    
     if map_state.prev_geom.is_none() {
         if let Some(partition) = render_state.partitions.first() {
             let bounds = partition.bounds();
@@ -123,13 +171,6 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         }
         else {
             requested_center = Some((1000, 1000));
-        }
-    }
-    
-    if ui.is_key_pressed(Key::F2) {
-        map_state.aspect_ratio = if map_state.aspect_ratio == 1.0 { 2.5 } else { 1.0 };
-        if let Some(geom) = &map_state.prev_geom {
-            requested_center = Some(map_get_center_screen(geom));
         }
     }
     
@@ -195,12 +236,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         build_window_preview(ui, &mut ex, preview_state, &mut render_state, preview_screen);
     });
     
-    if should_go_to_level_list {
-        Some(Task::ShowLevelList)
-    }
-    else {
-        None
-    }
+    None
 }
 
 struct PartitionState {
@@ -293,7 +329,8 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut Parti
     ui.drag_int_config("##MaxWidth")
         .range(1, i32::MAX)
         .speed(0.1)
-        .display_format(format!("%d screens / {max_width_px}px"))
+        .try_display_format(format!("%d screens / {max_width_px}px"))
+        .expect("Invalid display format")
         .build(ui, &mut partition_state.max_width);
     
     let max_height_px = partition_state.max_height * 240;
@@ -301,7 +338,8 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut Parti
     ui.drag_int_config("##MaxHeight")
         .range(1, i32::MAX)
         .speed(0.1)
-        .display_format(format!("%d screens / {max_height_px}px"))
+        .try_display_format(format!("%d screens / {max_height_px}px"))
+        .expect("Invalid display format")
         .build(ui, &mut partition_state.max_height);
     
     {
@@ -312,7 +350,8 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut Parti
         ui.widget_group_label("Max memory");
         let _disabled = ui.begin_disabled();
         ui.drag_float_config("##MaxMemory")
-            .display_format(format!("%.1f{unit}"))
+            .try_display_format(format!("%.1f{unit}"))
+            .expect("Invalid display format")
             .build(ui, &mut max_size);
     }
     
@@ -398,7 +437,7 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selec
             flags: TableColumnFlags::NONE,
             width: Some(TableColumnWidth::Fixed(0.0)),
             indent: None,
-            user_id: None,
+            user_data: TableColumnUserData::new(0),
         });
     }
     
@@ -458,9 +497,18 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selec
     go_to_partition_index
 }
 
-#[derive(Default)]
 struct PreviewState {
-    preview: Option<(ScreenCoord, u64)>,
+    preview: Option<(ScreenCoord, TextureId)>,
+    scale: f32,
+}
+
+impl Default for PreviewState {
+    fn default() -> Self {
+        Self {
+            preview: None,
+            scale: 1.0,
+        }
+    }
 }
 
 fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewState, render_state: &mut RenderState, screen_pos: Option<ScreenCoord>) { 
@@ -474,13 +522,13 @@ fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewSta
     });
     
     if pos_changed {
-        if let Some(preview) = preview_state.preview.take() {
-            ex.textures.delete_texture(preview.1);
+        if let Some((_, texture_id)) = preview_state.preview.take() {
+            ex.textures.destroy_texture(texture_id);
         }
         
         preview_state.preview = match draw_single_screen(render_state, pos) {
             Some(image) => {
-                let id = ex.textures.create_texture_from_bytes(image.width(), image.height(), &image);
+                let id = ex.textures.create_texture(image.width(), image.height(), &image);
                 Some((pos, id))
             }
             None => None
@@ -488,9 +536,12 @@ fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewSta
     }
     
     if let Some(preview) = &preview_state.preview
-        && let Some(texture) = ex.textures.get_texture(preview.1)
+        && let Some(texture) = ex.textures.get_texture_info(preview.1)
     {
-        ui.image(texture, texture.size());
+        let [width, height] = texture.size();
+        ui.get_window_draw_list().set_sampler_nearest();
+        ui.image(texture, [width * preview_state.scale, height * preview_state.scale]);
+        ui.get_window_draw_list().set_sampler_linear();
     }
 }
 
@@ -547,7 +598,6 @@ fn build_window_drawing(
     let _group = ui.widget_group_begin();
     
     let mut seed_buffer = seed.to_string();
-    let label_width = ui.calc_text_width("Seed");
     let button_width = ui.calc_button_width("Random");
     let inner_spacing_x = unsafe { ui.style().item_inner_spacing()[0] };
     ui.widget_group_label("Seed");
@@ -632,7 +682,8 @@ fn build_window_drawing(
     ui.widget_group_label("Alpha sim frames");
     if ui.drag_int_config("##AlphaFrames")
         .range(0, i32::MAX)
-        .display_format(format!("%d / {alpha_sim_secs:.1}s"))
+        .try_display_format(format!("%d / {alpha_sim_secs:.1}s"))
+        .expect("Invalid display format")
         .build(ui, &mut state.alpha_sim_frames)
     {
         draw_options.trans_frames = state.alpha_sim_frames as u32;
@@ -705,7 +756,7 @@ fn build_window_export(
     render_state_lock: &RenderStateLock,
     render_progress: &mut RenderProgress,
     render_cancel: &mut Arc<AtomicBool>,
-) -> bool {
+) {
     let _group = ui.widget_group_begin();
     
     let button_height = ui.text_line_height() * 2.0;
@@ -769,14 +820,6 @@ fn build_window_export(
     ui.checkbox("Don't create subdirectory for single partition", &mut export_state.no_subdir_for_single);
     ui.checkbox("Use subdirectory name for single partition", &mut export_state.use_subdir_name_for_single);
     ui.checkbox("Multithreaded encoding", &mut export_state.use_multithreaded_encoder);
-    
-    ui.new_line();
-    if ui.small_button("Open another level") {
-        true
-    }
-    else {
-        false
-    }
 }
 
 pub struct RenderState {
@@ -1040,11 +1083,11 @@ impl State {
         }
         
         State {
+            layout: None,
             render_state_lock: Arc::new(RwLock::new(render_state)),
             render_rx: None,
             render_progress: RenderProgress::default(),
             render_cancel: Arc::new(AtomicBool::new(false)),
-            setup_windows: true,
             map_state: MapState::default(),
             partition_state: PartitionState::new(partition_members),
             drawing_state: DrawingState::default(),

@@ -14,7 +14,7 @@ use std::{fs, path::{Path, PathBuf}};
 
 use anyhow::{Result, Context};
 use imgui_app::{imgui_init, platform_init, renderer_init, run};
-use imgui_app::dear_imgui_rs::ConfigFlags;
+use imgui_app::dear_imgui_rs::{ConfigFlags, StyleColor};
 use libks::editions::is_ks_dir;
 
 use screens::*;
@@ -50,6 +50,9 @@ fn main() -> Result<()> {
         style.set_window_padding([8.0, 8.0]);
         style.set_window_border_size(0.0);
         style.set_frame_rounding(2.0);
+        
+        let [r, g, b, _] = style.color(StyleColor::PopupBg);
+        imgui.imgui.style_mut().set_color(StyleColor::PopupBg, [r, g, b, 1.0]);
     }
     
     let mut app = init_app();
@@ -83,9 +86,13 @@ fn main() -> Result<()> {
                     let state = level_list::State::new(&app.ks_dir);
                     app.screen = Screen::LevelList(state);
                 }
+                Some(level_map::Task::Exit) => {
+                    return imgui_app::Task::Exit;
+                }
                 None => {}
             }
         }
+        imgui_app::Task::None
     });
 
     Ok(())

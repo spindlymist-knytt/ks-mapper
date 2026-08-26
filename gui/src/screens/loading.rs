@@ -111,11 +111,10 @@ pub fn build_ui(ui: &Ui, ex: Extras, state: &mut State) -> Option<Task> {
         }
         else {
             let [width_avail, height_avail] = ui.content_region_avail();
-            let [width, height] = ui.current_font().calc_text_size(
-                ui.current_font_size(),
+            let [width, height] = ui.calc_text_size_with_opts(
+                state.status,
+                false,
                 width_avail,
-                width_avail,
-                state.status
             );
             let x = f32::round((width_avail - width) * 0.5);
             let y = f32::round((height_avail - height) * 0.5);
@@ -166,7 +165,7 @@ fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyho
 
     let _ = tx.send(LoadMessage::Partitioning);
     let partitions =
-        if screen_map.len() < 20000 {
+        if screen_map.len() < 25000 {
             let partitioner = IslandsPartitioner {
                 max_size: (120, 300),
                 gap: 1..=10,
