@@ -2,7 +2,7 @@ use std::thread::JoinHandle;
 use std::{path::PathBuf, sync::{Arc, atomic::{self, AtomicBool}, mpsc, RwLock}};
 use image::RgbaImage;
 use imgui_app::{Extras, Fonts, ImguiExt};
-use imgui_app::dear_imgui_rs::{Condition, DockLayout, DockLayoutApply, DockSplit, InputText, InputTextCallbackHandler, InputTextFlags, MouseButton, SelectableFlags, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnUserData, TableColumnWidth, TableFlags, TextureId, Ui, WindowFlags, WindowKey};
+use imgui_app::dear_imgui_rs::{Condition, DockLayout, DockLayoutApply, DockSplit, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnUserData, TableColumnWidth, TableFlags, TextureId, Ui, WindowFlags, WindowKey};
 use ksmap::drawing::DrawContext;
 use ksmap::{
     definitions::ObjectDefs,
@@ -22,6 +22,7 @@ use crate::{map_widget::{build_map, MapState, map_get_center_screen}, ui_extensi
 
 pub struct State {
     layout: Option<DockLayout>,
+    reset_layout: bool,
     render_thread: Option<JoinHandle<()>>,
     render_rx: Option<mpsc::Receiver<RenderMessage>>,
     render_state_lock: RenderStateLock,
@@ -54,6 +55,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     
     let State {
         layout,
+        reset_layout,
         render_thread,
         render_rx,
         render_state_lock,
@@ -109,16 +111,21 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         )
     });
     ui.dockspace()
-        .layout(layout, DockLayoutApply::IfMissing)
+        .layout(layout, if *reset_layout { DockLayoutApply::Replace } else { DockLayoutApply::IfMissing })
         .main_viewport()
         .build()
         .expect("Invalid dockspace layout");
+    *reset_layout = false;
     
     let Ok(mut render_state) = render_state_lock.write() else {
         return Some(Task::ShowLevelList);
     };
     
     let mut requested_center: Option<ScreenCoord> = None;
+    
+    if ui.is_key_pressed(Key::F2) {
+        return Some(Task::ShowLevelList);
+    }
     
     if let Some(_menu_bar) = ui.begin_main_menu_bar() {
         if let Some(_file_menu) = ui.begin_menu("File") {
@@ -153,6 +160,14 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
                     preview_state.scale = 4.0;
                 }
             });
+            if ui.menu_item("Recenter preview") {
+                preview_state.center = [0.5, 0.5];
+            }
+        });
+        ui.menu("Window", || {
+            if ui.menu_item("Reset layout") {
+                *reset_layout = true;
+            }
         });
     }
     
@@ -210,22 +225,22 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     
     let hover_pos = {
         let _map_padding = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0])); 
-        ui.window("Map")
-            .flags(WindowFlags::NO_MOVE)
-            .build(|| {
-                build_map(
-                    ui,
-                    map_state,
-                    &render_state.screen_map,
-                    render_state.partitions.get(partition_state.selected),
-                    &partition_state.partition_members,
-                    requested_center,
-                )
-            })
-            .unwrap_or(None)
+        ui.window("Map").build(|| {
+            build_map(
+                ui,
+                map_state,
+                &render_state.screen_map,
+                render_state.partitions.get(partition_state.selected),
+                &partition_state.partition_members,
+                requested_center,
+            )
+        }).unwrap_or(None)
     };
     
-    ui.window("Preview").build(|| {
+    let _padding = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0]));
+    ui.window("Preview")
+        .flags(WindowFlags::NO_SCROLLBAR | WindowFlags::NO_SCROLL_WITH_MOUSE)
+    .build(|| {
         let preview_screen =
             if map_state.selected_screen.is_some() {
                 map_state.selected_screen.clone()
@@ -499,6 +514,7 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selec
 
 struct PreviewState {
     preview: Option<(ScreenCoord, TextureId)>,
+    center: [f32; 2],
     scale: f32,
 }
 
@@ -506,12 +522,17 @@ impl Default for PreviewState {
     fn default() -> Self {
         Self {
             preview: None,
+            center: [0.5, 0.5],
             scale: 1.0,
         }
     }
 }
 
 fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewState, render_state: &mut RenderState, screen_pos: Option<ScreenCoord>) { 
+    let [origin_x, origin_y] = ui.cursor_pos();
+    let [origin_x_screen, origin_y_screen] = ui.cursor_screen_pos();
+    let mut is_window_hovered = ui.is_window_hovered();
+    
     let Some(pos) = screen_pos else {
         ui.text("Mouse over the map to preview a screen");
         return;
@@ -533,14 +554,46 @@ fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewSta
             }
             None => None
         };
+        preview_state.center = [0.5, 0.5];
+    }
+    
+    if is_window_hovered {
+        let mouse_wheel = ui.get_mouse_wheel();
+        if mouse_wheel != 0.0 {
+            preview_state.scale = f32::clamp(preview_state.scale + mouse_wheel, 1.0, 8.0);
+        }
     }
     
     if let Some(preview) = &preview_state.preview
         && let Some(texture) = ex.textures.get_texture_info(preview.1)
     {
-        let [width, height] = texture.size();
+        let [width_avail, height_avail] = ui.content_region_avail();
+        let width = texture.width() * preview_state.scale;
+        let height = texture.height() * preview_state.scale;
+        
+        if is_window_hovered {
+            let border_x = f32::round(0.10 * width_avail);
+            let border_y = f32::round(0.10 * height_avail);
+            let [mouse_x_screen, mouse_y_screen] = ui.mouse_pos();
+            let mouse_x_window = mouse_x_screen - (origin_x_screen + border_x);
+            let mouse_y_window = mouse_y_screen - (origin_y_screen + border_y);
+            let mouse_x_proportion = mouse_x_window / (width_avail - border_x * 2.0);
+            let mouse_y_proportion = mouse_y_window / (height_avail - border_y * 2.0);
+            preview_state.center = [mouse_x_proportion.clamp(0.0, 1.0), mouse_y_proportion.clamp(0.0, 1.0)];
+        }
+        if width <= width_avail {
+            preview_state.center[0] = 0.5;
+        }
+        if height <= height_avail {
+            preview_state.center[1] = 0.5;
+        }
+        
+        let x = f32::round((width_avail - width) * preview_state.center[0]);
+        let y = f32::round((height_avail - height) * preview_state.center[1]);
+        ui.set_cursor_pos([origin_x + x, origin_y + y]);
+        
         ui.get_window_draw_list().set_sampler_nearest();
-        ui.image(texture, [width * preview_state.scale, height * preview_state.scale]);
+        ui.image(texture, [width, height]);
         ui.get_window_draw_list().set_sampler_linear();
     }
 }
@@ -1084,6 +1137,7 @@ impl State {
         
         State {
             layout: None,
+            reset_layout: false,
             render_state_lock: Arc::new(RwLock::new(render_state)),
             render_rx: None,
             render_progress: RenderProgress::default(),
