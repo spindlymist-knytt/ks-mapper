@@ -75,26 +75,25 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
         let key_drawing = WindowKey::new("Drawing", "Drawing").unwrap();
         let key_preview = WindowKey::new("Preview", "Preview").unwrap();
         
+        let style = unsafe { ui.style() };
         let proportion_left = {
-            let width_left = unsafe {
+            let width_left =
                 600.0
-                + 2.0 * ui.style().window_padding()[0]
-                + 0.5 * ui.style().docking_separator_size()
-            };
+                + 2.0 * style.window_padding()[0]
+                + 0.5 * style.docking_separator_size();
             let width_avail = ui.main_viewport().size()[0];
             (width_left / width_avail).min(0.5)
         };
         
         let proportion_top = {
-            let height_bottom = unsafe {
+            let height_bottom =
                 240.0
-                + 2.0 * ui.style().window_padding()[1]
-                + 0.5 * ui.style().docking_separator_size()
-                + 2.0 * ui.style().frame_padding()[1]
-                + ui.style().window_border_size()
-                + ui.text_line_height()
-            };
-            let height_avail = ui.main_viewport().size()[1];
+                + 2.0 * style.window_padding()[1]
+                + 0.5 * style.docking_separator_size()
+                + 2.0 * style.frame_padding()[1]
+                + style.window_border_size()
+                + ui.text_line_height();
+            let height_avail = ui.main_viewport().size()[1] - ui.current_font_size() - 2.0 * style.frame_padding()[1];
             1.0 - f32::min(0.5, height_bottom / height_avail)
         };
         
@@ -146,6 +145,10 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
                     requested_center = Some(map_get_center_screen(geom));
                 }
             }
+            ui.separator();
+            if ui.menu_item("Recenter preview") {
+                preview_state.center = [0.5, 0.5];
+            }
             ui.menu("Preview scale", || {
                 if ui.menu_item_toggle("1x", None::<&str>, &mut (preview_state.scale == 1.0), true) {
                     preview_state.scale = 1.0;
@@ -160,9 +163,6 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
                     preview_state.scale = 4.0;
                 }
             });
-            if ui.menu_item("Recenter preview") {
-                preview_state.center = [0.5, 0.5];
-            }
         });
         ui.menu("Window", || {
             if ui.menu_item("Reset layout") {
@@ -531,10 +531,11 @@ impl Default for PreviewState {
 fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewState, render_state: &mut RenderState, screen_pos: Option<ScreenCoord>) { 
     let [origin_x, origin_y] = ui.cursor_pos();
     let [origin_x_screen, origin_y_screen] = ui.cursor_screen_pos();
-    let mut is_window_hovered = ui.is_window_hovered();
+    let [width_avail, height_avail] = ui.content_region_avail();
+    let is_window_hovered = ui.is_window_hovered();
     
     let Some(pos) = screen_pos else {
-        ui.text("Mouse over the map to preview a screen");
+        ui.text_aligned_center_center("Mouse over the map to preview a screen");
         return;
     };
     
@@ -567,7 +568,6 @@ fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewSta
     if let Some(preview) = &preview_state.preview
         && let Some(texture) = ex.textures.get_texture_info(preview.1)
     {
-        let [width_avail, height_avail] = ui.content_region_avail();
         let width = texture.width() * preview_state.scale;
         let height = texture.height() * preview_state.scale;
         

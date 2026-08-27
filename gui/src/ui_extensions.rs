@@ -4,6 +4,7 @@ use imgui_app::dear_imgui_rs::{GroupToken, StyleVar, Ui};
 pub trait UiExt {
     fn text_aligned_right<S: AsRef<str>>(&self, text: S);
     fn text_aligned_center<S: AsRef<str>>(&self, text: S);
+    fn text_aligned_center_center<S: AsRef<str>>(&self, text: S);
     fn checkbox_small<S: AsRef<str>>(&self, label: S, checked: &mut bool) -> bool;
     fn calc_text_width<S: AsRef<str>>(&self, text: S) -> f32;
     fn calc_button_size<S: AsRef<str>>(&self, label: S) -> [f32; 2];
@@ -24,6 +25,19 @@ impl UiExt for Ui {
     fn text_aligned_center<S: AsRef<str>>(&self, text: S) {
         let [width, _] = self.calc_text_size(text.as_ref());
         self.align_next_item_center(width);
+        self.text(text);
+    }
+    
+    fn text_aligned_center_center<S: AsRef<str>>(&self, text: S) {
+        let [width, height] = self.calc_text_size(text.as_ref());
+        self.align_next_item_center(width);
+        
+        let height_avail = self.content_region_avail_height();
+        if height_avail > height {
+            let delta_y = f32::round((height_avail - height) / 2.0);
+            self.set_cursor_pos_y(self.cursor_pos_y() + delta_y);
+        }
+        
         self.text(text);
     }
     
