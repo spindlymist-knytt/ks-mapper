@@ -28,7 +28,7 @@ impl State {
     }
 }
 
-pub fn build_ui(ui: &Ui, ex: Extras, state: &mut State) -> Option<PathBuf> {
+pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<PathBuf> {
     let (width, height) = ex.window.size();
     let open_level = ui.window("Main")
         .position([0.0, 0.0], Condition::Always)

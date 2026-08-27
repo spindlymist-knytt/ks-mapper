@@ -60,7 +60,7 @@ impl State {
     }
 }
 
-pub fn build_ui(ui: &Ui, ex: Extras, state: &mut State) -> Option<Task> {
+pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     let mut task = None;
     
     while let Ok(message) = state.rx.try_recv() {

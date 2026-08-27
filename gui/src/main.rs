@@ -17,10 +17,12 @@ use imgui_app::{imgui_init, platform_init, renderer_init, run};
 use imgui_app::dear_imgui_rs::{ConfigFlags, StyleColor};
 use libks::editions::is_ks_dir;
 
+use libks_ini::edit::Ini;
 use screens::*;
 
 struct App {
     ks_dir: PathBuf,
+    new_title: Option<String>,
     screen: Screen,
 }
 
@@ -31,10 +33,11 @@ enum Screen {
     LevelMap(level_map::State),
 }
 
+const APP_NAME: &'static str = "ksmap";
+
 fn main() -> Result<()> {
     env_logger::init();
-    
-    let platform = platform_init("ksmap", (1280, 768))?;
+    let platform = platform_init(APP_NAME, (1280, 768))?;
     let renderer = renderer_init(&platform.window, platform.window.size())?;
     let mut imgui = imgui_init(platform, renderer);
     
@@ -57,32 +60,35 @@ fn main() -> Result<()> {
     
     let mut app = init_app();
     
-    run(imgui, |ui, ex| {
+    run(imgui, |ui, mut ex| {
         match &mut app.screen {
-            Screen::StartupError(state) => startup_error::build_ui(ui, ex, state),
-            Screen::LevelList(state) => match level_list::build_ui(ui, ex, state) {
+            Screen::StartupError(state) => startup_error::build_ui(ui, &mut ex, state),
+            Screen::LevelList(state) => match level_list::build_ui(ui, &mut ex, state) {
                 Some(level_dir) => {
                     let state = loading::State::new(level_dir);
                     app.screen = Screen::Loading(state);
                 }
                 None => {}
             }
-            Screen::Loading(state) => match loading::build_ui(ui, ex, state) {
+            Screen::Loading(state) => match loading::build_ui(ui, &mut ex, state) {
                 Some(loading::Task::ShowLevelMap {
                     level_dir,
                     render_state
                 }) => {
+                    app.new_title = Some(get_window_title_for_level(&level_dir, &render_state.ini));
                     let state = level_map::State::new(level_dir, render_state);
                     app.screen = Screen::LevelMap(state);
                 }
                 Some(loading::Task::ShowLevelList) => {
+                    app.new_title = Some(APP_NAME.to_string());
                     let state = level_list::State::new(&app.ks_dir);
                     app.screen = Screen::LevelList(state);
                 }
                 None => {}
             }
-            Screen::LevelMap(state) => match level_map::build_ui(ui, ex, state) {
+            Screen::LevelMap(state) => match level_map::build_ui(ui, &mut ex, state) {
                 Some(level_map::Task::ShowLevelList) => {
+                    app.new_title = Some(APP_NAME.to_string());
                     let state = level_list::State::new(&app.ks_dir);
                     app.screen = Screen::LevelList(state);
                 }
@@ -92,6 +98,11 @@ fn main() -> Result<()> {
                 None => {}
             }
         }
+        
+        if let Some(title) = app.new_title.take() {
+            let _ = ex.window.set_title(&title);
+        }
+        
         imgui_app::Task::None
     });
 
@@ -145,7 +156,23 @@ fn init_app() -> App {
     
     App {
         ks_dir,
+        new_title: None,
         screen
+    }
+}
+
+fn get_window_title_for_level(level_dir: &Path, ini: &Ini) -> String {
+    if let Some(section) = ini.section("World")
+        && let Some(author) = section.get("Author")
+        && let Some(name) = section.get("Name")
+    {
+        format!("{author} - {name} | {APP_NAME}")
+    }
+    else if let Some(dir_name) = level_dir.file_name() {
+        format!("{} | {APP_NAME}", dir_name.display())
+    }
+    else {
+        return APP_NAME.to_owned();
     }
 }
 

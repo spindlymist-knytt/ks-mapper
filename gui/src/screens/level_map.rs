@@ -40,7 +40,7 @@ pub enum Task {
     Exit,
 }
 
-pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
+pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     if state.render_thread.is_some() {
         let (width, height) = ex.window.size();
         ui.window("Main")
@@ -48,7 +48,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
             .size([width as f32, height as f32], Condition::Always)
             .flags(WindowFlags::NO_TITLE_BAR | WindowFlags::NO_MOVE | WindowFlags::NO_RESIZE)
         .build(|| {
-            build_window_progress(ui, &mut ex, state);
+            build_window_progress(ui, ex, state);
         });
         return None;
     }
@@ -172,7 +172,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     }
     
     ui.window("Export").build(|| {
-        build_window_export(ui, &mut ex, export_state, &mut render_state, render_thread, render_rx, render_state_lock, render_progress, render_cancel)
+        build_window_export(ui, ex, export_state, &mut render_state, render_thread, render_rx, render_state_lock, render_progress, render_cancel)
     });
     
     if map_state.prev_geom.is_none() {
@@ -190,7 +190,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     }
     
     let go_to_partition_index = ui.window("Partitions").build(|| {
-        build_window_partitions(ui, &mut ex, partition_state, &mut render_state)
+        build_window_partitions(ui, ex, partition_state, &mut render_state)
     }).unwrap_or_default();
     if let Some(i) = go_to_partition_index
         && let Some(partition) = render_state.partitions.get(i)
@@ -205,7 +205,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
     
     let invalidations = ui.window("Drawing").build(|| {
         let RenderState { draw_options, sync_options, seed, .. } = &mut *render_state;
-        build_window_drawing(ui, &mut ex,
+        build_window_drawing(ui, ex,
             drawing_state,
             draw_options,
             sync_options,
@@ -248,7 +248,7 @@ pub fn build_ui(ui: &Ui, mut ex: Extras, state: &mut State) -> Option<Task> {
             else {
                 hover_pos
             };
-        build_window_preview(ui, &mut ex, preview_state, &mut render_state, preview_screen);
+        build_window_preview(ui, ex, preview_state, &mut render_state, preview_screen);
     });
     
     None
