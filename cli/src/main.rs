@@ -150,7 +150,8 @@ fn main() -> Result<()> {
         println!("{bounds} ({}/{})", i + 1, partitions.len());
         
         let canvas = time_it!("    Drawing", {
-            drawing::draw_partition(draw_context, &partition)?
+            drawing::draw_partition(draw_context, &partition)
+                .inspect_err(|_| println!(" [failed]"))?
         });
         
         let path: &Path = if output_is_dir {
@@ -166,10 +167,12 @@ fn main() -> Result<()> {
             
         time_it!("    Exporting", {
             if cli.single_threaded_encoder {
-                drawing::export_canvas(canvas, path)?
+                drawing::export_canvas(canvas, path)
+                    .inspect_err(|_| println!(" [failed]"))?
             }
             else {
-                drawing::export_canvas_multithreaded(canvas, path)?
+                drawing::export_canvas_multithreaded(canvas, path)
+                    .inspect_err(|_| println!(" [failed]"))?
             }
         });
     }
