@@ -136,7 +136,23 @@ fn make_canvas(bounds: &Bounds) -> Result<RgbaImage> {
             return Err(anyhow!("Partition is too large: {bounds}"));
         };
     
-    Ok(RgbaImage::new(width, height))
+    let Some(n_bytes) = (width as usize).checked_mul(height as usize)
+        .and_then(|pixels| pixels.checked_mul(4))
+        else {
+            return Err(anyhow!("Partition is too large: {bounds}"));
+        };
+    
+    let mut buffer = Vec::<u8>::new();
+    match buffer.try_reserve_exact(n_bytes) {
+        Ok(_) => {
+            unsafe { buffer.set_len(n_bytes); }
+            buffer.fill(0);
+            let image = RgbaImage::from_vec(width, height, buffer)
+                .expect("Buffer should be the correct size.");
+            Ok(image)
+        }
+        Err(_) => Err(anyhow!("Not enough memory available for partition: {bounds}"))
+    }
 }
 
 pub fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
