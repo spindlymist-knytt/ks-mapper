@@ -37,7 +37,7 @@ const APP_NAME: &'static str = "ksmap";
 
 fn main() -> Result<()> {
     env_logger::init();
-    let platform = platform_init(APP_NAME, (1280, 768))?;
+    let platform = platform_init(APP_NAME, (1740, 980))?;
     let renderer = renderer_init(&platform.window, platform.window.size())?;
     let mut imgui = imgui_init(platform, renderer);
     

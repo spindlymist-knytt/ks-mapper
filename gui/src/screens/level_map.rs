@@ -68,64 +68,41 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         preview_state,
     } = state;
     
-    let layout = layout.get_or_insert_with(|| {
-        let key_map = WindowKey::new("Map", "Map").unwrap();
-        let key_export = WindowKey::new("Export", "Export").unwrap();
-        let key_partitions = WindowKey::new("Partitions", "Partitions").unwrap();
-        let key_drawing = WindowKey::new("Drawing", "Drawing").unwrap();
-        let key_preview = WindowKey::new("Preview", "Preview").unwrap();
-        
-        let style = unsafe { ui.style() };
-        let proportion_left = {
-            let width_left =
-                600.0
-                + 2.0 * style.window_padding()[0]
-                + 0.5 * style.docking_separator_size();
-            let width_avail = ui.main_viewport().size()[0];
-            (width_left / width_avail).min(0.5)
-        };
-        
-        let proportion_top = {
-            let height_bottom =
-                240.0
-                + 2.0 * style.window_padding()[1]
-                + 0.5 * style.docking_separator_size()
-                + 2.0 * style.frame_padding()[1]
-                + style.window_border_size()
-                + ui.text_line_height();
-            let height_avail = ui.main_viewport().size()[1] - ui.current_font_size() - 2.0 * style.frame_padding()[1];
-            1.0 - f32::min(0.5, height_bottom / height_avail)
-        };
-        
-        DockLayout::split(
-            DockSplit::Left,
-            proportion_left,
-            DockLayout::split(
-                DockSplit::Up,
-                proportion_top,
-                DockLayout::tabs(&[key_export, key_partitions, key_drawing]),
-                DockLayout::tabs(&[key_preview])
-            ),
-            DockLayout::tabs(&[key_map])
-        )
-    });
-    ui.dockspace()
-        .layout(layout, if *reset_layout { DockLayoutApply::Replace } else { DockLayoutApply::IfMissing })
-        .main_viewport()
-        .build()
-        .expect("Invalid dockspace layout");
-    *reset_layout = false;
+    {
+        let menu_bar_height = ui.text_line_height() + 2.0 * unsafe { ui.style().frame_padding()[1] };
+        let (width, height) = ex.window.size();
+        let window_padding = unsafe { ui.style().window_padding() };
+        let _token = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0]));
+        ui.window("Main")
+            .position([0.0, menu_bar_height], Condition::Always)
+            .size([width as f32, height as f32 - menu_bar_height], Condition::Always)
+            .flags(WindowFlags::NO_TITLE_BAR | WindowFlags::NO_MOVE | WindowFlags::NO_RESIZE | WindowFlags::NO_BRING_TO_FRONT_ON_FOCUS)
+        .build(|| {
+            let _token = ui.push_style_var(StyleVar::WindowPadding(window_padding));
+            if *reset_layout {
+                layout.replace(create_dockspace_layout(ui));
+            }
+            let layout = layout.get_or_insert_with(|| create_dockspace_layout(ui));
+            let dockspace_id = ui.get_id("Dockspace");
+            ui.dockspace()
+                .layout(layout, if *reset_layout { DockLayoutApply::Replace } else { DockLayoutApply::IfMissing })
+                .root_id(dockspace_id)
+                .current_window([width as f32, height as f32 - menu_bar_height])
+                .build()
+                .expect("Invalid dockspace layout");
+            *reset_layout = false;
+        });
+    }
     
     let Ok(mut render_state) = render_state_lock.write() else {
         return Some(Task::ShowLevelList);
     };
     
-    let mut requested_center: Option<ScreenCoord> = None;
-    
     if ui.is_key_pressed(Key::F2) {
         return Some(Task::ShowLevelList);
     }
     
+    let mut requested_center: Option<ScreenCoord> = None;
     if let Some(_menu_bar) = ui.begin_main_menu_bar() {
         if let Some(_file_menu) = ui.begin_menu("File") {
             if ui.menu_item_with_shortcut("Return to level list", "F2") {
@@ -189,9 +166,14 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         }
     }
     
-    let go_to_partition_index = ui.window("Partitions").build(|| {
+    ui.window("Partition Options").build(|| {
         build_window_partitions(ui, ex, partition_state, &mut render_state)
+    });
+    
+    let go_to_partition_index = ui.window("Partitions").build(|| {
+        build_partition_table(ui, ex.fonts, &render_state.partitions, &mut partition_state.selected)
     }).unwrap_or_default();
+    
     if let Some(i) = go_to_partition_index
         && let Some(partition) = render_state.partitions.get(i)
     {
@@ -203,7 +185,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         requested_center = Some(partition_center);
     }
     
-    let invalidations = ui.window("Drawing").build(|| {
+    let invalidations = ui.window("Drawing Options").build(|| {
         let RenderState { draw_options, sync_options, seed, .. } = &mut *render_state;
         build_window_drawing(ui, ex,
             drawing_state,
@@ -254,6 +236,61 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     None
 }
 
+fn create_dockspace_layout(ui: &Ui) -> DockLayout {
+    let style = unsafe { ui.style() };
+    let [window_padding_x, window_padding_y] = style.window_padding();
+    let [_frame_padding_x, frame_padding_y] = style.frame_padding();
+    let [_item_spacing_x, item_spacing_y] = style.item_spacing();
+    
+    // Estimate sizes
+    let menu_bar_height = ui.text_line_height() + 2.0 * frame_padding_y;
+    let tab_bar_height = ui.text_line_height() + 2.0 * frame_padding_y + style.window_border_size();
+    let half_separator = 0.5 * style.docking_separator_size();
+    let preview_inner_width = 600.0 + 2.0 * window_padding_x;
+    let preview_total_width = preview_inner_width + half_separator;
+    let preview_inner_height = 240.0 + 2.0 * window_padding_y;
+    let preview_total_height = preview_inner_height + tab_bar_height + half_separator;
+    let export_inner_height =
+        (ui.text_line_height() * 2.0 + item_spacing_y) // Button
+        + (ui.text_line_height() + 2.0 * frame_padding_y + item_spacing_y) * 7.0 // Options
+        + 2.0 * window_padding_y; // Padding
+    let export_total_height = export_inner_height + tab_bar_height + half_separator;
+
+    // Calculate proportions
+    let width_avail = ui.main_viewport().size()[0];
+    let preview_percent_width = (preview_total_width / width_avail).min(0.5);
+    
+    let height_avail = ui.main_viewport().size()[1] - menu_bar_height;
+    let preview_percent_height = (preview_total_height / height_avail).min(1.0 / 3.0);
+    
+    let remaining_height_avail = height_avail - f32::round(preview_percent_height * height_avail) - half_separator;
+    let export_percent_height = (export_total_height / remaining_height_avail).min(2.0 / 3.0);
+    
+    let key_map = WindowKey::new("Map", "Map").unwrap();
+    let key_export = WindowKey::new("Export", "Export").unwrap();
+    let key_partition_opts = WindowKey::new("Partition Options", "Partition Options").unwrap();
+    let key_drawing_opts = WindowKey::new("Drawing Options", "Drawing Options").unwrap();
+    let key_preview = WindowKey::new("Preview", "Preview").unwrap();
+    let key_partitions = WindowKey::new("Partitions", "Partitions").unwrap();
+    
+    DockLayout::split(
+        DockSplit::Right,
+        preview_percent_width,
+        DockLayout::split(
+            DockSplit::Down,
+            preview_percent_height,
+            DockLayout::tabs(&[key_preview]),
+            DockLayout::split(
+                DockSplit::Up,
+                export_percent_height,
+                DockLayout::tabs(&[key_export, key_partition_opts, key_drawing_opts]),
+                DockLayout::tabs(&[key_partitions]),
+            ),
+        ),
+        DockLayout::tabs(&[key_map])
+    )
+}
+
 struct PartitionState {
     partition_members: FxHashMap<ScreenCoord, usize>,
     selected: usize,
@@ -295,8 +332,8 @@ enum PartitionAlgorithm {
     Grid,
 }
 
-fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut PartitionState, render_state: &mut RenderState) -> Option<usize> {
-    let group = ui.widget_group_begin();
+fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut PartitionState, render_state: &mut RenderState) {
+    let _group = ui.widget_group_begin();
     
     let button_height = ui.text_line_height() * 2.0;
     if ui.button_with_size("Rebuild partitions", [-1.0, button_height]) {
@@ -374,11 +411,6 @@ fn build_window_partitions(ui: &Ui, ex: &mut Extras, partition_state: &mut Parti
         PartitionAlgorithm::Islands => build_partition_options_islands(ui, partition_state),
         PartitionAlgorithm::Grid => build_partition_options_grid(ui, partition_state),
     };
-    
-    drop(group);
-    
-    ui.new_line();
-    build_partition_table(ui, ex.fonts, &render_state.partitions, &mut partition_state.selected)
 }
 
 fn build_partition_options_islands(ui: &Ui, state: &mut PartitionState) {
@@ -431,8 +463,11 @@ fn build_partition_options_grid(ui: &Ui, state: &mut PartitionState) {
 
 fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selected: &mut usize) -> Option<usize> {
     let mut go_to_partition_index: Option<usize> = None;
+    let mut table_builder = ui.table("PartitionsTable")
+        .outer_size([-1.0, -1.0])
+        .flags(TableFlags::BORDERS | TableFlags::SCROLL_Y);
     
-    let columns = [
+     let columns = [
         "Xmin",
         "Ymin",
         "Xmax",
@@ -443,20 +478,18 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selec
         "Height (px)",
         "Memory",
     ];
-    let mut table_builder = ui.table("##RageTable")
-        .flags(TableFlags::BORDERS | TableFlags::NO_HOST_EXTEND_X);
-    
     for column in columns {
         table_builder = table_builder.add_column(TableColumnSetup {
             name: column,
             flags: TableColumnFlags::NONE,
             width: Some(TableColumnWidth::Fixed(0.0)),
             indent: None,
-            user_data: TableColumnUserData::new(0),
+            user_data: TableColumnUserData::default(),
         });
     }
     
     table_builder.build(|ui| {
+        ui.table_setup_scroll_freeze(0, 1);
         ui.table_headers_row();
         
         let _font = ui.push_font(fonts.mono);
@@ -561,7 +594,7 @@ fn build_window_preview(ui: &Ui, ex: &mut Extras, preview_state: &mut PreviewSta
     if is_window_hovered {
         let mouse_wheel = ui.get_mouse_wheel();
         if mouse_wheel != 0.0 {
-            preview_state.scale = f32::clamp(preview_state.scale + mouse_wheel, 1.0, 8.0);
+            preview_state.scale = f32::clamp(preview_state.scale + mouse_wheel, 1.0, 4.0);
         }
     }
     
