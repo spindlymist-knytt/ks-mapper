@@ -19,6 +19,7 @@ use rustc_hash::FxHashMap;
 
 use crate::name_pattern::{self, NamePattern};
 use crate::{map_widget::{build_map, MapState, map_get_center_screen}, ui_extensions::UiExt};
+use crate::format_bytes::*;
 
 pub struct State {
     layout: Option<DockLayout>,
@@ -34,6 +35,33 @@ pub struct State {
     partition_state: PartitionState,
     drawing_state: DrawingState,
     preview_state: PreviewState,
+}
+
+impl State {
+    pub fn new(level_dir: PathBuf, render_state: RenderState) -> Self {    
+        let mut partition_members = FxHashMap::default();
+        for (i, positions) in render_state.partitions.iter().enumerate() {
+            for pos in positions {
+                partition_members.insert(*pos, i);
+            }
+        }
+        
+        State {
+            layout: None,
+            reset_layout: false,
+            render_state_lock: Arc::new(RwLock::new(render_state)),
+            render_rx: None,
+            render_progress: RenderProgress::default(),
+            render_cancel: Arc::new(AtomicBool::new(false)),
+            render_error: None,
+            map_state: MapState::default(),
+            partition_state: PartitionState::new(partition_members),
+            drawing_state: DrawingState::default(),
+            preview_state: PreviewState::default(),
+            export_state: ExportState::new(level_dir),
+            render_thread: None,
+        }
+    }
 }
 
 pub enum Task {
@@ -671,6 +699,17 @@ struct Invalidations {
     preview: bool,
 }
 
+struct MapSeedEditCallback(usize);
+
+impl InputTextCallbackHandler for MapSeedEditCallback {
+    fn on_edit(&mut self, mut data: imgui_app::dear_imgui_rs::TextCallbackData<'_>) {
+        let excess = data.str().len().saturating_sub(self.0);
+        if excess > 0 {
+            data.remove_chars(self.0, excess);
+        }
+    }
+}
+
 fn build_window_drawing(
     ui: &Ui,
     _ex: &mut Extras,
@@ -819,17 +858,6 @@ impl ExportState {
             no_subdir_for_single: true,
             use_subdir_name_for_single: true,
             use_multithreaded_encoder: true,
-        }
-    }
-}
-
-struct MapSeedEditCallback(usize);
-
-impl InputTextCallbackHandler for MapSeedEditCallback {
-    fn on_edit(&mut self, mut data: imgui_app::dear_imgui_rs::TextCallbackData<'_>) {
-        let excess = data.str().len().saturating_sub(self.0);
-        if excess > 0 {
-            data.remove_chars(self.0, excess);
         }
     }
 }
@@ -1134,94 +1162,4 @@ fn build_window_progress(ui: &Ui, _ex: &mut Extras, state: &mut State) {
             ui.text(task.status.to_string());
         }
     });
-}
-
-#[derive(Clone, Copy)]
-enum BytesUnit {
-    B,
-    KB,
-    MB,
-    GB,
-    TB,
-}
-
-const KB_SIZE: usize = 1024;
-const MB_SIZE: usize = KB_SIZE * 1024;
-const GB_SIZE: usize = MB_SIZE * 1024;
-const TB_SIZE: usize = GB_SIZE * 1024;
-
-impl BytesUnit {
-    fn to_bytes(&self) -> usize {
-        match self {
-            Self::B => 1,
-            Self::KB => KB_SIZE,
-            Self::MB => MB_SIZE,
-            Self::GB => GB_SIZE,
-            Self::TB => TB_SIZE,
-        }
-    }
-}
-
-impl std::fmt::Display for BytesUnit {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::B => f.write_str("B"),
-            Self::KB => f.write_str("KB"),
-            Self::MB => f.write_str("MB"),
-            Self::GB => f.write_str("GB"),
-            Self::TB => f.write_str("TB"),
-        }
-    }
-}
-
-fn best_unit_for_bytes(bytes: usize) -> BytesUnit {
-    match bytes {
-        0..KB_SIZE => BytesUnit::B,
-        KB_SIZE..MB_SIZE =>BytesUnit::KB,
-        MB_SIZE..GB_SIZE => BytesUnit::MB,
-        GB_SIZE..TB_SIZE => BytesUnit::GB,
-        _ => BytesUnit::TB,
-    }
-}
-
-fn convert_bytes_to_unit(bytes: usize, unit: BytesUnit) -> f32 {
-    bytes as f32/ unit.to_bytes() as f32
-}
-
-fn bytes_to_string(bytes: usize, precision: usize) -> String {
-    let unit = best_unit_for_bytes(bytes);
-    match unit {
-        BytesUnit::B => format!("{bytes}{unit}"),
-        _ => {
-            let value = convert_bytes_to_unit(bytes, unit);
-            format!("{value:.prec$}{unit}", prec = precision)
-        }
-    }
-}
-
-impl State {
-    pub fn new(level_dir: PathBuf, render_state: RenderState) -> Self {    
-        let mut partition_members = FxHashMap::default();
-        for (i, positions) in render_state.partitions.iter().enumerate() {
-            for pos in positions {
-                partition_members.insert(*pos, i);
-            }
-        }
-        
-        State {
-            layout: None,
-            reset_layout: false,
-            render_state_lock: Arc::new(RwLock::new(render_state)),
-            render_rx: None,
-            render_progress: RenderProgress::default(),
-            render_cancel: Arc::new(AtomicBool::new(false)),
-            render_error: None,
-            map_state: MapState::default(),
-            partition_state: PartitionState::new(partition_members),
-            drawing_state: DrawingState::default(),
-            preview_state: PreviewState::default(),
-            export_state: ExportState::new(level_dir),
-            render_thread: None,
-        }
-    }
 }
