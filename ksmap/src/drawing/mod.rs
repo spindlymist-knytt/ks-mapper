@@ -155,7 +155,7 @@ fn make_canvas(bounds: &Bounds) -> Result<RgbaImage> {
     }
 }
 
-pub fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
+pub fn export_canvas(canvas: RgbaImage, path: &Path, compression_level: u8) -> Result<()> {
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -164,7 +164,7 @@ pub fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
 
     let encoder = PngEncoder::new_with_quality(
         file,
-        image::codecs::png::CompressionType::Best,
+        image::codecs::png::CompressionType::Level(compression_level),
         Default::default(),
     );
 
@@ -177,7 +177,7 @@ pub fn export_canvas(canvas: RgbaImage, path: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()> {
+pub fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path, compression_level: u8) -> Result<()> {
     let file = fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -194,7 +194,7 @@ pub fn export_canvas_multithreaded(canvas: RgbaImage, path: &Path) -> Result<()>
     header.set_color(mtpng::ColorType::TruecolorAlpha, 8)?;
     
     let mut options = mtpng::encoder::Options::new();
-    options.set_compression_level(mtpng::CompressionLevel::High)?;
+    options.set_compression_level(compression_level.try_into().unwrap_or_default())?;
 
     let mut encoder = mtpng::encoder::Encoder::new(writer, &options);
     encoder.write_header(&header)?;

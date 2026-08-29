@@ -54,6 +54,9 @@ pub struct Cli {
     /// Don't use the multithreaded PNG encoder
     #[arg(long)]
     pub single_threaded_encoder: bool,
+    /// Output compression level from 1 to 9
+    #[arg(long, default_value = "9")]
+    pub compression: u8,
     /// Path to the KS data directory.
     /// If unspecified, it will be located relative to the level directory
     #[arg(long = "data", help_heading = "Paths")]

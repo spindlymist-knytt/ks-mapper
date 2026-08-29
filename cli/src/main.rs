@@ -167,11 +167,11 @@ fn main() -> Result<()> {
             
         time_it!("    Exporting", {
             if cli.single_threaded_encoder {
-                drawing::export_canvas(canvas, path)
+                drawing::export_canvas(canvas, path, cli.compression)
                     .inspect_err(|_| println!(" [failed]"))?
             }
             else {
-                drawing::export_canvas_multithreaded(canvas, path)
+                drawing::export_canvas_multithreaded(canvas, path, cli.compression)
                     .inspect_err(|_| println!(" [failed]"))?
             }
         });

@@ -974,6 +974,7 @@ struct ExportState {
     no_subdir_for_single: bool,
     use_subdir_name_for_single: bool,
     use_multithreaded_encoder: bool,
+    compression_level: u8,
 }
 
 impl ExportState {
@@ -987,6 +988,7 @@ impl ExportState {
             no_subdir_for_single: true,
             use_subdir_name_for_single: true,
             use_multithreaded_encoder: true,
+            compression_level: 9,
         }
     }
 }
@@ -1064,6 +1066,9 @@ fn build_window_export(
     ui.checkbox("Don't create subdirectory", &mut export_state.no_subdir);
     ui.checkbox("Don't create subdirectory for single partition", &mut export_state.no_subdir_for_single);
     ui.checkbox("Use subdirectory name for single partition", &mut export_state.use_subdir_name_for_single);
+    
+    ui.widget_group_label("Compression level");
+    ui.slider("##CompressionLevel", 1, 9, &mut export_state.compression_level);
     ui.checkbox("Multithreaded encoding", &mut export_state.use_multithreaded_encoder);
 }
 
@@ -1185,13 +1190,13 @@ fn do_the_render(render_state_lock: RenderStateLock, export_state: ExportState, 
         let output_path = output_dir.join(file_name).with_extension("png");
         
         if export_state.use_multithreaded_encoder {
-            if let Err(err) = drawing::export_canvas_multithreaded(canvas, &output_path) {
+            if let Err(err) = drawing::export_canvas_multithreaded(canvas, &output_path, export_state.compression_level) {
                 let _ = tx.send(RenderMessage::Error(err.to_string()));
                 return;
             }
         }
         else {
-            if let Err(err) = drawing::export_canvas(canvas, &output_path) {
+            if let Err(err) = drawing::export_canvas(canvas, &output_path, export_state.compression_level) {
                 let _ = tx.send(RenderMessage::Error(err.to_string()));
                 return;
             }

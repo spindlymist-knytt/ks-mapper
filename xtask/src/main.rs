@@ -220,7 +220,7 @@ fn render_seeds(level_dir: &Path, seeds: &[MapSeed], output_dir: &Path, level_na
             .expect("IO error while drawing map");
         
         let output_path = output_dir.join(format!("{seed}.png"));
-        export_canvas_multithreaded(canvas, &output_path)
+        export_canvas_multithreaded(canvas, &output_path, 9)
             .expect("Error while exporting map");
     }
 }
