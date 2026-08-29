@@ -525,24 +525,50 @@ fn build_partition_options_grid(ui: &Ui, state: &mut PartitionState) {
     ui.checkbox("Force rows and columns", &mut state.force);
 }
 
+const PARTITION_TABLE_COL_X_MIN     : usize = 0;
+const PARTITION_TABLE_COL_Y_MIN     : usize = 1;
+const PARTITION_TABLE_COL_X_MAX     : usize = 2;
+const PARTITION_TABLE_COL_Y_MAX     : usize = 3;
+const PARTITION_TABLE_COL_WIDTH     : usize = 4;
+const PARTITION_TABLE_COL_HEIGHT    : usize = 5;
+const PARTITION_TABLE_COL_WIDTH_PX  : usize = 6;
+const PARTITION_TABLE_COL_HEIGHT_PX : usize = 7;
+const PARTITION_TABLE_COL_MEMORY    : usize = 8;
+const PARTITION_TABLE_N_COLUMNS     : usize = 9;
+const PARTITION_TABLE_COL_LABELS: [&'static str; PARTITION_TABLE_N_COLUMNS] = [
+    "Xmin",
+    "Ymin",
+    "Xmax",
+    "Ymax",
+    "Width",
+    "Height",
+    "Width (px)",
+    "Height (px)",
+    "Memory",
+];
+
 fn build_partition_table(ui: &Ui, fonts: &Fonts, partition_state: &mut PartitionState, partitions: &mut [Partition]) -> Option<usize> {
     let mut go_to_partition_index: Option<usize> = None;
-    let mut table_builder = ui.table("PartitionsTable")
-        .outer_size([-1.0, -1.0])
-        .flags(TableFlags::BORDERS | TableFlags::SCROLL_Y | TableFlags::SORTABLE);
     
-     let columns = [
-        "Xmin",
-        "Ymin",
-        "Xmax",
-        "Ymax",
-        "Width",
-        "Height",
-        "Width (px)",
-        "Height (px)",
-        "Memory",
-    ];
-    for column in columns {
+    let table_height = {
+        let style = unsafe { ui.style() };
+        let n_rows = partitions.len() + 1; // +1 for header
+        let row_height = ui.text_line_height()
+            + 2.0 * style.cell_padding()[1];
+        let total_height = n_rows as f32 * row_height + 1.0; // +2 for outer borders, -1 for bottom border of last row
+        if total_height > ui.content_region_avail_height() {
+            -1.0 // fill
+        }
+        else {
+            total_height
+        }
+    };
+    
+    let mut table_builder = ui.table("PartitionsTable")
+        .outer_size([-1.0, table_height])
+        .flags(TableFlags::BORDERS | TableFlags::SCROLL_Y | TableFlags::SORTABLE);
+
+    for column in PARTITION_TABLE_COL_LABELS {
         table_builder = table_builder.add_column(TableColumnSetup {
             name: column,
             flags: TableColumnFlags::NONE,
@@ -637,31 +663,31 @@ fn sort_partitions(partitions: &mut [Partition], specs: &TableSortSpecs) {
     let column_index = spec.column_index.get();
     let is_descending = spec.sort_direction == SortDirection::Descending;
     match column_index {
-        0 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_X_MIN => do_sort!(partitions, is_descending, p, {
             (p.bounds().x_min(), p.bounds().y_min())
         }),
-        1 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_Y_MIN => do_sort!(partitions, is_descending, p, {
             (p.bounds().y_min(), p.bounds().x_min())
         }),
-        2 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_X_MAX => do_sort!(partitions, is_descending, p, {
             (p.bounds().x_max(), p.bounds().y_max())
         }),
-        3 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_Y_MAX => do_sort!(partitions, is_descending, p, {
             (p.bounds().y_max(), p.bounds().x_max())
         }),
-        4 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_WIDTH => do_sort!(partitions, is_descending, p, {
             (p.bounds().width(), p.bounds().height())
         }),
-        5 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_HEIGHT => do_sort!(partitions, is_descending, p, {
             (p.bounds().height(), p.bounds().width())
         }),
-        6 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_WIDTH_PX => do_sort!(partitions, is_descending, p, {
             (p.bounds().width_px(), p.bounds().height_px())
         }),
-        7 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_HEIGHT_PX => do_sort!(partitions, is_descending, p, {
             (p.bounds().height_px(), p.bounds().width_px())
         }),
-        8 => do_sort!(partitions, is_descending, p, {
+        PARTITION_TABLE_COL_MEMORY => do_sort!(partitions, is_descending, p, {
             p.bounds().size_bytes_rgba()
         }),
         _ => {}
