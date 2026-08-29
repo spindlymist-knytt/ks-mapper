@@ -296,6 +296,10 @@ pub fn build_map(
         let wheel_delta = ui.get_mouse_wheel();
         if wheel_delta != 0.0 && !map_state.is_dragging {
             let new_zoom_level = (map_state.zoom_level + wheel_delta as i32).clamp(0, 12);
+            if new_zoom_level == map_state.zoom_level {
+                return Some(hovered_screen_pos);
+            }
+            
             let (new_cell_width, new_cell_height) = get_cell_size_for_zoom_level(new_zoom_level, map_state.aspect_ratio);
             let new_line_thickness = get_line_thickness_for_zoom_level(new_zoom_level);
             
