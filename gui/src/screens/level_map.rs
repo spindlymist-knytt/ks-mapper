@@ -1,5 +1,5 @@
 use std::thread::JoinHandle;
-use std::{path::PathBuf, sync::{Arc, atomic::{self, AtomicBool}, mpsc::{self, TryRecvError}, RwLock}};
+use std::{path::{Path, PathBuf}, sync::{Arc, atomic::{self, AtomicBool}, mpsc::{self, TryRecvError}, RwLock}};
 use image::RgbaImage;
 use imgui_app::{Extras, Fonts, ImguiExt};
 use imgui_app::dear_imgui_rs::{Condition, DockLayout, DockLayoutApply, DockSplit, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnUserData, TableColumnWidth, TableFlags, TextureId, Ui, WindowFlags, WindowKey};
@@ -135,6 +135,25 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     let mut requested_center: Option<ScreenCoord> = None;
     if let Some(_menu_bar) = ui.begin_main_menu_bar() {
         if let Some(_file_menu) = ui.begin_menu("File") {
+            if ui.menu_item("Show output directory") {
+                let mut did_show = false;
+                if !export_state.no_subdir {
+                    let level_info = name_pattern::LevelInfo::new(&render_state.ini, &export_state.level_dir);
+                    let subdir_pattern = NamePattern::parse(&export_state.subdir_spec);
+                    let subdir_name = subdir_pattern.make_string(&level_info, None);
+                    let output_dir = export_state.output_dir.join(subdir_name);
+                    if output_dir.exists() {
+                        show_dir_in_file_explorer(&output_dir);
+                        did_show = true;
+                    }
+                }
+                if !did_show {
+                    show_dir_in_file_explorer(&export_state.output_dir);
+                }
+            }
+            if ui.menu_item("Show level directory") {
+                show_dir_in_file_explorer(&export_state.level_dir);
+            }
             if ui.menu_item_with_shortcut("Return to level list", "F2") {
                 return Some(Task::ShowLevelList);
             }
@@ -143,6 +162,14 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
                 return Some(Task::Exit);
             }
         }
+        ui.menu("Edit", || {
+            if ui.menu_item("Copy screen coordinates")
+                && let Some((coord, _)) = &preview_state.preview
+            {
+                let coord_string = format!("x{}y{}", coord.0, coord.1);
+                let _ = ex.clipboard.set_clipboard_text(&coord_string);
+            }
+        });
         ui.menu("View", || {
             let mut true_aspect_ratio = map_state.aspect_ratio == 2.5;
             ui.menu_item_toggle("Use true aspect ratio for map", None::<&str>, &mut true_aspect_ratio, true);
@@ -1002,16 +1029,7 @@ fn do_the_render(render_state_lock: RenderStateLock, export_state: ExportState, 
         options: render_state.draw_options.clone(),
     };
     
-    let world_section = render_state.ini.section("World");
-    let author = world_section.as_ref().and_then(|section| section.get("Author")).unwrap_or("Unknown");
-    let level_name = world_section.as_ref().and_then(|section| section.get("Name")).unwrap_or("Unknown");
-    let level_dir = export_state.level_dir.file_name().map(|name| name.to_string_lossy()).unwrap_or_default();
-    let level_info = name_pattern::LevelInfo {
-        dir_name: &level_dir,
-        author,
-        name: level_name,
-    };
-    
+    let level_info = name_pattern::LevelInfo::new(&render_state.ini, &export_state.level_dir);
     let partition_name_pattern = NamePattern::parse(&export_state.partition_spec);
     let subdir_name_pattern = NamePattern::parse(&export_state.subdir_spec);
     let subdir_name = subdir_name_pattern.make_string(&level_info, None);
@@ -1162,4 +1180,12 @@ fn build_window_progress(ui: &Ui, _ex: &mut Extras, state: &mut State) {
             ui.text(task.status.to_string());
         }
     });
+}
+
+fn show_dir_in_file_explorer<P: AsRef<Path>>(path: P) {
+    let Ok(abs_path) = std::path::absolute(path) else { return };
+    let _ = std::process::Command::new("explorer.exe")
+        .arg("/root,")
+        .arg(abs_path)
+        .output();
 }

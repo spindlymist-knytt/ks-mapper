@@ -1,6 +1,10 @@
 use std::fmt::Write;
+use std::path::Path;
 
+use libks_ini::edit::Ini;
 use ksmap::partition::Bounds;
+
+use crate::get_level_author_and_name;
 
 pub struct NamePattern {
     parts: Vec<PatternPart>
@@ -17,6 +21,20 @@ pub struct LevelInfo<'a> {
     pub dir_name: &'a str,
     pub author: &'a str,
     pub name: &'a str,
+}
+
+impl<'a> LevelInfo<'a> {
+    pub fn new(ini: &'a Ini, level_dir: &'a Path) -> Self {
+        let (author, level_name) = get_level_author_and_name(ini);
+        let dir_name = level_dir.file_name()
+            .and_then(|name| name.to_str());
+
+        Self {
+            dir_name: dir_name.unwrap_or("Unknown"),
+            author: author.unwrap_or("Unknown"),
+            name: level_name.unwrap_or("Unknown"),
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]

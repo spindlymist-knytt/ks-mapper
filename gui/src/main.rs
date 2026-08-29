@@ -163,10 +163,7 @@ fn init_app() -> App {
 }
 
 fn get_window_title_for_level(level_dir: &Path, ini: &Ini) -> String {
-    if let Some(section) = ini.section("World")
-        && let Some(author) = section.get("Author")
-        && let Some(name) = section.get("Name")
-    {
+    if let (Some(author), Some(name)) = get_level_author_and_name(ini) {
         format!("{author} - {name} | {APP_NAME}")
     }
     else if let Some(dir_name) = level_dir.file_name() {
@@ -175,6 +172,15 @@ fn get_window_title_for_level(level_dir: &Path, ini: &Ini) -> String {
     else {
         return APP_NAME.to_owned();
     }
+}
+
+pub fn get_level_author_and_name(ini: &Ini) -> (Option<&str>, Option<&str>) {
+    let Some(world_section) = ini.section("World") else {
+        return (None, None);
+    };
+    let author = world_section.get("Author");
+    let level_name = world_section.get("Name");
+    (author, level_name)
 }
 
 enum PathArg {
