@@ -16,13 +16,41 @@ impl Bounds {
     pub fn size(&self) -> (u64, u64) {
         (self.width(), self.height())
     }
+    
+    pub fn size_bytes_rgba(&self) -> u64 {
+        self.width_px() * self.height_px() * 4
+    }
 
     pub fn width(&self) -> u64 {
         self.x.end.abs_diff(self.x.start)
     }
     
+    pub fn width_px(&self) -> u64 {
+        self.width() * 600
+    }
+    
     pub fn height(&self) -> u64 {
         self.y.end.abs_diff(self.y.start)
+    }
+    
+    pub fn height_px(&self) -> u64 {
+        self.height() * 240
+    }
+    
+    pub fn x_min(&self) -> i64 {
+        self.x.start
+    }
+    
+    pub fn y_min(&self) -> i64 {
+        self.y.start
+    }
+    
+    pub fn x_max(&self) -> i64 {
+        (self.x.end - 1).max(self.x.start)
+    }
+    
+    pub fn y_max(&self) -> i64 {
+        (self.y.end - 1).max(self.y.start)
     }
     
     pub fn contains(&self, other: &Bounds) -> bool {

@@ -1,8 +1,9 @@
+use std::cmp;
 use std::thread::JoinHandle;
 use std::{path::{Path, PathBuf}, sync::{Arc, atomic::{self, AtomicBool}, mpsc::{self, TryRecvError}, RwLock}};
 use image::RgbaImage;
 use imgui_app::{Extras, Fonts, ImguiExt};
-use imgui_app::dear_imgui_rs::{Condition, DockLayout, DockLayoutApply, DockSplit, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnUserData, TableColumnWidth, TableFlags, TextureId, Ui, WindowFlags, WindowKey};
+use imgui_app::dear_imgui_rs::{Condition, DockLayout, DockLayoutApply, DockSplit, InputText, InputTextCallbackHandler, InputTextFlags, Key, MouseButton, SelectableFlags, SortDirection, StyleColor, StyleVar, TableColumnFlags, TableColumnSetup, TableColumnUserData, TableColumnWidth, TableFlags, TableSortSpecs, TextureId, Ui, WindowFlags, WindowKey};
 use ksmap::drawing::DrawContext;
 use ksmap::{
     definitions::ObjectDefs,
@@ -228,7 +229,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     });
     
     let go_to_partition_index = ui.window("Partitions").build(|| {
-        build_partition_table(ui, ex.fonts, &render_state.partitions, &mut partition_state.selected)
+        build_partition_table(ui, ex.fonts, partition_state, &mut render_state.partitions)
     }).unwrap_or_default();
     
     if let Some(i) = go_to_partition_index
@@ -295,7 +296,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
 
 fn create_dockspace_layout(ui: &Ui) -> DockLayout {
     let style = unsafe { ui.style() };
-    let [window_padding_x, window_padding_y] = style.window_padding();
+    let [_window_padding_x, window_padding_y] = style.window_padding();
     let [_frame_padding_x, frame_padding_y] = style.frame_padding();
     let [_item_spacing_x, item_spacing_y] = style.item_spacing();
     
@@ -303,8 +304,7 @@ fn create_dockspace_layout(ui: &Ui) -> DockLayout {
     let menu_bar_height = ui.text_line_height() + 2.0 * frame_padding_y;
     let tab_bar_height = ui.text_line_height() + 2.0 * frame_padding_y + style.window_border_size();
     let half_separator = 0.5 * style.docking_separator_size();
-    let preview_inner_width = 600.0 + 2.0 * window_padding_x;
-    let preview_total_width = preview_inner_width + half_separator;
+    let sidebar_width = 700.0 + half_separator;
     let preview_inner_height = 240.0 + 2.0 * window_padding_y;
     let preview_total_height = preview_inner_height + tab_bar_height + half_separator;
     let export_inner_height =
@@ -315,7 +315,7 @@ fn create_dockspace_layout(ui: &Ui) -> DockLayout {
 
     // Calculate proportions
     let width_avail = ui.main_viewport().size()[0];
-    let preview_percent_width = (preview_total_width / width_avail).min(0.5);
+    let preview_percent_width = (sidebar_width / width_avail).min(0.5);
     
     let height_avail = ui.main_viewport().size()[1] - menu_bar_height;
     let preview_percent_height = (preview_total_height / height_avail).min(1.0 / 3.0);
@@ -362,6 +362,8 @@ struct PartitionState {
     cols: i32,
     force: bool,
     grid_fallback: bool,
+    /// Set up the default sort column on the first frame
+    set_sort_column: bool,
 }
 
 impl PartitionState {
@@ -380,6 +382,7 @@ impl PartitionState {
             cols: 10,
             force: false,
             grid_fallback: true,
+            set_sort_column: true,
         }
     }
 }
@@ -522,11 +525,11 @@ fn build_partition_options_grid(ui: &Ui, state: &mut PartitionState) {
     ui.checkbox("Force rows and columns", &mut state.force);
 }
 
-fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selected: &mut usize) -> Option<usize> {
+fn build_partition_table(ui: &Ui, fonts: &Fonts, partition_state: &mut PartitionState, partitions: &mut [Partition]) -> Option<usize> {
     let mut go_to_partition_index: Option<usize> = None;
     let mut table_builder = ui.table("PartitionsTable")
         .outer_size([-1.0, -1.0])
-        .flags(TableFlags::BORDERS | TableFlags::SCROLL_Y);
+        .flags(TableFlags::BORDERS | TableFlags::SCROLL_Y | TableFlags::SORTABLE);
     
      let columns = [
         "Xmin",
@@ -553,14 +556,26 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selec
         ui.table_setup_scroll_freeze(0, 1);
         ui.table_headers_row();
         
+        // Sorting
+        if partition_state.set_sort_column {
+            ui.table_set_column_sort_direction(8, SortDirection::Descending, false);
+            partition_state.set_sort_column = false;
+        }
+        if let Some(mut specs) = ui.table_get_sort_specs()
+            && specs.is_dirty()
+        {
+            sort_partitions(partitions, &specs);
+            specs.clear_dirty(ui);
+        }
+        
         let _font = ui.push_font(fonts.mono);
         
         for (i, partition) in partitions.iter().enumerate() {
             let bounds = partition.bounds();
-            let x_min = bounds.x.start;
-            let x_max = bounds.x.end - 1;
-            let y_min = bounds.y.start;
-            let y_max = bounds.y.end - 1;
+            let x_min = bounds.x_min();
+            let x_max = bounds.x_max();
+            let y_min = bounds.y_min();
+            let y_max = bounds.y_max();
             let width = x_max - x_min + 1;
             let height = y_max - y_min + 1;
             let width_px = width * 600;
@@ -573,11 +588,11 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selec
             let x_min_str = x_min.to_string();
             ui.align_next_item_right(ui.calc_text_size(&x_min_str)[0]);
             if ui.selectable_config(x_min_str)
-                .selected(*selected == i)
+                .selected(partition_state.selected == i)
                 .flags(SelectableFlags::SPAN_ALL_COLUMNS)
                 .build()
             {
-                *selected = i;
+                partition_state.selected = i;
             }
             if ui.is_item_clicked() && ui.is_mouse_double_clicked(MouseButton::Left) {
                 go_to_partition_index = Some(i);
@@ -604,6 +619,53 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partitions: &[Partition], selec
     });
     
     go_to_partition_index
+}
+
+fn sort_partitions(partitions: &mut [Partition], specs: &TableSortSpecs) {
+    macro_rules! do_sort {
+        ($partitions:ident, $is_descending:expr, $p:ident, $get_key:block) => {
+            if $is_descending {
+                $partitions.sort_by_key(|$p: &Partition| cmp::Reverse($get_key));
+            }
+            else {
+                $partitions.sort_by_key(|$p: &Partition| $get_key);
+            }
+        };
+    }
+    
+    let Some(spec) = specs.iter().next() else { return };
+    let column_index = spec.column_index.get();
+    let is_descending = spec.sort_direction == SortDirection::Descending;
+    match column_index {
+        0 => do_sort!(partitions, is_descending, p, {
+            (p.bounds().x_min(), p.bounds().y_min())
+        }),
+        1 => do_sort!(partitions, is_descending, p, {
+            (p.bounds().y_min(), p.bounds().x_min())
+        }),
+        2 => do_sort!(partitions, is_descending, p, {
+            (p.bounds().x_max(), p.bounds().y_max())
+        }),
+        3 => do_sort!(partitions, is_descending, p, {
+            (p.bounds().y_max(), p.bounds().x_max())
+        }),
+        4 => do_sort!(partitions, is_descending, p, {
+            (p.bounds().width(), p.bounds().height())
+        }),
+        5 => do_sort!(partitions, is_descending, p, {
+            (p.bounds().height(), p.bounds().width())
+        }),
+        6 => do_sort!(partitions, is_descending, p, {
+            (p.bounds().width_px(), p.bounds().height_px())
+        }),
+        7 => do_sort!(partitions, is_descending, p, {
+            (p.bounds().height_px(), p.bounds().width_px())
+        }),
+        8 => do_sort!(partitions, is_descending, p, {
+            p.bounds().size_bytes_rgba()
+        }),
+        _ => {}
+    }
 }
 
 struct PreviewState {
