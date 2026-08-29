@@ -109,8 +109,11 @@ pub fn build_map(
     let map_size = ui.content_region_avail();
     let [map_x_screen, map_y_screen] = ui.get_cursor_screen_pos();
     
-    let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level);
     let (cell_width, cell_height) = get_cell_size_for_zoom_level(map_state.zoom_level, map_state.aspect_ratio);
+    let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level, (cell_width, cell_height));
+    // Coordinates need to be adjusted so the lines aren't centered on the given position
+    // This will need to be updated for ImGui 1.93
+    let line_correction = line_thickness / 2.0 - 0.5;
     
     // Recenter if map was resized
     if requested_center.is_none()
@@ -159,13 +162,13 @@ pub fn build_map(
     let n_grid_cells = rows * cols;
     
     // Draw grid lines
-    if get_line_thickness_for_zoom_level(map_state.zoom_level) > 0.0 {
-        let mut x = map_x_screen + geom.origin_x;
+    if line_thickness > 0.0 {
+        let mut x = map_x_screen + geom.origin_x + line_correction;
         for _ in 0..cols {
             draw_list.add_line_v(x, map_y_screen, map_y_screen + map_size[1], [0.1, 0.1, 0.1], line_thickness);
             x += geom.cell_outer_width;
         }
-        let mut y = map_y_screen + geom.origin_y;
+        let mut y = map_y_screen + geom.origin_y + line_correction;
         for _ in 0..rows {
             draw_list.add_line_h(map_x_screen, map_x_screen + map_size[0], y, [0.1, 0.1, 0.1], line_thickness);
             y += geom.cell_outer_height;
@@ -205,7 +208,16 @@ pub fn build_map(
         
         if cell_height >= 5.0 {
             let highlight_color = HIGHLIGHT_COLORS[color_index];
-            draw_rect_relative(top_left, bottom_right, highlight_color, false);
+            let mut top_left_screen = relative_to_screen_coords(top_left);
+            top_left_screen[0] += line_correction;
+            top_left_screen[1] += line_correction;
+            let mut bottom_right_screen = relative_to_screen_coords(bottom_right);
+            bottom_right_screen[0] -= line_correction;
+            bottom_right_screen[1] -= line_correction;
+            draw_list.add_rect(top_left_screen, bottom_right_screen, highlight_color)
+                .filled(false)
+                .thickness(line_thickness)
+                .build();
         }
     };
     let draw_indicator = |(x, y), color| {
@@ -301,7 +313,7 @@ pub fn build_map(
             }
             
             let (new_cell_width, new_cell_height) = get_cell_size_for_zoom_level(new_zoom_level, map_state.aspect_ratio);
-            let new_line_thickness = get_line_thickness_for_zoom_level(new_zoom_level);
+            let new_line_thickness = get_line_thickness_for_zoom_level(new_zoom_level, (new_cell_width, new_cell_height));
             
             // The general idea here is to keep the point the mouse is hovering over in the same position as we zoom
             // We start by converting the pixel position to a proportion that is agnostic to the zoom level
@@ -376,7 +388,7 @@ fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)
     let total_bias = (map_state.bias.0 + pan.0, map_state.bias.1 + pan.1);
     
     let (cell_width, cell_height) = get_cell_size_for_zoom_level(map_state.zoom_level, map_state.aspect_ratio);
-    let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level);
+    let line_thickness = get_line_thickness_for_zoom_level(map_state.zoom_level, (cell_width, cell_height));
     let cell_outer_width = cell_width + line_thickness;
     let cell_outer_height = cell_height + line_thickness;
     
@@ -430,8 +442,13 @@ fn get_cell_size_for_zoom_level(zoom: i32, aspect_ratio: f32) -> (f32, f32) {
     (width, height)
 }
 
-fn get_line_thickness_for_zoom_level(zoom: i32) -> f32 {
-    if zoom < 4 { 0.0 } else { 1.0 }
+fn get_line_thickness_for_zoom_level(zoom: i32, cell_size: (f32, f32)) -> f32 {
+    if zoom < 4 {
+        0.0
+    }
+    else {
+        (f32::min(cell_size.0, cell_size.1) * 0.04).round().max(1.0)
+    }
 }
 
 pub fn map_get_center_screen(geom: &MapGeometry) -> ScreenCoord {
