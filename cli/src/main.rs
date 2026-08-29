@@ -203,6 +203,7 @@ fn make_partitions(
             max_size,
             gap: islands_args.min_gap..=islands_args.max_gap,
             force: force,
+            fallback_to_grid: !islands_args.no_subdivide,
         }),
         PartitionStrategy::Grid => Box::new(GridPartitioner {
             max_size,

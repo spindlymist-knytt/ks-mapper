@@ -14,7 +14,10 @@ use super::{Partition, Partitioner};
 pub struct IslandsPartitioner {
     pub max_size: (u64, u64),
     pub gap: RangeInclusive<u64>,
+    /// Partition one time even if the level fits into one image
     pub force: bool,
+    /// Use the grid partitioner if an island is still too large at the minimum gap
+    pub fallback_to_grid: bool,
 }
 
 impl Default for IslandsPartitioner {
@@ -23,6 +26,7 @@ impl Default for IslandsPartitioner {
             max_size: (48000, 48000),
             gap: 1..=20,
             force: false,
+            fallback_to_grid: true,
         }
     }
 }
@@ -40,13 +44,25 @@ impl Partitioner for IslandsPartitioner {
             return vec![partition];
         }
         
-        let mut partitions = partition_recursively(partition, self.max_size, *self.gap.start(), *self.gap.end());
+        let mut partitions = partition_recursively(
+            partition,
+            self.max_size,
+            *self.gap.start(),
+            *self.gap.end(),
+            self.fallback_to_grid,
+        );
         merge_redundant_partitions(&mut partitions);
         partitions
     }
 }
 
-fn partition_recursively(partition: Partition, max_size: (u64, u64), min_gap: u64, max_gap: u64) -> Vec<Partition> {
+fn partition_recursively(
+    partition: Partition,
+    max_size: (u64, u64),
+    min_gap: u64,
+    max_gap: u64,
+    fallback_to_grid: bool
+) -> Vec<Partition> {
     let mut partitions = Vec::new();
 
     let graph = partition_into_graph(partition, max_gap);
@@ -55,10 +71,10 @@ fn partition_recursively(partition: Partition, max_size: (u64, u64), min_gap: u6
         if is_too_large && max_gap > min_gap {
             // Reduce the gap and try again
             let new_max_gap = attenuate_max_gap(min_gap, max_gap);
-            let subpartitions = partition_recursively(partition, max_size, min_gap, new_max_gap);
+            let subpartitions = partition_recursively(partition, max_size, min_gap, new_max_gap, fallback_to_grid);
             partitions.extend(subpartitions);
         }
-        else if is_too_large && max_gap == min_gap {
+        else if is_too_large && max_gap == min_gap && fallback_to_grid {
             // We can't reduce the gap anymore, so switch to the grid strategy
             let (rows, cols) = grid::calc_grid_dimensions(&partition.bounds, max_size);
             let positions = partition.positions.iter();

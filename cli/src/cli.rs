@@ -92,6 +92,9 @@ pub struct IslandsArgs {
     /// -g sets min and max to the same value
     #[arg(short = 'g', long, default_value = "1", help_heading = "Islands partitioner")]
     pub min_gap: u64,
+    /// Don't further subdivide oversized islands after the minimum gap is reached
+    #[arg(long, help_heading = "Islands partitioner")]
+    pub no_subdivide: bool,
 }
 
 #[derive(Args)]

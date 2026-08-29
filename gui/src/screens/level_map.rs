@@ -309,7 +309,7 @@ fn create_dockspace_layout(ui: &Ui) -> DockLayout {
     let preview_total_height = preview_inner_height + tab_bar_height + half_separator;
     let export_inner_height =
         (ui.text_line_height() * 2.0 + item_spacing_y) // Button
-        + (ui.text_line_height() + 2.0 * frame_padding_y + item_spacing_y) * 7.0 // Options
+        + (ui.text_line_height() + 2.0 * frame_padding_y + item_spacing_y) * 8.0 // Options
         + 2.0 * window_padding_y; // Padding
     let export_total_height = export_inner_height + tab_bar_height + half_separator;
 
@@ -361,6 +361,7 @@ struct PartitionState {
     rows: i32,
     cols: i32,
     force: bool,
+    grid_fallback: bool,
 }
 
 impl PartitionState {
@@ -378,6 +379,7 @@ impl PartitionState {
             rows: 10,
             cols: 10,
             force: false,
+            grid_fallback: true,
         }
     }
 }
@@ -402,6 +404,7 @@ fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut Part
                     max_size,
                     gap,
                     force: partition_state.force,
+                    fallback_to_grid: partition_state.grid_fallback,
                 };
                 partitioner.partitions(&render_state.screen_map)
             }
@@ -485,6 +488,7 @@ fn build_partition_options_islands(ui: &Ui, state: &mut PartitionState) {
         .build(ui, &mut state.max_gap);
 
     ui.checkbox("Force gap size", &mut state.force);
+    ui.checkbox("Subdivide oversized islands", &mut state.grid_fallback);
 }
 
 fn build_partition_options_grid(ui: &Ui, state: &mut PartitionState) {

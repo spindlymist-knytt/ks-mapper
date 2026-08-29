@@ -170,6 +170,7 @@ fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyho
                 max_size: (120, 300),
                 gap: 1..=10,
                 force: false,
+                fallback_to_grid: true,
             };
             partitioner.partitions(&screen_map)
         }
