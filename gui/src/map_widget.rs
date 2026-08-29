@@ -220,6 +220,13 @@ pub fn build_map(
         ];
         draw_rect_relative(top_left, bottom_right, color, false);
     };
+    let draw_coord_string = |(x, y): ScreenCoord| {
+        let text = format!("x{}y{}", x, y);
+        let text_height = ui.calc_text_size(&text)[1];
+        let window_height = ui.window_height();
+        ui.set_cursor_pos([5.0, window_height - 5.0 - text_height]);
+        ui.text(text);
+    };
     
     // Now, we either iterate over screens (and check if they're on the map), or iterate over map cells
     // (and check if they contain a screen), whichever takes fewer iterations.
@@ -283,6 +290,7 @@ pub fn build_map(
             hovered_top_left[1] + cell_height,
         ];
         draw_rect_relative(hovered_top_left, hovered_bottom_right, [1.0, 1.0, 1.0, 1.0], false);
+        draw_coord_string(hovered_screen_pos);
         
         // Zoom
         let wheel_delta = ui.get_mouse_wheel();
@@ -339,6 +347,7 @@ pub fn build_map(
     }
     else if let Some(selected_pos) = &map_state.selected_screen {
         draw_indicator(*selected_pos, [1.0, 1.0, 0.0, 1.0]);
+        draw_coord_string(*selected_pos);
         None
     }
     else {
