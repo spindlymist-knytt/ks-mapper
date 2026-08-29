@@ -585,13 +585,23 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partition_state: &mut Partition
         // Sorting
         if partition_state.set_sort_column {
             ui.table_set_column_sort_direction(8, SortDirection::Descending, false);
-            partition_state.set_sort_column = false;
         }
         if let Some(mut specs) = ui.table_get_sort_specs()
             && specs.is_dirty()
         {
+            let selection_bounds = partitions.get(partition_state.selected)
+                .map(|p| p.bounds());
             sort_partitions(partitions, &specs);
             specs.clear_dirty(ui);
+            if partition_state.set_sort_column {
+                partition_state.selected = 0;
+                partition_state.set_sort_column = false;
+            }
+            else if let Some(bounds) = selection_bounds
+                && let Some(index) = partitions.iter().position(|p| p.bounds() == bounds)
+            {
+                partition_state.selected = index;
+            }
         }
         
         let _font = ui.push_font(fonts.mono);
