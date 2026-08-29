@@ -8,7 +8,7 @@ use petgraph::{
 use libks::ScreenCoord;
 use rustc_hash::FxHashMap;
 
-use crate::{partition::{grid, merge_redundant_partitions}, screen_map::ScreenMap};
+use crate::{partition::{grid, merge_nested_partitions}, screen_map::ScreenMap};
 use super::{Partition, Partitioner};
 
 pub struct IslandsPartitioner {
@@ -51,7 +51,7 @@ impl Partitioner for IslandsPartitioner {
             *self.gap.end(),
             self.fallback_to_grid,
         );
-        merge_redundant_partitions(&mut partitions);
+        merge_nested_partitions(&mut partitions);
         partitions
     }
 }

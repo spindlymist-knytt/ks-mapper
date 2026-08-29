@@ -20,11 +20,11 @@ pub struct Partition {
     bounds: Bounds,
 }
 
-pub fn merge_redundant_partitions(partitions: &mut Vec<Partition>) {
+pub fn merge_nested_partitions(partitions: &mut Vec<Partition>) {
     // This algorithm is not great, but it's fine for small numbers of partitions
     // For each partition, consider each partition that comes after it in the list
     let mut i = 0;
-    while i < partitions.len() {
+    'outer: while i < partitions.len() {
         let current = partitions[i].bounds();
         let mut j = i + 1;
         while j < partitions.len() {
@@ -33,14 +33,18 @@ pub fn merge_redundant_partitions(partitions: &mut Vec<Partition>) {
             if current.contains(&other) {
                 let removed = partitions.swap_remove(j);
                 partitions[i].merge(removed);
+                // Don't increment j because j is a different partition now
             }
             // If the other partition fully contains us, replace the current partition with that one
             // and remove the other one from the list
             else if other.contains(&current) {
                 let removed = partitions.swap_remove(j);
                 partitions[i].merge(removed);
-                j = i + 1; // Start over
-                continue;
+                // We need to recheck the partitions between i and j because they weren't given a chance to be consumed
+                // by j yet. We could try to merge more partitions before restarting, but I think that's worse in the
+                // average case. That would guarantee another ~(n - i) iterations of the inner loop. This way, we're
+                // only guaranteeing another ~(j - i) iterations.
+                continue 'outer;
             }
             else {
                 j += 1;
