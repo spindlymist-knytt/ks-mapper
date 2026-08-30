@@ -306,20 +306,10 @@ pub fn build_map(
             }
         }
         
+        draw_indicator(hovered_cell, [1.0, 1.0, 1.0, 1.0]);
         if let Some(pos) = &map_state.selected_screen {
             draw_indicator((pos.0 as i64, pos.1 as i64), [1.0, 1.0, 0.0, 1.0]);
         }
-        
-        let hovered_cell_pos = calc_cell_pos(hovered_cell, &geom);
-        let hovered_top_left = [
-            hovered_cell_pos[0] + line_thickness,
-            hovered_cell_pos[1] + line_thickness,
-        ];
-        let hovered_bottom_right = [
-            hovered_top_left[0] + cell_width,
-            hovered_top_left[1] + cell_height,
-        ];
-        draw_rect_relative(hovered_top_left, hovered_bottom_right, [1.0, 1.0, 1.0, 1.0], false);
         if let Some(pos) = &hovered_screen_pos {
             draw_coord_string(*pos);
         }
@@ -337,9 +327,10 @@ pub fn build_map(
             
             // The general idea here is to keep the point the mouse is hovering over in the same position as we zoom
             // We start by converting the pixel position to a proportion that is agnostic to the zoom level
+            let hovered_cell_top_left = calc_cell_pos(hovered_cell, &geom);
             let mouse_pos_within_cell = [
-                mouse_pos[0] - hovered_top_left[0],
-                mouse_pos[1] - hovered_top_left[1]
+                mouse_pos[0] - hovered_cell_top_left[0],
+                mouse_pos[1] - hovered_cell_top_left[1]
             ];
             let mouse_pos_within_cell_proportion = [
                 mouse_pos_within_cell[0] / geom.cell_outer_width,
@@ -350,8 +341,8 @@ pub fn build_map(
             let new_cell_outer_width = new_cell_width + new_line_thickness;
             let new_cell_outer_height = new_cell_height + new_line_thickness;
             let new_mouse_pos_within_cell = [
-                f32::round(mouse_pos_within_cell_proportion[0] * new_cell_outer_width),
-                f32::round(mouse_pos_within_cell_proportion[1] * new_cell_outer_height),
+                (mouse_pos_within_cell_proportion[0] * new_cell_outer_width).round().min(new_cell_outer_width - 1.0),
+                (mouse_pos_within_cell_proportion[1] * new_cell_outer_height).round().min(new_cell_outer_height - 1.0),
             ];
             
             // Working backwards, we can calculate where the top left of the hovered screen is at the new zoom level
