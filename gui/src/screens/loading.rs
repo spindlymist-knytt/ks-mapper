@@ -46,10 +46,13 @@ enum LoadMessage {
 }
 
 impl State {
-    pub fn new(level_dir: PathBuf) -> Self {
+    pub fn new(ks_dir: Option<PathBuf>, level_dir: PathBuf) -> Self {
         let (tx, rx) = mpsc::channel();
-        let path_for_thread = level_dir.clone();
-        let thread = thread::spawn(|| init_render_state(tx, path_for_thread));
+        let thread = {
+            let ks_dir = ks_dir.unwrap_or_else(|| level_dir.join("../.."));
+            let level_dir = level_dir.clone();
+            thread::spawn(|| init_render_state(tx, ks_dir, level_dir))
+        };
         
         Self {
             level_dir,
@@ -128,7 +131,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     task
 }
 
-fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyhow::Result<(RenderState, PartitionState)> {
+fn init_render_state(tx: mpsc::Sender<LoadMessage>, ks_dir: PathBuf, level_dir: PathBuf) -> anyhow::Result<(RenderState, PartitionState)> {
     let _ = tx.send(LoadMessage::LoadingMap);
     let screens = map_bin::parse_map_file(level_dir.join("Map.bin"))?;
     let screen_map = ScreenMap::new(screens);
@@ -150,7 +153,7 @@ fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyho
     };
 
     let _ = tx.send(LoadMessage::LoadingAssets);
-    let data_dir = level_dir.join("../../Data");
+    let data_dir = ks_dir.join("Data");
     let templates_dir = {
         let mut current_dir = std::env::current_exe()
             .unwrap_or_else(|_| PathBuf::new());

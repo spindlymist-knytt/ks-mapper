@@ -23,7 +23,7 @@ use libks_ini::edit::Ini;
 use screens::*;
 
 struct App {
-    ks_dir: PathBuf,
+    ks_dir: Option<PathBuf>,
     new_title: Option<String>,
     screen: Screen,
 }
@@ -67,7 +67,7 @@ fn main() -> Result<()> {
             Screen::StartupError(state) => startup_error::build_ui(ui, &mut ex, state),
             Screen::LevelList(state) => match level_list::build_ui(ui, &mut ex, state) {
                 Some(level_dir) => {
-                    let state = loading::State::new(level_dir);
+                    let state = loading::State::new(app.ks_dir.clone(), level_dir);
                     app.screen = Screen::Loading(state);
                 }
                 None => {}
@@ -83,17 +83,21 @@ fn main() -> Result<()> {
                     app.screen = Screen::LevelMap(state);
                 }
                 Some(loading::Task::ShowLevelList) => {
-                    app.new_title = Some(APP_NAME.to_string());
-                    let state = level_list::State::new(&app.ks_dir);
-                    app.screen = Screen::LevelList(state);
+                    if let Some(ks_dir) = &app.ks_dir {
+                        app.new_title = Some(APP_NAME.to_string());
+                        let state = level_list::State::new(ks_dir);
+                        app.screen = Screen::LevelList(state);
+                    }
                 }
                 None => {}
             }
             Screen::LevelMap(state) => match level_map::build_ui(ui, &mut ex, state) {
                 Some(level_map::Task::ShowLevelList) => {
-                    app.new_title = Some(APP_NAME.to_string());
-                    let state = level_list::State::new(&app.ks_dir);
-                    app.screen = Screen::LevelList(state);
+                    if let Some(ks_dir) = &app.ks_dir {
+                        app.new_title = Some(APP_NAME.to_string());
+                        let state = level_list::State::new(ks_dir);
+                        app.screen = Screen::LevelList(state);
+                    }
                 }
                 Some(level_map::Task::Exit) => {
                     return imgui_app::Task::Exit;
@@ -114,17 +118,23 @@ fn main() -> Result<()> {
 
 fn init_app() -> App {
     let arg = std::env::args().nth(1).map(interpret_path_arg);
-    let mut ks_dir = PathBuf::from(".");
+    let mut ks_dir: Option<PathBuf> = None;
     
     let screen = match arg {
         Some(Ok(PathArg::WorldPath(world_dir))) => {
-            ks_dir = world_dir.join("../..");
-            let state = loading::State::new(world_dir);
+            let maybe_ks_dir = world_dir.join("../..");
+            if is_ks_dir(&maybe_ks_dir) {
+                ks_dir = Some(maybe_ks_dir);
+            }
+            else if let Ok(Some(path)) = find_ks() {
+                ks_dir = Some(path);
+            }
+            let state = loading::State::new(ks_dir.clone(), world_dir);
             Screen::Loading(state)
         }
         Some(Ok(PathArg::KsPath(path))) => {
             let state = level_list::State::new(&path);
-            ks_dir = path;
+            ks_dir = Some(path);
             Screen::LevelList(state)
         }
         Some(Ok(PathArg::Unrecognized)) => {
@@ -140,7 +150,7 @@ fn init_app() -> App {
         None => match find_ks() {
             Ok(Some(path)) => {
                 let state = level_list::State::new(&path);
-                ks_dir = path;
+                ks_dir = Some(path);
                 Screen::LevelList(state)
             }
             Ok(None) => {
