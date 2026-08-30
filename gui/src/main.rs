@@ -57,7 +57,10 @@ fn main() -> Result<()> {
         style.set_frame_rounding(2.0);
         
         let [r, g, b, _] = style.color(StyleColor::PopupBg);
-        imgui.imgui.style_mut().set_color(StyleColor::PopupBg, [r, g, b, 1.0]);
+        style.set_color(StyleColor::PopupBg, [r, g, b, 1.0]);
+        
+        let [r, g, b, _] = style.color(StyleColor::WindowBg);
+        style.set_color(StyleColor::WindowBg, [r, g, b, 1.0]);
     }
     
     let mut app = init_app();
