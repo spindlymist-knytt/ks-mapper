@@ -10,6 +10,7 @@ mod screens {
 mod map_widget;
 mod name_pattern;
 mod format_bytes;
+mod tooltips;
 
 use std::{fs, path::{Path, PathBuf}};
 

@@ -19,6 +19,7 @@ use ksmap::screen_map::ScreenMap;
 use rustc_hash::FxHashMap;
 
 use crate::name_pattern::{self, NamePattern};
+use crate::tooltips::{set_tooltips_enabled, toggle_tooltips, tooltip, tooltips_are_enabled};
 use crate::{map_widget::{build_map, MapState, map_get_center_screen}, ui_extensions::UiExt};
 use crate::format_bytes::*;
 
@@ -129,6 +130,9 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         return Some(Task::ShowLevelList);
     };
     
+    if ui.is_key_pressed(Key::F1) {
+        toggle_tooltips();
+    }
     if ui.is_key_pressed(Key::F2) {
         return Some(Task::ShowLevelList);
     }
@@ -202,6 +206,13 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         ui.menu("Window", || {
             if ui.menu_item("Reset layout") {
                 *reset_layout = true;
+            }
+        });
+        ui.menu("Help", || {
+            let mut enabled = tooltips_are_enabled();
+            ui.menu_item_toggle("Show tooltips", Some("F1"), &mut enabled, true);
+            if ui.is_item_edited() {
+                set_tooltips_enabled(enabled);
             }
         });
     }
@@ -395,7 +406,7 @@ enum PartitionAlgorithm {
 }
 
 fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut PartitionState, render_state: &mut RenderState) {
-    let _group = ui.widget_group_begin();
+    let _token = ui.widget_group_begin();
     
     let button_height = ui.text_line_height() * 2.0;
     if ui.button_with_size("Rebuild partitions", [-1.0, button_height]) {
@@ -438,6 +449,10 @@ fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut Part
         1 => PartitionAlgorithm::Grid,
         _ => PartitionAlgorithm::Islands
     };
+    tooltip(ui, "\
+        Islands: Divide the map into clusters of screens that are near one another.\n\
+        \n\
+        Grid: Divide the map according to a grid.");
     
     let max_width_px = partition_state.max_width * 600;
     ui.widget_group_label("Max width");
@@ -447,6 +462,7 @@ fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut Part
         .try_display_format(format!("%d screens / {max_width_px}px"))
         .expect("Invalid display format")
         .build(ui, &mut partition_state.max_width);
+    tooltip(ui, "The maximum width of a single output image.");
     
     let max_height_px = partition_state.max_height * 240;
     ui.widget_group_label("Max height");
@@ -456,6 +472,7 @@ fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut Part
         .try_display_format(format!("%d screens / {max_height_px}px"))
         .expect("Invalid display format")
         .build(ui, &mut partition_state.max_height);
+    tooltip(ui, "The maximum height of a single output image.");
     
     {
         let max_bytes = max_width_px as usize * max_height_px as usize * 4;
@@ -463,11 +480,16 @@ fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut Part
         let mut max_size = convert_bytes_to_unit(max_bytes, unit);
         
         ui.widget_group_label("Max memory");
-        let _disabled = ui.begin_disabled();
+        let _token = ui.begin_disabled();
         ui.drag_float_config("##MaxMemory")
             .try_display_format(format!("%.1f{unit}"))
             .expect("Invalid display format")
             .build(ui, &mut max_size);
+        tooltip(ui, "The max possible size of a single output image in RAM if it had width and height equal to the \
+            max values set above.\n\
+            \n\
+            This is likely higher than the actual amount the largest partition will require. Check the Partitions \
+            window to see the amount required (excluding assets and working memory).");
     }
     
     match partition_state.algorithm {
@@ -482,6 +504,9 @@ fn build_partition_options_islands(ui: &Ui, state: &mut PartitionState) {
         .range(1, i32::MAX)
         .speed(0.05)
         .build(ui, &mut state.min_gap);
+    tooltip(ui, "If the max gap setting produces an island that is too big, that island will be broken up into \
+        smaller islands by gradually reducing the gap size down to this value. Set this to the same value as max gap \
+        if you don't want that to happen.");
 
     state.max_gap = state.max_gap.max(state.min_gap);
     ui.widget_group_label("Max gap");
@@ -489,9 +514,15 @@ fn build_partition_options_islands(ui: &Ui, state: &mut PartitionState) {
         .range(state.min_gap, i32::MAX)
         .speed(0.05)
         .build(ui, &mut state.max_gap);
+    tooltip(ui, "The number of empty screens allowed between the screens of an island.");
 
     ui.checkbox("Force gap size", &mut state.force);
+    tooltip(ui, "When enabled, the max gap setting will be respected even if the entire level fits into the chosen \
+        max size.");
+    
     ui.checkbox("Subdivide oversized islands", &mut state.grid_fallback);
+    tooltip(ui, "When enabled, if the gap settings produce an island that is too big, that island will be subdivided \
+        according to a grid (i.e. using the Grid algorithm).");
 }
 
 fn build_partition_options_grid(ui: &Ui, state: &mut PartitionState) {
@@ -500,29 +531,35 @@ fn build_partition_options_grid(ui: &Ui, state: &mut PartitionState) {
     
     ui.widget_group_label("Rows");
     {
-        let _disabled = ui.begin_disabled_with_cond(state.auto_rows);
+        let _token = ui.begin_disabled_with_cond(state.auto_rows);
         ui.set_next_item_width(-checkbox_width - inner_spacing_x);
         ui.drag_int_config("##Rows")
             .range(1, i32::MAX)
             .speed(0.05)
             .build(ui, &mut state.rows);
+        tooltip(ui, "The number of rows to divide the level into.");
     }
     ui.same_line_with_spacing(0.0, inner_spacing_x);
     ui.checkbox("Auto##AutoRows", &mut state.auto_rows);
+    tooltip(ui, "Calculate the number of rows based on the max height.");
     
     ui.widget_group_label("Cols");
     {
-        let _disabled = ui.begin_disabled_with_cond(state.auto_cols);
+        let _token = ui.begin_disabled_with_cond(state.auto_cols);
         ui.set_next_item_width(-checkbox_width - inner_spacing_x);
         ui.drag_int_config("##Columns")
             .range(state.min_gap, i32::MAX)
             .speed(0.05)
             .build(ui, &mut state.cols);
+        tooltip(ui, "The number of columns to divide the level into.");
     }
     ui.same_line_with_spacing(0.0, inner_spacing_x);
     ui.checkbox("Auto##AutoCols", &mut state.auto_cols);
+    tooltip(ui, "Calculate the number of columns based on the max width.");
     
     ui.checkbox("Force rows and columns", &mut state.force);
+    tooltip(ui, "When enabled, the row and column settings will be respected even if the entire level fits into the \
+        chosen max size.");
 }
 
 const PARTITION_TABLE_COL_X_MIN     : usize = 0;
@@ -867,6 +904,8 @@ fn build_window_drawing(
             *seed = new_seed;
         }
     }
+    tooltip(ui, "The RNG seed. If you use the same seed with the same settings, you will get the same output. Pick a \
+        new seed if you want different results. Must be between 1 and 16 hexadecimal digits (0-9 A-F).");
     
     ui.same_line_with_spacing(0.0, inner_spacing_x);
     if ui.button("Random") {
@@ -899,6 +938,10 @@ fn build_window_drawing(
             _ => {}
         }
     }
+    tooltip(ui, "How to handle laser phases.\n\
+        - Maximize: Choose the phase (red/green) with the most lasers\n\
+        - Randomize: Choose a phase (red/green) randomly\n\
+        - All: Draw all lasers regardless of phase");
     
     let mut tint_index = match draw_options.tint_strategy {
         TintStrategy::Ignore => 0,
@@ -915,6 +958,9 @@ fn build_window_drawing(
             _ => {}
         }
     }
+    tooltip(ui, "How to handle screen tints.\n\
+        - Ignore: Ignore screen tints.\n\
+        - Explicit: Apply tints to screens that explicitly have one.");
     
     ui.widget_group_label("Min alpha");
     if ui.drag_int_config("##MinAlpha")
@@ -924,6 +970,8 @@ fn build_window_drawing(
     {
         draw_options.trans_max_override = alpha_to_trans(state.min_alpha as u8);
     }
+    tooltip(ui, "The minimum alpha value (0-255) for objects that have random opacity. \
+        This helps ensure objects such as ghosts are visible on the map.");
     
     ui.widget_group_label("Min alpha threshold");
     if ui.drag_int_config("##AlphaThreshold")
@@ -933,6 +981,8 @@ fn build_window_drawing(
     {
         draw_options.trans_max_threshold = state.min_alpha_threshold as u32;
     }
+    tooltip(ui, "The number of copies of an object a screen must have to ignore the min alpha setting. \
+        This allows for more natural variation when an object appears many times on one screen.");
     
     let alpha_sim_secs = state.alpha_sim_frames as f32 / 50.0;
     ui.widget_group_label("Alpha sim frames");
@@ -944,9 +994,13 @@ fn build_window_drawing(
     {
         draw_options.trans_frames = state.alpha_sim_frames as u32;
     }
+    tooltip(ui, "The number of game frames to simulate for objects that have random opacity (50 = 1 second).");
     
     ui.checkbox("Show invisible objects", &mut draw_options.show_invisible);
+    tooltip(ui, "Draw editor icons for invisible objects such as shifts and signs.");
+    
     ui.checkbox("Show proximity-sensitive objects", &mut draw_options.show_proximity);
+    tooltip(ui, "Draw objects that are only visible when Juni is nearby such as 14:19.");
     
     let mut invalidations = Invalidations::default();
     if *draw_options != original_draw_options {
@@ -1032,7 +1086,8 @@ fn build_window_export(
     }
     
     {
-        ui.widget_group_label("Output dir");
+        ui.widget_group_label("Output directory");
+        let _token = ui.begin_group();
         
         let inner_spacing_x = unsafe { ui.style().item_inner_spacing()[0] };
         let button_width = ui.calc_button_width("Browse");
@@ -1056,20 +1111,57 @@ fn build_window_export(
             }
         }
     }
+    tooltip(ui, "The base directory save images to. See also: Subdirectory name");
     
     ui.widget_group_label("Subdirectory name");
     ui.input_text("##SubdirectoryName", &mut export_state.subdir_spec).build();
+    tooltip(ui, "The name of the subdirectory to save the images to relative to the output directory.\n\
+        \n\
+        The following expressions will be substituted:\n\
+        - $dirname: The name of the level directory.\n\
+        - $author: The author of the level from World.ini.\n\
+        - $name: The name of the level from World.ini.\n\
+        \n\
+        Use $$ if you want the directory name to have a dollar sign.");
     
     ui.widget_group_label("Partition name");
     ui.input_text("##PartitionName", &mut export_state.partition_spec).build();
+    tooltip(ui, "Specifies the filename for each partition. You should use the $ expressions below to ensure each \
+        partition is given a unique name. The file extension (.png) will be added automatically.\n\
+        \n\
+        The following expressions will be substituted:\n\
+        - $index: The number of the partition in the order exported, starting from 0.\n\
+        - $bounds: The full bounds of the partition, e.g. \"x100y200 to x300y400\".\n\
+        - $min: The top left screen of the partition, e.g. \"x100y200\".\n\
+        - $max: The bottom right screen of the partition, e.g. \"x300y400\".\n\
+        - $xmin: The minimum x coordinate in the partition, e.g. \"100\".\n\
+        - $xmax: The maximum x coordinate in the partition, e.g. \"300\".\n\
+        - $ymin: The minimum y coordinate in the partition, e.g. \"200\".\n\
+        - $ymax: The maximum y coordinate in the partition, e.g. \"400\".\n\
+        - $dirname: The name of the level directory.\n\
+        - $author: The author of the level from World.ini.\n\
+        - $name: The name of the level from World.ini.\n\
+        \n\
+        Use $$ if you want the file name to have a dollar sign.");
     
     ui.checkbox("Don't create subdirectory", &mut export_state.no_subdir);
+    tooltip(ui, "When enabled, the subdirectory name setting is ignored and the images are saved directly to the \
+        output directory.");
+    
     ui.checkbox("Don't create subdirectory for single partition", &mut export_state.no_subdir_for_single);
+    tooltip(ui, "When enabled, if there is only one partition, it will be saved directly to the output directory.");
+    
     ui.checkbox("Use subdirectory name for single partition", &mut export_state.use_subdir_name_for_single);
+    tooltip(ui, "When enabled, if there is only one partition, it will be named according to the subdirectory name \
+        setting instead of the partition name setting.");
     
     ui.widget_group_label("Compression level");
     ui.slider("##CompressionLevel", 1, 9, &mut export_state.compression_level);
+    tooltip(ui, "Desired compression level from 1 (fastest, worst compression) to 9 (slowest, best compression).");
+    
     ui.checkbox("Multithreaded encoding", &mut export_state.use_multithreaded_encoder);
+    tooltip(ui, "When enabled, multiple threads will be used for PNG encoding. This is usually MUCH faster, but the \
+        compression ratio may be slightly worse.");
 }
 
 pub struct RenderState {
