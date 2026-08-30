@@ -72,6 +72,7 @@ pub enum Task {
 }
 
 pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
+    // Show progress window when rendering
     if state.render_thread.is_some() || state.render_error.is_some() {
         let (width, height) = ex.window.size();
         ui.window("Main")
@@ -100,6 +101,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         preview_state,
     } = state;
     
+    // Initialize dockspace
     {
         let menu_bar_height = ui.text_line_height() + 2.0 * unsafe { ui.style().frame_padding()[1] };
         let (width, height) = ex.window.size();
@@ -136,6 +138,8 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     let mut show_level_list = false;
     let mut copy_screen_pos = false;
     let mut open_popup_controls = false;
+    
+    // Main menu
     if let Some(_menu_bar) = ui.begin_main_menu_bar() {
         if let Some(_file_menu) = ui.begin_menu("File") {
             if ui.menu_item_with_shortcut("Show output directory", "Ctrl+O") {
@@ -245,12 +249,25 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         }
     }
     
+    // Export
     ui.window("Export").build(|| {
         build_window_export(ui, ex, export_state, &mut render_state, render_thread, render_rx, render_state_lock, render_progress, render_cancel)
     });
     
-    if map_state.prev_geom.is_none() {
-        if let Some(partition) = render_state.partitions.first() {
+    // Partition options
+    ui.window("Partition Options").build(|| {
+        build_window_partitions(ui, ex, partition_state, &mut render_state)
+    });
+    
+    // Partition list
+    {
+        let go_to_partition_index = ui.window("Partition List").build(|| {
+            build_partition_table(ui, ex.fonts, partition_state, &mut render_state.partitions)
+        }).unwrap_or_default();
+        
+        if let Some(i) = go_to_partition_index
+            && let Some(partition) = render_state.partitions.get(i)
+        {
             let bounds = partition.bounds();
             let partition_center = (
                 (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i64,
@@ -258,52 +275,49 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
             );
             requested_center = Some(partition_center);
         }
-        else {
-            requested_center = Some((1000, 1000));
+    }
+    
+    // Drawing options
+    {
+        let invalidations = ui.window("Drawing Options").build(|| {
+            let RenderState { draw_options, sync_options, seed, .. } = &mut *render_state;
+            build_window_drawing(ui, ex,
+                drawing_state,
+                draw_options,
+                sync_options,
+                seed)
+        }).unwrap_or_default();
+        if invalidations.preview {
+            preview_state.preview = None;
+        }
+        if invalidations.world_sync {
+            render_state.world_sync = WorldSync::new(
+                render_state.seed,
+                &render_state.screen_map,
+                &render_state.object_defs,
+                &render_state.sync_options
+            );
         }
     }
     
-    ui.window("Partition Options").build(|| {
-        build_window_partitions(ui, ex, partition_state, &mut render_state)
-    });
-    
-    let go_to_partition_index = ui.window("Partition List").build(|| {
-        build_partition_table(ui, ex.fonts, partition_state, &mut render_state.partitions)
-    }).unwrap_or_default();
-    
-    if let Some(i) = go_to_partition_index
-        && let Some(partition) = render_state.partitions.get(i)
-    {
-        let bounds = partition.bounds();
-        let partition_center = (
-            (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i64,
-            (bounds.y.start + (bounds.y.end - bounds.y.start) / 2) as i64,
-        );
-        requested_center = Some(partition_center);
-    }
-    
-    let invalidations = ui.window("Drawing Options").build(|| {
-        let RenderState { draw_options, sync_options, seed, .. } = &mut *render_state;
-        build_window_drawing(ui, ex,
-            drawing_state,
-            draw_options,
-            sync_options,
-            seed)
-    }).unwrap_or_default();
-    if invalidations.preview {
-        preview_state.preview = None;
-    }
-    if invalidations.world_sync {
-        render_state.world_sync = WorldSync::new(
-            render_state.seed,
-            &render_state.screen_map,
-            &render_state.object_defs,
-            &render_state.sync_options
-        );
-    }
-    
+    // Map
     let hover_pos = {
-        let _map_padding = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0])); 
+        // Initial map center
+        if map_state.prev_geom.is_none() {
+            if let Some(partition) = render_state.partitions.first() {
+                let bounds = partition.bounds();
+                let partition_center = (
+                    (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i64,
+                    (bounds.y.start + (bounds.y.end - bounds.y.start) / 2) as i64,
+                );
+                requested_center = Some(partition_center);
+            }
+            else {
+                requested_center = Some((1000, 1000));
+            }
+        }
+        
+        let _token = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0])); 
         ui.window("Map").build(|| {
             build_map(
                 ui,
@@ -313,22 +327,25 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
                 &partition_state.partition_members,
                 requested_center,
             )
-        }).unwrap_or(None)
+        }).flatten()
     };
     
-    let _padding = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0]));
-    ui.window("Preview")
-        .flags(WindowFlags::NO_SCROLLBAR | WindowFlags::NO_SCROLL_WITH_MOUSE)
-    .build(|| {
-        let preview_screen =
-            if map_state.selected_screen.is_some() {
-                map_state.selected_screen.clone()
-            }
-            else {
-                hover_pos
-            };
-        build_window_preview(ui, ex, preview_state, &mut render_state, preview_screen);
-    });
+    // Preview
+    {
+        let _token = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0]));
+        ui.window("Preview")
+            .flags(WindowFlags::NO_SCROLLBAR | WindowFlags::NO_SCROLL_WITH_MOUSE)
+        .build(|| {
+            let preview_screen =
+                if map_state.selected_screen.is_some() {
+                    map_state.selected_screen.clone()
+                }
+                else {
+                    hover_pos
+                };
+            build_window_preview(ui, ex, preview_state, &mut render_state, preview_screen);
+        });
+    }
     
     // Hotkeys that should always trigger
     let ctrl = ui.io().key_ctrl();
@@ -352,6 +369,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         }
     }
     
+    // Complete any tasks triggered by a menu item or hotkey
     if show_output_directory {
         let mut did_show = false;
         if !export_state.no_subdir {
@@ -724,7 +742,7 @@ fn build_partition_table(ui: &Ui, fonts: &Fonts, partition_state: &mut Partition
             }
         }
         
-        let _font = ui.push_font(fonts.mono);
+        let _token = ui.push_font(fonts.mono);
         
         for (i, partition) in partitions.iter().enumerate() {
             let bounds = partition.bounds();
@@ -971,7 +989,7 @@ fn build_window_drawing(
     let original_draw_options = draw_options.clone();
     let original_sync_options = sync_options.clone();
     
-    let _group = ui.widget_group_begin();
+    let _token = ui.widget_group_begin();
     
     let mut seed_buffer = seed.to_string();
     let button_width = ui.calc_button_width("Random");
@@ -1141,7 +1159,7 @@ fn build_window_export(
     render_progress: &mut RenderProgress,
     render_cancel: &mut Arc<AtomicBool>,
 ) {
-    let _group = ui.widget_group_begin();
+    let _token = ui.widget_group_begin();
     
     let button_height = ui.text_line_height() * 2.0;
     if ui.button_with_size("Export", [-1.0, button_height]) {
@@ -1457,7 +1475,7 @@ fn build_window_progress(ui: &Ui, _ex: &mut Extras, state: &mut State) {
                 RenderTaskStatus::Exporting => ui.style_color(StyleColor::PlotHistogram),
                 RenderTaskStatus::Done => [0.5, 1.0, 0.5, 1.0],
             };
-            let _color_token = ui.push_style_color(StyleColor::Text, color);
+            let _token = ui.push_style_color(StyleColor::Text, color);
             ui.same_line();
             ui.text(task.status.to_string());
         }
