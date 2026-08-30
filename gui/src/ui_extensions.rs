@@ -2,6 +2,7 @@ use imgui_app::ImguiExt;
 use imgui_app::dear_imgui_rs::{Condition, GroupToken, StyleVar, Ui};
 use imgui_app::dear_imgui_rs::sys::{ImVec2_c, ImGuiCond};
 
+#[allow(dead_code)]
 pub trait UiExt {
     fn text_aligned_right<S: AsRef<str>>(&self, text: S);
     fn text_aligned_center<S: AsRef<str>>(&self, text: S);

@@ -1,5 +1,4 @@
 use imgui_app::dear_imgui_rs::{ItemHoveredFlags, Ui};
-use imgui_app::dear_imgui_rs::sys::ImVec2_c;
 
 use crate::ui_extensions::UiExt;
 
