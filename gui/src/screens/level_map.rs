@@ -137,7 +137,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         return Some(Task::ShowLevelList);
     }
     
-    let mut requested_center: Option<ScreenCoord> = None;
+    let mut requested_center: Option<(i64, i64)> = None;
     let mut open_popup_controls = false;
     if let Some(_menu_bar) = ui.begin_main_menu_bar() {
         if let Some(_file_menu) = ui.begin_menu("File") {
@@ -270,8 +270,8 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         if let Some(partition) = render_state.partitions.first() {
             let bounds = partition.bounds();
             let partition_center = (
-                (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i32,
-                (bounds.y.start + (bounds.y.end - bounds.y.start) / 2) as i32,
+                (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i64,
+                (bounds.y.start + (bounds.y.end - bounds.y.start) / 2) as i64,
             );
             requested_center = Some(partition_center);
         }
@@ -293,8 +293,8 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     {
         let bounds = partition.bounds();
         let partition_center = (
-            (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i32,
-            (bounds.y.start + (bounds.y.end - bounds.y.start) / 2) as i32,
+            (bounds.x.start + (bounds.x.end - bounds.x.start) / 2) as i64,
+            (bounds.y.start + (bounds.y.end - bounds.y.start) / 2) as i64,
         );
         requested_center = Some(partition_center);
     }

@@ -1,10 +1,10 @@
-use imgui_app::dear_imgui_rs::{Ui, MouseButton};
+use imgui_app::{dear_imgui_rs::{MouseButton, Ui}, wgpu::rwh::RawDisplayHandle::Xcb};
 use ksmap::{screen_map::ScreenMap, partition::Partition};
 use libks::ScreenCoord;
 use rustc_hash::FxHashMap;
 
 pub struct MapState {
-    pub top_left: ScreenCoord,
+    pub top_left: (i64, i64),
     pub is_dragging: bool,
     pub zoom_level: i32,
     pub bias: (f32, f32),
@@ -103,7 +103,7 @@ pub fn build_map(
     screens: &ScreenMap,
     selected_partition: Option<&Partition>,
     partition_members: &FxHashMap<ScreenCoord, usize>,
-    mut requested_center: Option<ScreenCoord>,
+    mut requested_center: Option<(i64, i64)>,
 ) -> Option<ScreenCoord> {
     let draw_list = ui.get_window_draw_list();
     let map_size = ui.content_region_avail();
@@ -126,8 +126,8 @@ pub fn build_map(
     // Move the top left of the map to get the desired center
     if let Some(center) = requested_center {
         map_state.top_left = (
-            center.0 - (map_size[0] / 2.0 / (cell_width + line_thickness)) as i32,
-            center.1 - (map_size[1] / 2.0 / (cell_height + line_thickness)) as i32,
+            center.0 as i64 - (map_size[0] / 2.0 / (cell_width + line_thickness)) as i64,
+            center.1 as i64 - (map_size[1] / 2.0 / (cell_height + line_thickness)) as i64,
         );
     }
     
@@ -190,7 +190,7 @@ pub fn build_map(
             .build();
     };
     let draw_screen_rect = |(x, y)| {
-        let cell_pos = calc_cell_pos((x, y), &geom);
+        let cell_pos = calc_cell_pos((x as i64, y as i64), &geom);
         let top_left = [
             cell_pos[0] + line_thickness,
             cell_pos[1] + line_thickness,
@@ -202,8 +202,8 @@ pub fn build_map(
         
         let partition_index = partition_members.get(&(x, y)).unwrap();
         let color_index = *partition_index % MAP_COLORS.len();
-        
         let color = MAP_COLORS[color_index];
+        
         draw_rect_relative(top_left, bottom_right, color, true);
         
         if cell_height >= 5.0 {
@@ -245,14 +245,22 @@ pub fn build_map(
     if screens.len() <= n_grid_cells {
         for screen in screens.iter() {
             let (x, y) = screen.position;
-            if x >= geom.x_min && x <= geom.x_max && y >= geom.y_min && y <= geom.y_max {
+            if x as i64 >= geom.x_min
+                && x as i64 <= geom.x_max
+                && y as i64 >= geom.y_min
+                && y as i64 <= geom.y_max
+            {
                 draw_screen_rect((x, y));
             }
         }
     }
     else {
-        for y in geom.y_min..=geom.y_max {
-            for x in geom.x_min..=geom.x_max {
+        let x_min = geom.x_min.max(i32::MIN as i64) as i32;
+        let x_max = geom.x_max.min(i32::MAX as i64) as i32;
+        let y_min = geom.y_min.max(i32::MIN as i64) as i32;
+        let y_max = geom.y_max.min(i32::MAX as i64) as i32;
+        for y in y_min..=y_max {
+            for x in x_min..=x_max {
                 if screens.index_of(&(x, y)).is_some() {
                     draw_screen_rect((x, y));
                 }
@@ -265,8 +273,8 @@ pub fn build_map(
         && !bounds.x.is_empty()
         && !bounds.y.is_empty()
     {
-        let top_left = calc_cell_pos((bounds.x.start as i32, bounds.y.start as i32), &geom);
-        let mut bottom_right = calc_cell_pos((bounds.x.end as i32, bounds.y.end as i32), &geom);
+        let top_left = calc_cell_pos((bounds.x.start, bounds.y.start), &geom);
+        let mut bottom_right = calc_cell_pos((bounds.x.end, bounds.y.end), &geom);
         bottom_right[0] += line_thickness;
         bottom_right[1] += line_thickness;
         draw_rect_relative(top_left, bottom_right, [1.0, 1.0, 1.0, 1.0], false);
@@ -275,24 +283,34 @@ pub fn build_map(
     // Hover and selection indicator
     if ui.is_window_hovered() {
         let mouse_pos = screen_to_relative_coords(ui.mouse_pos());
-        let hovered_screen_pos = get_hovered_screen_pos(mouse_pos, &geom);
+        let hovered_cell = get_hovered_screen_pos(mouse_pos, &geom);
+        let hovered_screen_pos =
+            if let Ok(x) = i32::try_from(hovered_cell.0)
+                && let Ok(y) = i32::try_from(hovered_cell.1)
+            {
+                Some((x, y))
+            }
+            else {
+                None
+            };
         
         if ui.is_mouse_clicked(MouseButton::Left) {
-            if screens.index_of(&hovered_screen_pos).is_some()
-                && map_state.selected_screen != Some(hovered_screen_pos)
+            if let Some(pos) = &hovered_screen_pos
+                && screens.index_of(&pos).is_some()
+                && map_state.selected_screen != Some(*pos)
             {
-                map_state.selected_screen = Some(hovered_screen_pos);
+                map_state.selected_screen = Some(*pos);
             }
             else {
                 map_state.selected_screen = None;
             }
         }
         
-        if let Some(selected_pos) = &map_state.selected_screen {
-            draw_indicator(*selected_pos, [1.0, 1.0, 0.0, 1.0]);
+        if let Some(pos) = &map_state.selected_screen {
+            draw_indicator((pos.0 as i64, pos.1 as i64), [1.0, 1.0, 0.0, 1.0]);
         }
         
-        let hovered_cell_pos = calc_cell_pos(hovered_screen_pos, &geom);
+        let hovered_cell_pos = calc_cell_pos(hovered_cell, &geom);
         let hovered_top_left = [
             hovered_cell_pos[0] + line_thickness,
             hovered_cell_pos[1] + line_thickness,
@@ -302,14 +320,16 @@ pub fn build_map(
             hovered_top_left[1] + cell_height,
         ];
         draw_rect_relative(hovered_top_left, hovered_bottom_right, [1.0, 1.0, 1.0, 1.0], false);
-        draw_coord_string(hovered_screen_pos);
+        if let Some(pos) = &hovered_screen_pos {
+            draw_coord_string(*pos);
+        }
         
         // Zoom
         let wheel_delta = ui.get_mouse_wheel();
         if wheel_delta != 0.0 && !map_state.is_dragging {
             let new_zoom_level = (map_state.zoom_level + wheel_delta as i32).clamp(0, 12);
             if new_zoom_level == map_state.zoom_level {
-                return Some(hovered_screen_pos);
+                return hovered_screen_pos;
             }
             
             let (new_cell_width, new_cell_height) = get_cell_size_for_zoom_level(new_zoom_level, map_state.aspect_ratio);
@@ -343,11 +363,11 @@ pub fn build_map(
             // Since we know the map coordinates of the hovered screen and the pixel coordinates of its top left corner,
             // we can do some math to figure out the what screen appears in the top left of the map and where its
             // top left corner is.
-            let blah_x = f32::ceil(new_hovered_cell_top_left[0] / new_cell_outer_width) as i32;
-            let blah_y = f32::ceil(new_hovered_cell_top_left[1] / new_cell_outer_height) as i32;
+            let blah_x = f32::ceil(new_hovered_cell_top_left[0] / new_cell_outer_width) as i64;
+            let blah_y = f32::ceil(new_hovered_cell_top_left[1] / new_cell_outer_height) as i64;
             let new_top_left_screen = (
-                hovered_screen_pos.0 - blah_x,
-                hovered_screen_pos.1 - blah_y,
+                hovered_cell.0 - blah_x,
+                hovered_cell.1 - blah_y,
             );
             let new_bias = (
                 new_hovered_cell_top_left[0] - blah_x as f32 * new_cell_outer_width,
@@ -359,11 +379,11 @@ pub fn build_map(
             map_state.bias = new_bias;
         }
         
-        Some(hovered_screen_pos)
+        hovered_screen_pos
     }
-    else if let Some(selected_pos) = &map_state.selected_screen {
-        draw_indicator(*selected_pos, [1.0, 1.0, 0.0, 1.0]);
-        draw_coord_string(*selected_pos);
+    else if let Some(pos) = &map_state.selected_screen {
+        draw_indicator((pos.0 as i64, pos.1 as i64), [1.0, 1.0, 0.0, 1.0]);
+        draw_coord_string(*pos);
         None
     }
     else {
@@ -374,10 +394,10 @@ pub fn build_map(
 #[derive(Clone)]
 pub struct MapGeometry {
     size: [f32; 2],
-    x_min: i32,
-    y_min: i32,
-    x_max: i32,
-    y_max: i32,
+    x_min: i64,
+    y_min: i64,
+    x_max: i64,
+    y_max: i64,
     origin_x: f32,
     origin_y: f32,
     cell_outer_width: f32,
@@ -392,8 +412,8 @@ fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)
     let cell_outer_width = cell_width + line_thickness;
     let cell_outer_height = cell_height + line_thickness;
     
-    let blah_x = f32::ceil(total_bias.0 / cell_outer_width) as i32;
-    let blah_y = f32::ceil(total_bias.1 / cell_outer_height) as i32;
+    let blah_x = f32::ceil(total_bias.0 / cell_outer_width) as i64;
+    let blah_y = f32::ceil(total_bias.1 / cell_outer_height) as i64;
     
     let x_min = map_state.top_left.0 - blah_x;
     let y_min = map_state.top_left.1 - blah_y;
@@ -401,8 +421,8 @@ fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)
     let origin_x = total_bias.0 + (x_min - map_state.top_left.0) as f32 * cell_outer_width;
     let origin_y = total_bias.1 + (y_min - map_state.top_left.1) as f32 * cell_outer_height;
     
-    let x_max = x_min + ((map_size.0 - origin_x) / cell_outer_width).floor() as i32;
-    let y_max = y_min + ((map_size.1 - origin_y) / cell_outer_height).floor() as i32;
+    let x_max = x_min + ((map_size.0 - origin_x) / cell_outer_width).floor() as i64;
+    let y_max = y_min + ((map_size.1 - origin_y) / cell_outer_height).floor() as i64;
     
     MapGeometry {
         size: map_size.into(),
@@ -417,9 +437,9 @@ fn calc_map_geometry(map_state: &MapState, pan: (f32, f32), map_size: (f32, f32)
     }
 }
 
-fn calc_cell_pos(screen_pos: ScreenCoord, geom: &MapGeometry) -> [f32; 2] {
-    let dx = screen_pos.0 - geom.x_min;
-    let dy = screen_pos.1 - geom.y_min;
+fn calc_cell_pos(screen_pos: (i64, i64), geom: &MapGeometry) -> [f32; 2] {
+    let dx = screen_pos.0 as i64 - geom.x_min;
+    let dy = screen_pos.1 as i64 - geom.y_min;
     
     let x = geom.origin_x + dx as f32 * geom.cell_outer_width;
     let y = geom.origin_y + dy as f32 * geom.cell_outer_height;
@@ -427,11 +447,11 @@ fn calc_cell_pos(screen_pos: ScreenCoord, geom: &MapGeometry) -> [f32; 2] {
     [x, y]
 }
 
-fn get_hovered_screen_pos(hover_pos: [f32; 2], geom: &MapGeometry) -> ScreenCoord {
+fn get_hovered_screen_pos(hover_pos: [f32; 2], geom: &MapGeometry) -> (i64, i64) {
     let offset_from_origin_x = hover_pos[0] - geom.origin_x;
     let offset_from_origin_y = hover_pos[1] - geom.origin_y;
-    let screen_x = geom.x_min + (offset_from_origin_x / geom.cell_outer_width).floor() as i32;
-    let screen_y = geom.y_min + (offset_from_origin_y / geom.cell_outer_height).floor() as i32;
+    let screen_x = geom.x_min + (offset_from_origin_x / geom.cell_outer_width).floor() as i64;
+    let screen_y = geom.y_min + (offset_from_origin_y / geom.cell_outer_height).floor() as i64;
     
     (screen_x, screen_y)
 }
@@ -451,8 +471,8 @@ fn get_line_thickness_for_zoom_level(zoom: i32, cell_size: (f32, f32)) -> f32 {
     }
 }
 
-pub fn map_get_center_screen(geom: &MapGeometry) -> ScreenCoord {
-    let x = geom.x_min + (geom.size[0] / 2.0 / geom.cell_outer_width) as i32;
-    let y = geom.y_min + (geom.size[1] / 2.0 / geom.cell_outer_height) as i32;
+pub fn map_get_center_screen(geom: &MapGeometry) -> (i64, i64) {
+    let x = geom.x_min + (geom.size[0] / 2.0 / geom.cell_outer_width) as i64;
+    let y = geom.y_min + (geom.size[1] / 2.0 / geom.cell_outer_height) as i64;
     (x, y)
 }
