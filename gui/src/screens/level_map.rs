@@ -130,38 +130,22 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         return Some(Task::ShowLevelList);
     };
     
-    if ui.is_key_pressed(Key::F1) {
-        toggle_tooltips();
-    }
-    if ui.is_key_pressed(Key::F2) {
-        return Some(Task::ShowLevelList);
-    }
-    
     let mut requested_center: Option<(i64, i64)> = None;
+    let mut show_level_directory = false;
+    let mut show_output_directory = false;
+    let mut show_level_list = false;
+    let mut copy_screen_pos = false;
     let mut open_popup_controls = false;
     if let Some(_menu_bar) = ui.begin_main_menu_bar() {
         if let Some(_file_menu) = ui.begin_menu("File") {
-            if ui.menu_item("Show output directory") {
-                let mut did_show = false;
-                if !export_state.no_subdir {
-                    let level_info = name_pattern::LevelInfo::new(&render_state.ini, &export_state.level_dir);
-                    let subdir_pattern = NamePattern::parse(&export_state.subdir_spec);
-                    let subdir_name = subdir_pattern.make_string(&level_info, None);
-                    let output_dir = export_state.output_dir.join(subdir_name);
-                    if output_dir.exists() {
-                        show_dir_in_file_explorer(&output_dir);
-                        did_show = true;
-                    }
-                }
-                if !did_show {
-                    show_dir_in_file_explorer(&export_state.output_dir);
-                }
+            if ui.menu_item_with_shortcut("Show output directory", "Ctrl+O") {
+                show_output_directory = true;
             }
-            if ui.menu_item("Show level directory") {
-                show_dir_in_file_explorer(&export_state.level_dir);
+            if ui.menu_item_with_shortcut("Show level directory", "Ctrl+F") {
+                show_level_directory = true;
             }
             if ui.menu_item_with_shortcut("Return to level list", "F2") {
-                return Some(Task::ShowLevelList);
+                show_level_list = true;
             }
             ui.separator();
             if ui.menu_item("Exit") {
@@ -169,11 +153,8 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
             }
         }
         ui.menu("Edit", || {
-            if ui.menu_item("Copy screen coordinates")
-                && let Some((coord, _)) = &preview_state.preview
-            {
-                let coord_string = format!("x{}y{}", coord.0, coord.1);
-                let _ = ex.clipboard.set_clipboard_text(&coord_string);
+            if ui.menu_item_with_shortcut("Copy screen coordinates", "Ctrl+C") {
+                copy_screen_pos = true;
             }
         });
         ui.menu("View", || {
@@ -257,7 +238,9 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         ui.new_line();
         
         let button_width = ui.calc_text_width("OK") * 4.0;
-        if ui.button_with_size("OK", [button_width, 0.0]) {
+        if ui.button_with_size("OK", [button_width, 0.0])
+            || ui.is_key_pressed(Key::Escape)
+        {
             ui.close_current_popup();
         }
     }
@@ -347,7 +330,62 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         build_window_preview(ui, ex, preview_state, &mut render_state, preview_screen);
     });
     
-    None
+    // Hotkeys that should always trigger
+    let ctrl = ui.io().key_ctrl();
+    if ui.is_key_pressed(Key::F1) {
+        toggle_tooltips();
+    }
+    if ui.is_key_pressed(Key::F2) {
+        show_level_list = true;
+    }
+    if ctrl && ui.is_key_pressed(Key::F) {
+        show_level_directory = true;
+    }
+    if ctrl && ui.is_key_pressed(Key::O) {
+        show_output_directory = true;
+    }
+    
+    // Hotkeys that shouldn't trigger when a widget has focus
+    if !ui.is_any_item_focused() && !ui.is_any_item_active() {
+        if ctrl && ui.is_key_pressed(Key::C) {
+            copy_screen_pos = true;
+        }
+    }
+    
+    if show_output_directory {
+        let mut did_show = false;
+        if !export_state.no_subdir {
+            let level_info = name_pattern::LevelInfo::new(&render_state.ini, &export_state.level_dir);
+            let subdir_pattern = NamePattern::parse(&export_state.subdir_spec);
+            let subdir_name = subdir_pattern.make_string(&level_info, None);
+            let output_dir = export_state.output_dir.join(subdir_name);
+            if output_dir.exists() {
+                show_dir_in_file_explorer(&output_dir);
+                did_show = true;
+            }
+        }
+        if !did_show {
+            show_dir_in_file_explorer(&export_state.output_dir);
+        }
+    }
+    if show_level_directory {
+        show_dir_in_file_explorer(&export_state.level_dir);
+    }
+    if copy_screen_pos {
+        if let Some(pos) = map_state.selected_screen.as_ref()
+            .or(hover_pos.as_ref())
+        {
+            let coord_string = format!("x{}y{}", pos.0, pos.1);
+            let _ = ex.clipboard.set_clipboard_text(&coord_string);
+        }
+    }
+    
+    if show_level_list {
+        Some(Task::ShowLevelList)
+    }
+    else {
+        None
+    }
 }
 
 fn create_dockspace_layout(ui: &Ui) -> DockLayout {
