@@ -1,6 +1,8 @@
 use imgui_app::dear_imgui_rs::{ItemHoveredFlags, Ui};
 use imgui_app::dear_imgui_rs::sys::ImVec2_c;
 
+use crate::ui_extensions::UiExt;
+
 static mut SHOW_TOOLTIPS: bool = false;
 
 pub fn tooltips_are_enabled() -> bool {
@@ -33,10 +35,7 @@ pub fn tooltip(ui: &Ui, text: &str) {
     
     if text_width_unwrapped > text_max_width {
         let text_width_wrapped = ui.calc_text_size_with_opts(text, false, text_max_width)[0];
-        unsafe {
-            let window_size = ImVec2_c::from([text_width_wrapped, 0.0]);
-            imgui_app::dear_imgui_rs::sys::igSetNextWindowContentSize(window_size);
-        }
+        ui.set_next_window_content_size([text_width_wrapped, 0.0]);
         ui.tooltip(|| {
             ui.text_wrapped(text);
         });

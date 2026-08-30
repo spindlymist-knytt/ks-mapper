@@ -1,5 +1,6 @@
 use imgui_app::ImguiExt;
-use imgui_app::dear_imgui_rs::{GroupToken, StyleVar, Ui};
+use imgui_app::dear_imgui_rs::{Condition, GroupToken, StyleVar, Ui};
+use imgui_app::dear_imgui_rs::sys::{ImVec2_c, ImGuiCond};
 
 pub trait UiExt {
     fn text_aligned_right<S: AsRef<str>>(&self, text: S);
@@ -13,6 +14,9 @@ pub trait UiExt {
     fn calc_checkbox_width<S: AsRef<str>>(&self, label: S) -> f32;
     fn widget_group_begin(&self) -> GroupToken<'_>;
     fn widget_group_label<S: AsRef<str>>(&self, label: S);
+    fn set_next_window_pos(&self, pos: impl Into<[f32; 2]>, condition: Condition, pivot: impl Into<[f32; 2]>);
+    fn set_next_window_size(&self, size: impl Into<[f32; 2]>, condition: Condition);
+    fn set_next_window_content_size(&self, size: impl Into<[f32; 2]>);
 }
 
 impl UiExt for Ui {
@@ -95,5 +99,29 @@ impl UiExt for Ui {
         self.text(label);
         self.same_line_with_spacing(0.0, inner_spacing_x);
         self.set_next_item_width(-1.0);
+    }
+    
+    fn set_next_window_pos(&self, pos: impl Into<[f32; 2]>, condition: Condition, pivot: impl Into<[f32; 2]>) {
+        unsafe {
+            let pos = ImVec2_c::from(pos.into());
+            let condition = condition as i32 as ImGuiCond;
+            let pivot = ImVec2_c::from(pivot.into());
+            imgui_app::dear_imgui_rs::sys::igSetNextWindowPos(pos, condition, pivot);
+        }
+    }
+    
+    fn set_next_window_size(&self, size: impl Into<[f32; 2]>, condition: Condition) {
+        unsafe {
+            let size = ImVec2_c::from(size.into());
+            let condition = condition as i32 as ImGuiCond;
+            imgui_app::dear_imgui_rs::sys::igSetNextWindowSize(size, condition);
+        }
+    }
+    
+    fn set_next_window_content_size(&self, size: impl Into<[f32; 2]>) {
+        unsafe {
+            let size = ImVec2_c::from(size.into());
+            imgui_app::dear_imgui_rs::sys::igSetNextWindowContentSize(size);
+        }
     }
 }

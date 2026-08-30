@@ -138,6 +138,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     }
     
     let mut requested_center: Option<ScreenCoord> = None;
+    let mut open_popup_controls = false;
     if let Some(_menu_bar) = ui.begin_main_menu_bar() {
         if let Some(_file_menu) = ui.begin_menu("File") {
             if ui.menu_item("Show output directory") {
@@ -214,7 +215,51 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
             if ui.is_item_edited() {
                 set_tooltips_enabled(enabled);
             }
+            if ui.menu_item("Controls") {
+                open_popup_controls = true;
+            }
         });
+    }
+    
+    // Controls popup
+    if open_popup_controls {
+        ui.open_popup("Controls");
+    }
+    {
+        let [viewport_width, viewport_height] = ui.main_viewport().size();
+        ui.set_next_window_pos([viewport_width * 0.5, viewport_height * 0.5], Condition::Always, [0.5, 0.5]);
+    }
+    if let Some(_token) = ui.begin_modal_popup_config("Controls")
+        .flags(WindowFlags::ALWAYS_AUTO_RESIZE | WindowFlags::NO_MOVE | WindowFlags::NO_RESIZE)
+        .begin()
+    {
+        let header = |label: &str| {
+            let _token = ui.push_font_with_size(None, 24.0);
+            ui.text(label);
+        };
+        
+        header("Map");
+        ui.bullet_text("Right click and drag to pan.");
+        ui.bullet_text("Scroll wheel to zoom in and out.");
+        ui.bullet_text("Click on a screen to lock the preview.");
+        ui.bullet_text("To unlock the preview, click on the selected screen again, or on an empty screen.");
+        ui.new_line();
+        
+        header("Partition List");
+        ui.bullet_text("Double click on a partition to center it.");
+        ui.bullet_text("Click on a column header to sort by that column.");
+        ui.bullet_text("To invert the sort order, click on the column header again.");
+        ui.new_line();
+        
+        header("Preview");
+        ui.bullet_text("Scroll wheel to zoom in and out.");
+        ui.bullet_text("If the preview is too large, simply move the mouse over the preview to pan.");
+        ui.new_line();
+        
+        let button_width = ui.calc_text_width("OK") * 4.0;
+        if ui.button_with_size("OK", [button_width, 0.0]) {
+            ui.close_current_popup();
+        }
     }
     
     ui.window("Export").build(|| {
@@ -239,7 +284,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         build_window_partitions(ui, ex, partition_state, &mut render_state)
     });
     
-    let go_to_partition_index = ui.window("Partitions").build(|| {
+    let go_to_partition_index = ui.window("Partition List").build(|| {
         build_partition_table(ui, ex.fonts, partition_state, &mut render_state.partitions)
     }).unwrap_or_default();
     
@@ -339,7 +384,7 @@ fn create_dockspace_layout(ui: &Ui) -> DockLayout {
     let key_partition_opts = WindowKey::new("Partition Options", "Partition Options").unwrap();
     let key_drawing_opts = WindowKey::new("Drawing Options", "Drawing Options").unwrap();
     let key_preview = WindowKey::new("Preview", "Preview").unwrap();
-    let key_partitions = WindowKey::new("Partitions", "Partitions").unwrap();
+    let key_partitions = WindowKey::new("Partition List", "Partition List").unwrap();
     
     DockLayout::split(
         DockSplit::Right,
@@ -450,9 +495,9 @@ fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut Part
         _ => PartitionAlgorithm::Islands
     };
     tooltip(ui, "\
-        Islands: Divide the map into clusters of screens that are near one another.\n\
-        \n\
-        Grid: Divide the map according to a grid.");
+        How to split up the map when it's too large to fit into a single image.\n\
+        - Islands: Divide the map into clusters of screens that are near one another.\n\
+        - Grid: Divide the map according to a grid.");
     
     let max_width_px = partition_state.max_width * 600;
     ui.widget_group_label("Max width");
@@ -1115,7 +1160,7 @@ fn build_window_export(
     
     ui.widget_group_label("Subdirectory name");
     ui.input_text("##SubdirectoryName", &mut export_state.subdir_spec).build();
-    tooltip(ui, "The name of the subdirectory to save the images to relative to the output directory.\n\
+    tooltip(ui, "The name of the subdirectory to save the images to, relative to the output directory.\n\
         \n\
         The following expressions will be substituted:\n\
         - $dirname: The name of the level directory.\n\
