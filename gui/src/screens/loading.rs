@@ -15,12 +15,12 @@ use libks::{map_bin, world_ini};
 use ksmap::{definitions, screen_map::ScreenMap};
 use anyhow::anyhow;
 
-use crate::screens::level_map::RenderState;
+use crate::screens::level_map::{PartitionState, RenderState};
 
 pub struct State {
     level_dir: PathBuf,
     status: &'static str,
-    thread: Option<JoinHandle<anyhow::Result<RenderState>>>,
+    thread: Option<JoinHandle<anyhow::Result<(RenderState, PartitionState)>>>,
     rx: mpsc::Receiver<LoadMessage>,
     error: Option<anyhow::Error>,
 }
@@ -30,6 +30,7 @@ pub enum Task {
     ShowLevelMap {
         level_dir: PathBuf,
         render_state: RenderState,
+        partition_state: PartitionState,
     }
 }
 
@@ -81,10 +82,11 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     {
         let thread = state.thread.take().unwrap();
         match thread.join() {
-            Ok(Ok(render_state)) => {
+            Ok(Ok((render_state, partition_state))) => {
                 task = Some(Task::ShowLevelMap {
                     level_dir: state.level_dir.clone(),
                     render_state,
+                    partition_state,
                 });
             }
             Ok(Err(err)) => {
@@ -126,7 +128,7 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
     task
 }
 
-fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyhow::Result<RenderState> {
+fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyhow::Result<(RenderState, PartitionState)> {
     let _ = tx.send(LoadMessage::LoadingMap);
     let screens = map_bin::parse_map_file(level_dir.join("Map.bin"))?;
     let screen_map = ScreenMap::new(screens);
@@ -164,25 +166,28 @@ fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyho
     gfx.load_objects(&assets.objects, &mut warnings)?;
 
     let _ = tx.send(LoadMessage::Partitioning);
-    let partitions =
-        if screen_map.len() < 25000 {
-            let partitioner = IslandsPartitioner {
-                max_size: (120, 300),
-                gap: 1..=10,
-                force: false,
-                fallback_to_grid: true,
-            };
-            partitioner.partitions(&screen_map)
-        }
-        else {
-            let partitioner = GridPartitioner {
-                max_size: (120, 300),
-                rows: None,
-                cols: None,
-                force: false,
-            };
-            partitioner.partitions(&screen_map)
+    let partitions;
+    let partition_state;
+    if screen_map.len() < 25000 {
+        let partitioner = IslandsPartitioner {
+            max_size: (120, 300),
+            gap: 1..=10,
+            force: false,
+            fallback_to_grid: true,
         };
+        partitions = partitioner.partitions(&screen_map);
+        partition_state = PartitionState::from_islands(partitioner, &partitions);
+    }
+    else {
+        let partitioner = GridPartitioner {
+            max_size: (120, 300),
+            rows: None,
+            cols: None,
+            force: false,
+        };
+        partitions = partitioner.partitions(&screen_map);
+        partition_state = PartitionState::from_grid(partitioner, &partitions);
+    }
 
     let _ = tx.send(LoadMessage::Syncing);
     let seed = MapSeed::random();
@@ -207,7 +212,7 @@ fn init_render_state(tx: mpsc::Sender<LoadMessage>, level_dir: PathBuf) -> anyho
     };
     
     let _ = tx.send(LoadMessage::Done);
-    Ok(render_state)
+    Ok((render_state, partition_state))
 }
 
 fn error_display(ui: &Ui, err: &anyhow::Error) {

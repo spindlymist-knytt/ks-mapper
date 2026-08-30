@@ -40,14 +40,7 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(level_dir: PathBuf, render_state: RenderState) -> Self {    
-        let mut partition_members = FxHashMap::default();
-        for (i, positions) in render_state.partitions.iter().enumerate() {
-            for pos in positions {
-                partition_members.insert(*pos, i);
-            }
-        }
-        
+    pub fn new(level_dir: PathBuf, render_state: RenderState, partition_state: PartitionState) -> Self {    
         State {
             layout: None,
             reset_layout: false,
@@ -57,7 +50,7 @@ impl State {
             render_cancel: Arc::new(AtomicBool::new(false)),
             render_error: None,
             map_state: MapState::default(),
-            partition_state: PartitionState::new(partition_members),
+            partition_state,
             drawing_state: DrawingState::default(),
             preview_state: PreviewState::default(),
             export_state: ExportState::new(level_dir),
@@ -460,7 +453,7 @@ fn create_dockspace_layout(ui: &Ui) -> DockLayout {
     )
 }
 
-struct PartitionState {
+pub struct PartitionState {
     partition_members: FxHashMap<ScreenCoord, usize>,
     selected: usize,
     algorithm: PartitionAlgorithm,
@@ -479,11 +472,48 @@ struct PartitionState {
 }
 
 impl PartitionState {
-    fn new(partition_members: FxHashMap<ScreenCoord, usize>) -> Self {
+    pub fn from_islands(partitioner: IslandsPartitioner, partitions: &[Partition]) -> Self {
+        let mut partition_members = FxHashMap::default();
+        update_partition_members(&mut partition_members, partitions);
         Self {
             partition_members,
             selected: 0,
-            algorithm: PartitionAlgorithm::default(),
+            algorithm: PartitionAlgorithm::Islands,
+            max_width: partitioner.max_size.0 as i32,
+            max_height: partitioner.max_size.1 as i32,
+            min_gap: *partitioner.gap.start() as i32,
+            max_gap: *partitioner.gap.end() as i32,
+            force: partitioner.force,
+            grid_fallback: partitioner.fallback_to_grid,
+            ..Default::default()
+        }
+    }
+    
+    pub fn from_grid(partitioner: GridPartitioner, partitions: &[Partition]) -> Self {
+        let mut partition_members = FxHashMap::default();
+        update_partition_members(&mut partition_members, partitions);
+        Self {
+            partition_members,
+            selected: 0,
+            algorithm: PartitionAlgorithm::Grid,
+            max_width: partitioner.max_size.0 as i32,
+            max_height: partitioner.max_size.1 as i32,
+            auto_rows: partitioner.rows.is_none(),
+            auto_cols: partitioner.cols.is_none(),
+            rows: partitioner.rows.unwrap_or(10) as i32,
+            cols: partitioner.cols.unwrap_or(10) as i32,
+            force: partitioner.force,
+            ..Default::default()
+        }
+    }
+}
+
+impl Default for PartitionState {
+    fn default() -> Self {
+        Self {
+            partition_members: FxHashMap::default(),
+            selected: 0,
+            algorithm: PartitionAlgorithm::Islands,
             max_width: 120,
             max_height: 300,
             min_gap: 1,
@@ -504,6 +534,15 @@ enum PartitionAlgorithm {
     #[default]
     Islands,
     Grid,
+}
+
+fn update_partition_members(members: &mut FxHashMap<ScreenCoord, usize>, partitions: &[Partition]) {
+    members.clear();
+    for (i, positions) in partitions.iter().enumerate() {
+        for pos in positions {
+            members.insert(*pos, i);
+        }
+    }
 }
 
 fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut PartitionState, render_state: &mut RenderState) {
@@ -532,14 +571,8 @@ fn build_window_partitions(ui: &Ui, _ex: &mut Extras, partition_state: &mut Part
                 };
                 partitioner.partitions(&render_state.screen_map)
             }
-        };
-        
-        partition_state.partition_members.clear();
-        for (i, positions) in render_state.partitions.iter().enumerate() {
-            for pos in positions {
-                partition_state.partition_members.insert(*pos, i);
-            }
-        }
+        };        
+        update_partition_members(&mut partition_state.partition_members, &render_state.partitions);
     }
     
     let mut algo_index = partition_state.algorithm as usize;

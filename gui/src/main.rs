@@ -75,10 +75,11 @@ fn main() -> Result<()> {
             Screen::Loading(state) => match loading::build_ui(ui, &mut ex, state) {
                 Some(loading::Task::ShowLevelMap {
                     level_dir,
-                    render_state
+                    render_state,
+                    partition_state,
                 }) => {
                     app.new_title = Some(get_window_title_for_level(&level_dir, &render_state.ini));
-                    let state = level_map::State::new(level_dir, render_state);
+                    let state = level_map::State::new(level_dir, render_state, partition_state);
                     app.screen = Screen::LevelMap(state);
                 }
                 Some(loading::Task::ShowLevelList) => {
