@@ -1,4 +1,4 @@
-use imgui_app::dear_imgui_rs::{MouseButton, Ui};
+use imgui_app::dear_imgui_rs::{MouseButton, TextureId, Ui};
 use ksmap::{screen_map::ScreenMap, partition::Partition};
 use libks::ScreenCoord;
 use rustc_hash::FxHashMap;
@@ -11,6 +11,7 @@ pub struct MapState {
     pub aspect_ratio: f32,
     pub prev_geom: Option<MapGeometry>,
     pub selected_screen: Option<ScreenCoord>,
+    pub screen_textures: FxHashMap<ScreenCoord, TextureId>,
 }
 
 impl Default for MapState {
@@ -23,6 +24,7 @@ impl Default for MapState {
             aspect_ratio: 1.0,
             prev_geom: None,
             selected_screen: None,
+            screen_textures: FxHashMap::default()
         }
     }
 }
@@ -130,25 +132,37 @@ pub fn build_map(
             top_left[1] + cell_height
         ];
         
-        let partition_index = partition_members.get(&(x, y)).unwrap();
-        let color_index = *partition_index % MAP_COLORS.len();
-        let color = MAP_COLORS[color_index];
-        
-        draw_rect_relative(top_left, bottom_right, color, true);
-        
-        if cell_height >= 5.0 {
-            let highlight_color = HIGHLIGHT_COLORS[color_index];
-            let mut top_left_screen = relative_to_screen_coords(top_left);
-            top_left_screen[0] += line_correction;
-            top_left_screen[1] += line_correction;
-            let mut bottom_right_screen = relative_to_screen_coords(bottom_right);
-            bottom_right_screen[0] -= line_correction;
-            bottom_right_screen[1] -= line_correction;
-            draw_list.add_rect(top_left_screen, bottom_right_screen, highlight_color)
-                .filled(false)
-                .thickness(line_thickness)
-                .build();
+        match map_state.screen_textures.get(&(x, y)) {
+            Some(texture) => {
+                let top_left_abs = relative_to_screen_coords(top_left);
+                let bottom_right_abs = relative_to_screen_coords(bottom_right);
+                draw_list.add_image(*texture, top_left_abs, bottom_right_abs, [0.0, 0.0], [1.0, 1.0], [1.0, 1.0, 1.0]);
+            }
+            None => {
+                draw_rect_relative(top_left, bottom_right, MAP_COLORS[0], true);
+            }
         }
+        
+        // let partition_index = partition_members.get(&(x, y)).unwrap();
+        // let color_index = *partition_index % MAP_COLORS.len();
+        // let color = MAP_COLORS[color_index];
+        
+        // draw_rect_relative(top_left, bottom_right, color, true);
+        
+        // if cell_height >= 5.0 {
+        //     let highlight_color = HIGHLIGHT_COLORS[color_index];
+        //     let mut top_left_screen = relative_to_screen_coords(top_left);
+        //     top_left_screen[0] += line_correction;
+        //     top_left_screen[1] += line_correction;
+        //     let mut bottom_right_screen = relative_to_screen_coords(bottom_right);
+        //     bottom_right_screen[0] -= line_correction;
+        //     bottom_right_screen[1] -= line_correction;
+        //     draw_list.add_rect(top_left_screen, bottom_right_screen, highlight_color)
+        //         .filled(false)
+        //         .thickness(line_thickness)
+        //         .build();
+        // }
+        
     };
     let draw_indicator = |(x, y), color| {
         let cell_pos = calc_cell_pos((x, y), &geom);
@@ -169,6 +183,10 @@ pub fn build_map(
         ui.set_cursor_pos([5.0, window_height - 5.0 - text_height]);
         ui.text(text);
     };
+    
+    if map_state.zoom_level >= 4 {
+        draw_list.set_sampler_nearest();
+    }
     
     // Now, we either iterate over screens (and check if they're on the map), or iterate over map cells
     // (and check if they contain a screen), whichever takes fewer iterations.
@@ -197,6 +215,8 @@ pub fn build_map(
             }
         }
     }
+    
+    draw_list.set_sampler_linear();
     
     // Draw partition outline
     if let Some(bounds) = selected_partition.map(|partition| partition.bounds())
@@ -378,18 +398,21 @@ fn get_hovered_screen_pos(hover_pos: [f32; 2], geom: &MapGeometry) -> (i64, i64)
 }
 
 fn get_cell_size_for_zoom_level(zoom: i32, aspect_ratio: f32) -> (f32, f32) {
-    let height = 1.6f32.powi(zoom).round();
-    let width = (height * aspect_ratio).round().max(1.0);
-    (width, height)
+    // let height = 1.6f32.powi(zoom).round();
+    // let width = (height * aspect_ratio).round().max(1.0);
+    // (width, height)
+    let factor = 2.0f32.powi(zoom - 4);
+    (600.0 * factor, 240.0 * factor)
 }
 
 fn get_line_thickness_for_zoom_level(zoom: i32, cell_size: (f32, f32)) -> f32 {
-    if zoom < 4 {
-        0.0
-    }
-    else {
-        (f32::min(cell_size.0, cell_size.1) * 0.04).round().max(1.0)
-    }
+    1.0
+    // if zoom < 4 {
+    //     0.0
+    // }
+    // else {
+    //     (f32::min(cell_size.0, cell_size.1) * 0.04).round().max(1.0)
+    // }
 }
 
 pub fn map_get_center_screen(geom: &MapGeometry) -> (i64, i64) {

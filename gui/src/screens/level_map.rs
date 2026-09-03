@@ -125,6 +125,15 @@ pub fn build_ui(ui: &Ui, ex: &mut Extras, state: &mut State) -> Option<Task> {
         return Some(Task::ShowLevelList);
     };
     
+    if map_state.screen_textures.is_empty() {
+        let positions: Vec<_> = render_state.screen_map.iter().map(|screen| screen.position).collect();
+        for pos in positions {
+            let Some(image) = draw_single_screen(&mut render_state, pos) else { continue };
+            let texture_id = ex.textures.create_texture(600, 240, &image.into_vec());
+            map_state.screen_textures.insert(pos, texture_id);
+        }
+    }
+    
     let mut requested_center: Option<(i64, i64)> = None;
     let mut show_level_directory = false;
     let mut show_output_directory = false;
